@@ -4,7 +4,7 @@ import WhatClipCore
 /// The full history window: sidebar (filters, boards, snippets), the list, a preview and actions on the selected item.
 @MainActor
 final class HistoryWindowController: NSObject, NSTableViewDataSource, NSTableViewDelegate, NSSearchFieldDelegate, NSMenuDelegate {
-    enum Section: Equatable { case header, all, library, pinned, text, links, images, files, textInImages, board(Int64), snippets, settings, about }
+    enum Section: Equatable { case header, all, library, pinned, text, links, images, files, textInImages, board(Int64), snippets, settings, about, tools }
 
     private let window: NSWindow
     private let store: ClipStore
@@ -195,6 +195,7 @@ final class HistoryWindowController: NSObject, NSTableViewDataSource, NSTableVie
         for b in boards { s.append((b.name, .board(b.id))) }
         if boards.isEmpty { s.append((Lang.t("ui.noBoards"), .header)) }
         s.append((Lang.t("ui.tools"), .header))
+        s.append((Lang.t("ui.tools.page"), .tools))
         s.append((Lang.t("ui.snippets"), .snippets))
         s.append((Lang.t("ui.app"), .header))
         s.append((Lang.t("ui.settings"), .settings))
@@ -210,10 +211,10 @@ final class HistoryWindowController: NSObject, NSTableViewDataSource, NSTableVie
     /// Shows the settings or About pane for their sections, and the list and preview for every other section.
     private func updateChrome() {
         // While locked, Settings and About are hidden too: the lock covers the whole app, not only the list.
-        let isSettings = section == .settings && !locked, isAbout = section == .about && !locked
-        listPaneRef?.isHidden = isSettings || isAbout || locked
+        let isSettings = section == .settings && !locked, isAbout = section == .about && !locked, isTools = section == .tools && !locked
+        listPaneRef?.isHidden = isSettings || isAbout || isTools || locked
         settingsHost.isHidden = !isSettings
-        aboutScroll.isHidden = !isAbout
+        aboutScroll.isHidden = !(isAbout || isTools)
         if isSettings, let root = settingsRoot, root.superview !== settingsHost {
             settingsHost.subviews.forEach { $0.removeFromSuperview() }
             root.translatesAutoresizingMaskIntoConstraints = false
@@ -221,13 +222,13 @@ final class HistoryWindowController: NSObject, NSTableViewDataSource, NSTableVie
             NSLayoutConstraint.activate([root.topAnchor.constraint(equalTo: settingsHost.topAnchor), root.bottomAnchor.constraint(equalTo: settingsHost.bottomAnchor),
                                          root.leadingAnchor.constraint(equalTo: settingsHost.leadingAnchor), root.trailingAnchor.constraint(equalTo: settingsHost.trailingAnchor)])
         }
-        if isAbout {
-            let page = aboutPage()
+        if isAbout || isTools {
+            let page = isTools ? toolsPage() : aboutPage()
             aboutScroll.documentView = page
             page.widthAnchor.constraint(equalTo: aboutScroll.contentView.widthAnchor).isActive = true
             page.heightAnchor.constraint(greaterThanOrEqualTo: aboutScroll.contentView.heightAnchor).isActive = true
         }
-        let plain = !isSettings && !isAbout
+        let plain = !isSettings && !isAbout && !isTools
         previewScroll.isHidden = !plain
         previewImage.isHidden = true
         snippetBox.isHidden = true
@@ -289,7 +290,7 @@ final class HistoryWindowController: NSObject, NSTableViewDataSource, NSTableVie
     func reloadList() {
         updateChrome()
         // Settings and About own the whole detail pane: nothing else to load.
-        if !locked && (section == .settings || section == .about) { return }
+        if !locked && (section == .settings || section == .about || section == .tools) { return }
         if locked { items = []; list.reloadData(); showDetail(nil); preview.string = Lang.t("ui.lockedMain"); return }
         if section == .snippets {
             snippets = (try? store.snippets(query: search.stringValue)) ?? []
@@ -308,7 +309,7 @@ final class HistoryWindowController: NSObject, NSTableViewDataSource, NSTableVie
         case .board(let id): items = ((try? store.items(onBoard: id)) ?? []).filter { search.stringValue.isEmpty || $0.text.localizedCaseInsensitiveContains(search.stringValue) }
         case .library: items = (try? store.list(query: search.stringValue, limit: 1000, filter: .init(favoritesOnly: true))) ?? []
         case .textInImages: items = (try? store.list(query: search.stringValue, limit: 1000, filter: .init(hasText: true))) ?? []
-        case .snippets, .header, .settings, .about: break
+        case .snippets, .header, .settings, .about, .tools: break
         }
         list.reloadData()
         if viewMode.selectedSegment == 1 { shelf.reload(items, store: store) }
@@ -355,7 +356,7 @@ final class HistoryWindowController: NSObject, NSTableViewDataSource, NSTableVie
 
     /// The right-click menu for a card or row at an index in the current list.
     func contextMenu(forItem index: Int) -> NSMenu? {
-        guard section != .settings, section != .about, section != .snippets, items.indices.contains(index) else { return nil }
+        guard section != .settings, section != .about, section != .tools, section != .snippets, items.indices.contains(index) else { return nil }
         let menu = NSMenu()
         for m in ItemActions.menuItems(for: items[index], store: store, changed: { [weak self] in self?.reloadList() }) { menu.addItem(m) }
         for m in ItemActions.actionItems(for: items[index], actions: UserAction.parse(monitor.settings.actionsText), store: store, changed: { [weak self] in self?.reloadList() }) { menu.addItem(m) }
@@ -365,7 +366,7 @@ final class HistoryWindowController: NSObject, NSTableViewDataSource, NSTableVie
     /// Right-click on a list row: edit, pin, favourite or delete that item.
     func menuNeedsUpdate(_ menu: NSMenu) {
         menu.removeAllItems()
-        guard section != .settings, section != .about, section != .snippets, items.indices.contains(list.clickedRow) else { return }
+        guard section != .settings, section != .about, section != .tools, section != .snippets, items.indices.contains(list.clickedRow) else { return }
         let item = items[list.clickedRow]
         for m in ItemActions.menuItems(for: item, store: store, changed: { [weak self] in self?.reloadList() }) { menu.addItem(m) }
     }
@@ -722,4 +723,56 @@ func mirrorForRTL(_ view: NSView) {
     view.userInterfaceLayoutDirection = .rightToLeft
     if let field = view as? NSTextField { field.alignment = .right }
     for sub in view.subviews { mirrorForRTL(sub) }
+}
+
+extension HistoryWindowController {
+    /// Capture and tools: every feature that otherwise lives only in the menu bar, as buttons in the window.
+    /// Each button sends its action down the responder chain to the app, the same action the menu uses.
+    func toolsPage() -> NSView {
+        let app = NSApp.delegate as? AppDelegate
+        let paused = app?.monitor.isPaused ?? false
+        let stacking = app?.stackOn ?? false
+        let needsLock = app?.monitor.settings.requireTouchID ?? false
+        func heading(_ s: String) -> NSTextField {
+            let f = NSTextField(labelWithString: s); f.font = .systemFont(ofSize: 13, weight: .semibold); f.textColor = .secondaryLabelColor; return f
+        }
+        func button(_ title: String, _ action: Selector) -> NSButton {
+            let b = NSButton(title: title, target: nil, action: action); b.bezelStyle = .rounded; return b
+        }
+        func group(_ title: String, _ buttons: [NSView]) -> NSStackView {
+            let column = NSStackView(views: buttons); column.orientation = .vertical; column.alignment = .leading; column.spacing = 8
+            let section = NSStackView(views: [heading(title), column]); section.orientation = .vertical; section.alignment = .leading; section.spacing = 10
+            return section
+        }
+        let capture = group(Lang.t("ui.tools.sec.capture"), [
+            button(Lang.t("ui.m.screenshot"), #selector(AppDelegate.screenshot)),
+            button(Lang.t("ui.m.gif"), #selector(AppDelegate.recordGIF)),
+            button(Lang.t("ui.m.annotate"), #selector(AppDelegate.annotateLatest)),
+            button(Lang.t("ui.m.emoji"), #selector(AppDelegate.openEmoji)),
+        ])
+        let clipboard = group(Lang.t("ui.tools.sec.clipboard"), [
+            paused ? button(Lang.t("ui.m.resume"), #selector(AppDelegate.resumeCapture))
+                   : button(Lang.t("ui.m.pauseCapturing"), #selector(AppDelegate.pauseForever)),
+            button(Lang.t("ui.m.ignoreNext"), #selector(AppDelegate.ignoreNext)),
+            button(stacking ? Lang.t("ui.m.stopStack") : Lang.t("ui.m.startStack"), #selector(AppDelegate.toggleStack)),
+            button(Lang.t("ui.m.clearStack"), #selector(AppDelegate.clearStack)),
+            button(Lang.t("ui.m.clearHistory"), #selector(AppDelegate.clearHistory)),
+        ])
+        var dataButtons = [button(Lang.t("ui.tools.export"), #selector(AppDelegate.exportHistory)),
+                           button(Lang.t("ui.tools.import"), #selector(AppDelegate.importHistory))]
+        let data = group(Lang.t("ui.tools.sec.data"), dataButtons)
+        var setupButtons = [button(Lang.t("ui.m.setup"), #selector(AppDelegate.openOnboarding)),
+                            button(Lang.t("ui.m.help"), #selector(AppDelegate.openHelp))]
+        if needsLock { setupButtons.append(button(Lang.t("ui.lockNow"), #selector(AppDelegate.lockHistory))) }
+        let setup = group(Lang.t("ui.tools.sec.setup"), setupButtons)
+        let title = NSTextField(labelWithString: Lang.t("ui.tools.page")); title.font = .systemFont(ofSize: 22, weight: .bold)
+        let hint = NSTextField(wrappingLabelWithString: Lang.t("ui.tools.hint")); hint.textColor = .secondaryLabelColor; hint.preferredMaxLayoutWidth = 520
+        let page = NSStackView(views: [title, hint, capture, clipboard, data, setup])
+        page.orientation = .vertical; page.alignment = .leading; page.spacing = 22
+        page.edgeInsets = NSEdgeInsets(top: 28, left: 28, bottom: 28, right: 28)
+        page.userInterfaceLayoutDirection = Lang.isRightToLeft ? .rightToLeft : .leftToRight
+        page.translatesAutoresizingMaskIntoConstraints = false
+        if Lang.isRightToLeft { mirrorForRTL(page) }
+        return page
+    }
 }

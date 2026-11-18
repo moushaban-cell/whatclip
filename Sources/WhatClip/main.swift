@@ -88,6 +88,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
         case "onboarding": onboarding.show()
         case "settings": history.show(section: .settings)
         case "about": history.show(section: .about)
+        case "tools": history.show(section: .tools)
         case "emoji": emoji.show()
         default: break
         }

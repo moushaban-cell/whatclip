@@ -86,8 +86,9 @@ enum AutoPaste {
 
     /// Brings the previous app forward, then sends ⌘V to it.
     static func paste(into app: NSRunningApplication?) {
-        app?.activate()
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.15) {
+        // Forces the app the person was using to the front, then waits until it has focus before sending ⌘V.
+        app?.activate(options: [.activateIgnoringOtherApps])
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.35) {
             let src = CGEventSource(stateID: .combinedSessionState)
             for down in [true, false] {
                 let e = CGEvent(keyboardEventSource: src, virtualKey: 9, keyDown: down)
