@@ -290,6 +290,7 @@ extension Lang {
         "ui.unfavourite": "Unfavourite",
         "ui.favourite": "Favourite",
         "ui.deleteNItems": "Delete {n} items",
+        "ui.set.watchShots": "Add screenshots I take with the Mac's tool to my history",
     ]
     private static let uiL1: [String: String] = [
         "ui.editTextMore": "编辑文本…",
@@ -566,6 +567,7 @@ extension Lang {
         "ui.unfavourite": "取消收藏",
         "ui.favourite": "收藏",
         "ui.deleteNItems": "删除 {n} 个项目",
+        "ui.set.watchShots": "把我用 Mac 截图工具拍的截图加入历史记录",
     ]
     private static let uiL2: [String: String] = [
         "ui.editTextMore": "टेक्स्ट संपादित करें…",
@@ -842,6 +844,7 @@ extension Lang {
         "ui.unfavourite": "पसंदीदा से हटाएँ",
         "ui.favourite": "पसंदीदा",
         "ui.deleteNItems": "{n} आइटम हटाएँ",
+        "ui.set.watchShots": "मैं Mac के टूल से जो स्क्रीनशॉट लेता हूँ, उन्हें इतिहास में जोड़ें",
     ]
     private static let uiL3: [String: String] = [
         "ui.editTextMore": "Editar texto…",
@@ -1118,6 +1121,7 @@ extension Lang {
         "ui.unfavourite": "Quitar de favoritos",
         "ui.favourite": "Favorito",
         "ui.deleteNItems": "Eliminar {n} elementos",
+        "ui.set.watchShots": "Añadir al historial las capturas que hago con la herramienta del Mac",
     ]
     private static let uiL4: [String: String] = [
         "ui.editTextMore": "Modifier le texte…",
@@ -1394,6 +1398,7 @@ extension Lang {
         "ui.unfavourite": "Retirer des favoris",
         "ui.favourite": "Favori",
         "ui.deleteNItems": "Supprimer {n} éléments",
+        "ui.set.watchShots": "Ajouter à l’historique les captures faites avec l’outil du Mac",
     ]
     private static let uiL5: [String: String] = [
         "ui.editTextMore": "تعديل النص…",
@@ -1670,6 +1675,7 @@ extension Lang {
         "ui.unfavourite": "إلغاء المفضلة",
         "ui.favourite": "مفضلة",
         "ui.deleteNItems": "حذف {n} عنصرًا",
+        "ui.set.watchShots": "إضافة لقطات الشاشة التي ألتقطها بأداة Mac إلى السجل",
     ]
     private static let uiL6: [String: String] = [
         "ui.editTextMore": "টেক্সট সম্পাদনা করুন…",
@@ -1946,6 +1952,7 @@ extension Lang {
         "ui.unfavourite": "পছন্দ সরান",
         "ui.favourite": "পছন্দ",
         "ui.deleteNItems": "{n}টি আইটেম মুছুন",
+        "ui.set.watchShots": "Mac-এর টুল দিয়ে নেওয়া স্ক্রিনশট আমার ইতিহাসে যোগ করুন",
     ]
     private static let uiL7: [String: String] = [
         "ui.editTextMore": "Editar texto…",
@@ -2222,6 +2229,7 @@ extension Lang {
         "ui.unfavourite": "Desfavoritar",
         "ui.favourite": "Favoritar",
         "ui.deleteNItems": "Excluir {n} itens",
+        "ui.set.watchShots": "Adicionar ao histórico as capturas feitas com a ferramenta do Mac",
     ]
     private static let uiL8: [String: String] = [
         "ui.editTextMore": "Изменить текст…",
@@ -2498,6 +2506,7 @@ extension Lang {
         "ui.unfavourite": "Убрать из избранного",
         "ui.favourite": "В избранное",
         "ui.deleteNItems": "Удалить элементов: {n}",
+        "ui.set.watchShots": "Добавлять в историю снимки, сделанные инструментом Mac",
     ]
     private static let uiL9: [String: String] = [
         "ui.editTextMore": "テキストを編集…",
@@ -2774,6 +2783,7 @@ extension Lang {
         "ui.unfavourite": "お気に入りを解除",
         "ui.favourite": "お気に入り",
         "ui.deleteNItems": "{n} 件の項目を削除",
+        "ui.set.watchShots": "Mac の標準ツールで撮ったスクリーンショットを履歴に追加",
     ]
     private static let uiL10: [String: String] = [
         "ui.editTextMore": "Text bearbeiten…",
@@ -3050,5 +3060,6 @@ extension Lang {
         "ui.unfavourite": "Favorit entfernen",
         "ui.favourite": "Favorit",
         "ui.deleteNItems": "{n} Einträge löschen",
+        "ui.set.watchShots": "Mit dem Mac-Werkzeug aufgenommene Screenshots in den Verlauf aufnehmen",
     ]
 }

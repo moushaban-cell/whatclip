@@ -56,6 +56,8 @@ public struct WhatClipSettings: Sendable, Codable, Equatable {
     public var syncFolder: String
     /// Check GitHub once a day for a newer version. Sends no personal data.
     public var checkForUpdates: Bool
+    /// Add screenshots taken with the Mac's own screenshot tool (saved as files) to the history.
+    public var watchScreenshots: Bool
 
     public static let supportedLanguages = ["en", "zh-Hans", "hi", "es", "fr", "ar", "bn", "pt", "ru", "ja", "de"]
 
@@ -70,8 +72,8 @@ public struct WhatClipSettings: Sendable, Codable, Equatable {
                 appearance: AppearanceChoice = .system, popupPlacement: PopupPlacement = .menuIcon, clearOnQuit: Bool = false,
                 fuzzySearch: Bool = true, ignoredPatterns: [String] = [], onboardingDone: Bool = false, showInDock: Bool = true,
                 gifSeconds: Int = 5, gifFramesPerSecond: Int = 8, hotKeyCode: Int = 7, hotKeyModifiers: Int = 768, autoPaste: Bool = true, language: String = "en",
-                actionsText: String = "", syncFolder: String = "", checkForUpdates: Bool = true) {
-        self.actionsText = actionsText; self.syncFolder = syncFolder; self.checkForUpdates = checkForUpdates
+                actionsText: String = "", syncFolder: String = "", checkForUpdates: Bool = true, watchScreenshots: Bool = true) {
+        self.actionsText = actionsText; self.syncFolder = syncFolder; self.checkForUpdates = checkForUpdates; self.watchScreenshots = watchScreenshots
         self.language = language; self.autoPaste = autoPaste; self.gifSeconds = gifSeconds; self.gifFramesPerSecond = gifFramesPerSecond; self.hotKeyCode = hotKeyCode; self.hotKeyModifiers = hotKeyModifiers
         self.showInDock = showInDock
         self.appearance = appearance; self.popupPlacement = popupPlacement; self.clearOnQuit = clearOnQuit
@@ -90,7 +92,7 @@ public struct WhatClipSettings: Sendable, Codable, Equatable {
 
     enum CodingKeys: String, CodingKey {
         case excludedBundleIDs, secretAction, secretLifetimeSeconds, retention, maxItems, encryptPayloads, requireTouchID, launchAtLogin, recognizeText
-        case appearance, popupPlacement, clearOnQuit, fuzzySearch, ignoredPatterns, onboardingDone, showInDock, gifSeconds, gifFramesPerSecond, hotKeyCode, hotKeyModifiers, autoPaste, language, actionsText, syncFolder, checkForUpdates
+        case appearance, popupPlacement, clearOnQuit, fuzzySearch, ignoredPatterns, onboardingDone, showInDock, gifSeconds, gifFramesPerSecond, hotKeyCode, hotKeyModifiers, autoPaste, language, actionsText, syncFolder, checkForUpdates, watchScreenshots
     }
 
     /// Tolerant: a missing or wrong field takes its default instead of failing the whole file.
@@ -122,7 +124,8 @@ public struct WhatClipSettings: Sendable, Codable, Equatable {
             language: (try? c?.decode(String.self, forKey: .language)) ?? d.language,
             actionsText: (try? c?.decode(String.self, forKey: .actionsText)) ?? d.actionsText,
             syncFolder: (try? c?.decode(String.self, forKey: .syncFolder)) ?? d.syncFolder,
-            checkForUpdates: (try? c?.decode(Bool.self, forKey: .checkForUpdates)) ?? d.checkForUpdates)
+            checkForUpdates: (try? c?.decode(Bool.self, forKey: .checkForUpdates)) ?? d.checkForUpdates,
+            watchScreenshots: (try? c?.decode(Bool.self, forKey: .watchScreenshots)) ?? d.watchScreenshots)
     }
 
     /// Keeps numbers in sensible ranges and drops invalid bundle identifiers.

@@ -6,6 +6,7 @@ import WhatClipCore
 final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
     var status: NSStatusItem!
     var monitor: PasteboardMonitor!
+    var screenshots: ScreenshotWatcher?
     var store: ClipStore!
     var picker: PickerController!
     var settings: SettingsWindowController!
@@ -39,6 +40,9 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
         monitor = PasteboardMonitor(store: store, settingsStore: SettingsStore(url: dir.appendingPathComponent("settings.json")))
         monitor.applyPrivacyAndSystem(monitor.settings)
         monitor.start()
+        screenshots = ScreenshotWatcher(isEnabled: { [weak self] in self?.monitor.settings.watchScreenshots ?? false },
+                                        onNew: { [weak self] url in self?.monitor.importScreenshot(url) })
+        screenshots?.start()
         picker = PickerController(store: store, monitor: monitor)
         settings = SettingsWindowController(monitor: monitor)
         history = HistoryWindowController(store: store, monitor: monitor)

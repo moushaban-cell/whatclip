@@ -135,6 +135,16 @@ final class PasteboardMonitor {
 
     private func classifyKind(_ text: String) -> ClipKind { WhatClipCore.classify(text) }
 
+    /// A screenshot the person took with the Mac's own tool. Recorded like a copy, unless paused or turned off in Settings.
+    func importScreenshot(_ url: URL) {
+        guard settings.watchScreenshots, !isPaused, let data = try? Data(contentsOf: url), !data.isEmpty else { return }
+        let ext = url.pathExtension.lowercased()
+        let type = (ext == "jpg" || ext == "jpeg") ? "public.jpeg" : ((ext == "tif" || ext == "tiff") ? "public.tiff" : "public.png")
+        let captured = Captured(kind: .image, text: "Image \(Self.size(data))", policyText: "image", payload: data, payloadType: type)
+        store(captured, app: "com.apple.screencapture", expiresIn: nil, secrets: [])
+        onChange?()
+    }
+
     private func store(_ c: Captured, app: String?, expiresIn: TimeInterval?, secrets: [SecretKind]) {
         if let payload = c.payload, let type = c.payloadType {
             // Save first; read the text of an image in the background. Recognition can take seconds the first time.

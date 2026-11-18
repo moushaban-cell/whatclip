@@ -32,6 +32,7 @@ final class SettingsWindowController: NSObject, NSWindowDelegate {
     private let syncField = NSTextField()
     private let chooseSync = NSButton(title: Lang.t("ui.chooseFolder"), target: nil, action: nil)
     private let updates = NSButton(checkboxWithTitle: Lang.t("ui.set.updates"), target: nil, action: nil)
+    private let watchShots = NSButton(checkboxWithTitle: Lang.t("ui.set.watchShots"), target: nil, action: nil)
     private let loginItem = NSButton(checkboxWithTitle: Lang.t("ui.set.login"), target: nil, action: nil)
     private let ocr = NSButton(checkboxWithTitle: Lang.t("ui.set.ocr"), target: nil, action: nil)
     private let status = NSTextField(labelWithString: "")
@@ -111,7 +112,7 @@ final class SettingsWindowController: NSObject, NSWindowDelegate {
             label(Lang.t("ui.set.lookBehaviour")),
             row(Lang.t("ui.set.appearance"), appearancePop), row(Lang.t("ui.set.openPicker"), placementPop),
             row(Lang.t("ui.set.language"), languagePop), hint(Lang.t("ui.set.languageHint")),
-            autoPaste, showInDock, fuzzy, clearOnQuit, loginItem, updates,
+            autoPaste, showInDock, fuzzy, clearOnQuit, loginItem, updates, watchShots,
             label(Lang.t("ui.set.actionsLabel")), actionsScroll,
             hint(Lang.t("ui.set.actionsHint")),
             label(Lang.t("ui.set.syncLabel")), NSStackView(views: [syncField, chooseSync]),
@@ -225,6 +226,7 @@ final class SettingsWindowController: NSObject, NSWindowDelegate {
         actionsView.string = s.actionsText
         syncField.stringValue = s.syncFolder
         updates.state = s.checkForUpdates ? .on : .off
+        watchShots.state = s.watchScreenshots ? .on : .off
         autoPaste.state = s.autoPaste ? .on : .off
         clearOnQuit.state = s.clearOnQuit ? .on : .off; fuzzy.state = s.fuzzySearch ? .on : .off
         ignoredField.stringValue = s.ignoredPatterns.joined(separator: "  ")
@@ -247,6 +249,7 @@ final class SettingsWindowController: NSObject, NSWindowDelegate {
         s.actionsText = actionsView.string
         s.syncFolder = syncField.stringValue
         s.checkForUpdates = updates.state == .on
+        s.watchScreenshots = watchShots.state == .on
         s.autoPaste = autoPaste.state == .on
         s.gifSeconds = [3, 5, 10, 15][max(0, gifSecondsPop.indexOfSelectedItem)]
         s.gifFramesPerSecond = [5, 8, 12, 15][max(0, gifFPSPop.indexOfSelectedItem)]
