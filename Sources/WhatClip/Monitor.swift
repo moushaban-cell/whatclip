@@ -158,9 +158,9 @@ final class PasteboardMonitor {
                 }
             }
         } else if c.kind == .file {
-            _ = try? store.add(kind: .file, text: c.text, sourceBundleID: app)
+            do { _ = try store.add(kind: .file, text: c.text, sourceBundleID: app) } catch { logCaptureFailure(error) }
         } else {
-            _ = try? store.add(text: c.text, sourceBundleID: app, expiresIn: expiresIn, secretKinds: secrets)
+            do { _ = try store.add(text: c.text, sourceBundleID: app, expiresIn: expiresIn, secretKinds: secrets) } catch { logCaptureFailure(error) }
         }
     }
 

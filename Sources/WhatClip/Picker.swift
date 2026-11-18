@@ -403,7 +403,8 @@ final class PickerController: NSObject, NSSearchFieldDelegate, NSTableViewDataSo
         guard let i = selected, i.kind == .image || i.kind == .gif else { return }
         let text = store.ocrText(for: i.id)
         guard !text.isEmpty else { status.stringValue = Lang.t("ui.noTextImage"); return }
-        _ = try? store.add(text: text, sourceBundleID: i.sourceBundleID); reload()
+        do { _ = try store.add(text: text, sourceBundleID: i.sourceBundleID) } catch { reportFailure(error) }
+        reload()
     }
 
     /// Opens the picker on a given section (used by the menu-bar submenus).
@@ -416,7 +417,8 @@ final class PickerController: NSObject, NSSearchFieldDelegate, NSTableViewDataSo
 
     private func toggleFavorite() {
         guard let item = selected else { return }
-        try? store.setFavorite(item.id, !item.favorite); reload()
+        do { try store.setFavorite(item.id, !item.favorite) } catch { reportFailure(error) }
+        reload()
     }
 
     /// Removes the decrypted preview copies. Called when the picker closes and at launch and quit.
@@ -427,7 +429,8 @@ final class PickerController: NSObject, NSSearchFieldDelegate, NSTableViewDataSo
 
     private func togglePin() {
         guard let item = selected else { return }
-        try? store.setPinned(item.id, !item.pinned); reload()
+        do { try store.setPinned(item.id, !item.pinned) } catch { reportFailure(error) }
+        reload()
     }
     /// Deletes every selected item (multi-select with Shift or Command clicks).
     private func deleteSelected() {

@@ -137,6 +137,11 @@ enum Design {
     }
 }
 
+/// A copy that could not be saved. Logs the error only, never the copied content, and does not interrupt the person's copying.
+func logCaptureFailure(_ error: Error) {
+    NSLog("WhatClip: a copy could not be saved: %@", String(describing: error))
+}
+
 /// Shows a plain failure message after an action could not finish. Used where a delete or clear would otherwise fail silently.
 @MainActor
 func reportFailure(_ error: Error) {
