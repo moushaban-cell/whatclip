@@ -18,7 +18,7 @@ final class HistoryWindowController: NSObject, NSTableViewDataSource, NSTableVie
     private let settingsHost = NSView()
     private let aboutScroll = NSScrollView()
     private var listPaneRef: NSView?
-    private let viewMode = NSSegmentedControl(labels: ["List", "Cards"], trackingMode: .selectOne, target: nil, action: nil)
+    private let viewMode = NSSegmentedControl(labels: [Lang.t("ui.list"), Lang.t("ui.cards")], trackingMode: .selectOne, target: nil, action: nil)
     private let shelf = ShelfController()
     private let preview = NSTextView()
     private let previewScroll = NSScrollView()
@@ -57,7 +57,7 @@ final class HistoryWindowController: NSObject, NSTableViewDataSource, NSTableVie
         if locked {
             list.reloadData()
             Task { @MainActor in
-                let ok = await Authentication.unlock(reason: "Open your clipboard history")
+                let ok = await Authentication.unlock(reason: Lang.t("ui.reasonOpen"))
                 self.locked = !ok
                 self.reloadList()
             }
@@ -73,17 +73,17 @@ final class HistoryWindowController: NSObject, NSTableViewDataSource, NSTableVie
     private func build() {
         sidebar.headerView = nil; sidebar.dataSource = self; sidebar.delegate = self; sidebar.rowHeight = 26
         sidebar.addTableColumn(NSTableColumn(identifier: .init("side")))
-        sidebar.setAccessibilityLabel("Sections")
+        sidebar.setAccessibilityLabel(Lang.t("ui.a11y.sections"))
         let sideScroll = NSScrollView(); sideScroll.documentView = sidebar; sideScroll.hasVerticalScroller = true; sideScroll.borderType = .noBorder
 
-        search.placeholderString = "Search"; search.delegate = self
+        search.placeholderString = Lang.t("ui.search"); search.delegate = self
         list.headerView = nil; list.dataSource = self; list.delegate = self; list.rowHeight = Design.rowHeight
-        list.allowsMultipleSelection = true; list.setAccessibilityLabel("Items")
+        list.allowsMultipleSelection = true; list.setAccessibilityLabel(Lang.t("ui.a11y.items"))
         // Keyboard: Return or a double-click copies the selected item; arrows move through the list (built into the table).
         list.target = self; list.doubleAction = #selector(copyItem)
         let rowMenu = NSMenu(); rowMenu.delegate = self; list.menu = rowMenu
         list.addTableColumn(NSTableColumn(identifier: .init("item")))
-        list.setAccessibilityLabel("Items")
+        list.setAccessibilityLabel(Lang.t("ui.a11y.items"))
         listScroll.documentView = list; listScroll.hasVerticalScroller = true; listScroll.borderType = .noBorder
 
         preview.isEditable = false; preview.font = .systemFont(ofSize: 14); preview.textContainerInset = NSSize(width: 14, height: 14)
@@ -95,14 +95,14 @@ final class HistoryWindowController: NSObject, NSTableViewDataSource, NSTableVie
         actions.orientation = .horizontal; actions.spacing = 8
 
         // Snippet editor (shown in place of the preview in the Snippets section)
-        snippetTitle.placeholderString = "Title"; snippetFolder.placeholderString = "Folder (optional)"; snippetTags.placeholderString = "Tags, separated by commas"
+        snippetTitle.placeholderString = Lang.t("ui.title"); snippetFolder.placeholderString = Lang.t("ui.folderOpt"); snippetTags.placeholderString = Lang.t("ui.tagsPh")
         snippetBody.font = .monospacedSystemFont(ofSize: 12, weight: .regular); snippetBody.isRichText = false; snippetBody.isAutomaticQuoteSubstitutionEnabled = false
         let bodyScroll = NSScrollView(); bodyScroll.documentView = snippetBody; bodyScroll.hasVerticalScroller = true; bodyScroll.borderType = .bezelBorder
         bodyScroll.heightAnchor.constraint(greaterThanOrEqualToConstant: 180).isActive = true
-        let hint = NSTextField(wrappingLabelWithString: "Use {{name}} for values to fill in when you insert this snippet.")
+        let hint = NSTextField(wrappingLabelWithString: Lang.t("ui.snippetHint"))
         hint.font = .systemFont(ofSize: 11); hint.textColor = .secondaryLabelColor
         let buttons = NSStackView(views: [
-            button("Save snippet", #selector(saveSnippet)), button("Insert…", #selector(insertSnippet)), button("Delete", #selector(deleteSnippet)),
+            button("Save snippet", #selector(saveSnippet)), button("Insert…", #selector(insertSnippet)), button(Lang.t("ui.delete"), #selector(deleteSnippet)),
         ])
         buttons.spacing = 8
         snippetBox.orientation = .vertical; snippetBox.alignment = .leading; snippetBox.spacing = 8
@@ -142,7 +142,7 @@ final class HistoryWindowController: NSObject, NSTableViewDataSource, NSTableVie
         // Three resizable panes: sections, items, details. A split view keeps each pane at its own size.
         sideScroll.widthAnchor.constraint(greaterThanOrEqualToConstant: 200).isActive = true
         viewMode.selectedSegment = 0; viewMode.target = self; viewMode.action = #selector(viewModeChanged)
-        viewMode.setAccessibilityLabel("Show as list or cards")
+        viewMode.setAccessibilityLabel(Lang.t("ui.a11y.viewMode"))
         shelf.scroll.isHidden = true
         shelf.menuForItem = { [weak self] i in self?.contextMenu(forItem: i) }
         shelf.onSelect = { [weak self] index in
@@ -158,6 +158,7 @@ final class HistoryWindowController: NSObject, NSTableViewDataSource, NSTableVie
         // A plain layout keeps each pane exactly where it belongs, including when Settings replaces the list.
         let panes = PaneLayout(panes: [sideScroll, listPane, detail], widths: [220, 300, nil])
         window.contentView = panes
+        panes.userInterfaceLayoutDirection = Lang.isRightToLeft ? .rightToLeft : .leftToRight
 
     }
 
@@ -185,18 +186,18 @@ final class HistoryWindowController: NSObject, NSTableViewDataSource, NSTableVie
 
     /// The sidebar in groups: History, Library, Boards, Tools. Headers are shown but cannot be selected.
     func reloadSidebar() {
-        var s: [(String, Section)] = [("History", .header), ("All items", .all), ("Pinned", .pinned), ("Text", .text), ("Links", .links),
-                                      ("Images and GIFs", .images), ("Files", .files), ("Text found in images", .textInImages),
-                                      ("Library", .header), ("Favourites", .library)]
+        var s: [(String, Section)] = [(Lang.t("ui.history"), .header), (Lang.t("ui.allItems"), .all), (Lang.t("ui.pinned"), .pinned), (Lang.t("ui.text"), .text), (Lang.t("ui.links"), .links),
+                                      (Lang.t("ui.imagesGifs"), .images), (Lang.t("ui.files"), .files), (Lang.t("ui.textInImages"), .textInImages),
+                                      (Lang.t("ui.library"), .header), (Lang.t("ui.favourites"), .library)]
         let boards = (try? store.boards()) ?? []
-        s.append(("Boards", .header))
+        s.append((Lang.t("ui.boards"), .header))
         for b in boards { s.append((b.name, .board(b.id))) }
-        if boards.isEmpty { s.append(("No boards yet", .header)) }
-        s.append(("Tools", .header))
-        s.append(("Snippets", .snippets))
-        s.append(("App", .header))
-        s.append(("Settings", .settings))
-        s.append(("About WhatClip", .about))
+        if boards.isEmpty { s.append((Lang.t("ui.noBoards"), .header)) }
+        s.append((Lang.t("ui.tools"), .header))
+        s.append((Lang.t("ui.snippets"), .snippets))
+        s.append((Lang.t("ui.app"), .header))
+        s.append((Lang.t("ui.settings"), .settings))
+        s.append((Lang.t("ui.about"), .about))
         sections = s
         sidebar.reloadData()
         if let row = sections.firstIndex(where: { $0.1 == section }) { sidebar.selectRowIndexes([row], byExtendingSelection: false) }
@@ -234,7 +235,7 @@ final class HistoryWindowController: NSObject, NSTableViewDataSource, NSTableVie
         let t = NSTextView(); t.isEditable = false; t.drawsBackground = false; t.textContainerInset = NSSize(width: 22, height: 22)
         t.isVerticallyResizable = true; t.isHorizontallyResizable = false; t.autoresizingMask = [.width]
         t.textContainer?.widthTracksTextView = true; t.minSize = NSSize(width: 0, height: 0); t.maxSize = NSSize(width: CGFloat.greatestFiniteMagnitude, height: CGFloat.greatestFiniteMagnitude)
-        t.string = ["WhatClip \(v)", "", "A clipboard history for macOS. Everything stays on this Mac: no account, no network, no telemetry.", "", "Open the picker with the shortcut in Settings (⇧⌘V by default). Copies from password managers are never recorded.", "", "Licence: MIT. Source and notices: README.md, THIRD_PARTY_NOTICES.md and LICENSE in the project repository."].joined(separator: "\n")
+        t.string = [Lang.t("ui.aboutVersion", ["v": v]), "", Lang.t("ui.about.desc"), "", Lang.t("ui.about.open"), "", Lang.t("ui.about.licence")].joined(separator: "\n")
         t.font = .systemFont(ofSize: 14); t.textColor = .labelColor
         return t
     }
@@ -243,12 +244,12 @@ final class HistoryWindowController: NSObject, NSTableViewDataSource, NSTableVie
         updateChrome()
         // Settings and About own the whole detail pane: nothing else to load.
         if !locked && (section == .settings || section == .about) { return }
-        if locked { items = []; list.reloadData(); showDetail(nil); preview.string = "Locked. Unlock with Touch ID or your Mac password to see your history and settings."; return }
+        if locked { items = []; list.reloadData(); showDetail(nil); preview.string = Lang.t("ui.lockedMain"); return }
         if section == .snippets {
             snippets = (try? store.snippets(query: search.stringValue)) ?? []
             list.reloadData()
             snippetBox.isHidden = selectedSnippet == nil; previewScroll.isHidden = selectedSnippet != nil
-            if selectedSnippet == nil { preview.string = "Choose a snippet, or create one with the New snippet button." }
+            if selectedSnippet == nil { preview.string = Lang.t("ui.chooseSnippet") }
             return
         }
         switch section {
@@ -355,23 +356,23 @@ final class HistoryWindowController: NSObject, NSTableViewDataSource, NSTableVie
     private func showDetail(_ i: ClipItem?) {
         actions.arrangedSubviews.forEach { $0.removeFromSuperview() }
         if case .board = section { actions.addArrangedSubview(button("Edit board…", #selector(editBoard))) }
-        guard let i else { preview.string = "Nothing here yet."; previewImage.isHidden = true; preview.isHidden = false; return }
+        guard let i else { preview.string = Lang.t("ui.nothingHere"); previewImage.isHidden = true; preview.isHidden = false; return }
         if i.kind == .image || i.kind == .gif, let d = store.payloadData(for: i), let img = NSImage(data: d) {
             previewImage.image = img; previewImage.isHidden = false; preview.isHidden = true
         } else {
             previewImage.isHidden = true; preview.isHidden = false
-            var body = i.secretKinds.isEmpty ? i.listTitle : "Hidden secret: \(i.secretKinds.map(\.rawValue).joined(separator: ", "))"
+            var body = i.secretKinds.isEmpty ? i.listTitle : Lang.t("ui.hiddenSecretLine", ["kinds": i.secretKinds.map(\.rawValue).joined(separator: ", ")])
             let ocr = store.ocrText(for: i.id)
             if !ocr.isEmpty { body += "\n\n— Text in this image —\n" + ocr }
             preview.string = String(body.prefix(20_000))
         }
         // Primary actions stay visible; everything else lives in one More menu, so the row never overflows.
-        actions.addArrangedSubview(button("Copy", #selector(copyItem)))
-        actions.addArrangedSubview(button(i.pinned ? "Unpin" : "Pin", #selector(togglePin)))
+        actions.addArrangedSubview(button(Lang.t("ui.copy"), #selector(copyItem)))
+        actions.addArrangedSubview(button(i.pinned ? Lang.t("ui.unpin") : Lang.t("ui.pin"), #selector(togglePin)))
         actions.addArrangedSubview(button(i.favorite ? "Unfavourite" : "Favourite", #selector(toggleFavorite)))
-        actions.addArrangedSubview(menuButton("More", moreMenu(i)))
+        actions.addArrangedSubview(menuButton(Lang.t("ui.more"), moreMenu(i)))
         let n = list.selectedRowIndexes.count
-        let del = button(n > 1 ? "Delete \(n) items" : "Delete", #selector(deleteItem))
+        let del = button(n > 1 ? "Delete \(n) items" : Lang.t("ui.delete"), #selector(deleteItem))
         del.contentTintColor = .systemRed
         actions.addArrangedSubview(del)
     }
@@ -396,7 +397,7 @@ final class HistoryWindowController: NSObject, NSTableViewDataSource, NSTableVie
     private func toolsMenu() -> NSMenu {
         let m = NSMenu()
         for t in TextTool.allCases {
-            let it = NSMenuItem(title: t.title, action: #selector(runTool(_:)), keyEquivalent: ""); it.target = self; it.representedObject = t.rawValue; m.addItem(it)
+            let it = NSMenuItem(title: Lang.t("tt." + t.rawValue), action: #selector(runTool(_:)), keyEquivalent: ""); it.target = self; it.representedObject = t.rawValue; m.addItem(it)
         }
         return m
     }
@@ -414,12 +415,12 @@ final class HistoryWindowController: NSObject, NSTableViewDataSource, NSTableVie
         func entry(_ t: String, _ a: Selector, _ obj: Any? = nil) { let it = NSMenuItem(title: t, action: a, keyEquivalent: ""); it.target = self; it.representedObject = obj; m.addItem(it) }
         func sub(_ t: String, _ menu: NSMenu) { let it = NSMenuItem(title: t, action: nil, keyEquivalent: ""); it.submenu = menu; m.addItem(it) }
         entry("Tags…", #selector(editTags))
-        sub("Add to board", boardMenu())
+        sub(Lang.t("ui.addToBoard"), boardMenu())
         if i.kind == .text || i.kind == .richText || i.kind == .url {
-            sub("Text tools", toolsMenu())
-            sub("Paste as…", pasteFormatMenu())
+            sub(Lang.t("ui.textTools"), toolsMenu())
+            sub(Lang.t("ui.pasteAs"), pasteFormatMenu())
             let smart = SmartRecognizer.find(in: i.text)
-            if !smart.isEmpty { sub("Smart actions", smartMenu(smart)) }
+            if !smart.isEmpty { sub(Lang.t("ui.smartActions"), smartMenu(smart)) }
         }
         if i.kind == .image, store.payloadData(for: i) != nil {
             entry("Annotate…", #selector(annotateItem))
@@ -431,7 +432,7 @@ final class HistoryWindowController: NSObject, NSTableViewDataSource, NSTableVie
     private func pasteFormatMenu() -> NSMenu {
         let m = NSMenu()
         for f in PasteFormat.allCases {
-            let it = NSMenuItem(title: f.title, action: #selector(pasteAs(_:)), keyEquivalent: ""); it.target = self; it.representedObject = f.rawValue; m.addItem(it)
+            let it = NSMenuItem(title: Lang.t("pf." + f.rawValue), action: #selector(pasteAs(_:)), keyEquivalent: ""); it.target = self; it.representedObject = f.rawValue; m.addItem(it)
         }
         return m
     }
@@ -462,16 +463,16 @@ final class HistoryWindowController: NSObject, NSTableViewDataSource, NSTableVie
         let picked = list.selectedRowIndexes.compactMap { items[safe: $0]?.id }
         guard !picked.isEmpty else { return }
         if picked.count > 1 {
-            let a = NSAlert(); a.messageText = "Delete \(picked.count) items?"; a.informativeText = "Pinned items are deleted too. This cannot be undone."
-            a.addButton(withTitle: "Delete"); a.addButton(withTitle: "Cancel")
+            let a = NSAlert(); a.messageText = Lang.t("ui.deleteN", ["n": "\(picked.count)"]); a.informativeText = Lang.t("ui.deleteNInfo")
+            a.addButton(withTitle: Lang.t("ui.delete")); a.addButton(withTitle: Lang.t("ui.cancel"))
             guard a.runModal() == .alertFirstButtonReturn else { return }
         }
         try? store.delete(picked); reloadList()
     }
     @objc private func editTags() {
         guard let i = selectedItem else { return }
-        let alert = NSAlert(); alert.messageText = "Tags"; alert.informativeText = "Separate tags with commas, for example work, invoice."
-        alert.addButton(withTitle: "Save"); alert.addButton(withTitle: "Cancel")
+        let alert = NSAlert(); alert.messageText = Lang.t("ui.tags"); alert.informativeText = Lang.t("ui.tagsInfo")
+        alert.addButton(withTitle: Lang.t("ui.save")); alert.addButton(withTitle: Lang.t("ui.cancel"))
         let f = NSTextField(frame: NSRect(x: 0, y: 0, width: 300, height: 24)); f.stringValue = store.tags(for: i.id).joined(separator: ", ")
         alert.accessoryView = f
         guard alert.runModal() == .alertFirstButtonReturn else { return }
@@ -492,10 +493,10 @@ final class HistoryWindowController: NSObject, NSTableViewDataSource, NSTableVie
 
     /// Name and colour of a board, in one dialog. Used for new boards and for editing.
     private func boardDialog(title: String, name: String, colour: String) -> (String, BoardColor)? {
-        let alert = NSAlert(); alert.messageText = title; alert.addButton(withTitle: "Save"); alert.addButton(withTitle: "Cancel")
+        let alert = NSAlert(); alert.messageText = title; alert.addButton(withTitle: Lang.t("ui.save")); alert.addButton(withTitle: Lang.t("ui.cancel"))
         let stack = NSStackView(); stack.orientation = .vertical; stack.alignment = .leading; stack.spacing = 8
-        let f = NSTextField(frame: NSRect(x: 0, y: 0, width: 260, height: 24)); f.placeholderString = "Board name"; f.stringValue = name
-        let pop = NSPopUpButton(); pop.addItems(withTitles: BoardColor.allCases.map(\.title))
+        let f = NSTextField(frame: NSRect(x: 0, y: 0, width: 260, height: 24)); f.placeholderString = Lang.t("ui.boardName"); f.stringValue = name
+        let pop = NSPopUpButton(); pop.addItems(withTitles: BoardColor.allCases.map { Lang.t("bc." + $0.rawValue) })
         pop.selectItem(at: BoardColor.allCases.firstIndex { $0.rawValue == colour } ?? 0)
         stack.addArrangedSubview(f); stack.addArrangedSubview(pop)
         stack.frame = NSRect(x: 0, y: 0, width: 260, height: 60)
@@ -506,13 +507,13 @@ final class HistoryWindowController: NSObject, NSTableViewDataSource, NSTableVie
     }
 
     @objc private func newBoard() {
-        guard let (name, colour) = boardDialog(title: "New board", name: "", colour: "blue") else { return }
+        guard let (name, colour) = boardDialog(title: Lang.t("ui.newBoard"), name: "", colour: "blue") else { return }
         _ = try? store.addBoard(name: name, color: colour.rawValue); reloadSidebar()
     }
     /// Renames and recolours the board in view.
     @objc func editBoard() {
         guard case .board(let id) = section, let b = (try? store.boards())?.first(where: { $0.id == id }),
-              let (name, colour) = boardDialog(title: "Edit board", name: b.name, colour: b.colorName) else { return }
+              let (name, colour) = boardDialog(title: Lang.t("ui.editBoard"), name: b.name, colour: b.colorName) else { return }
         try? store.updateBoard(id, name: name, color: colour); reloadSidebar()
     }
     @objc private func runTool(_ s: NSMenuItem) {
@@ -526,13 +527,13 @@ final class HistoryWindowController: NSObject, NSTableViewDataSource, NSTableVie
 
     @objc func newSnippet() {
         section = .snippets; selectedSnippet = nil
-        if let s = try? store.addSnippet(title: "New snippet", body: "") { selectedSnippet = s }
+        if let s = try? store.addSnippet(title: Lang.t("ui.newSnippet"), body: "") { selectedSnippet = s }
         reloadList(); reloadSidebar()
         if let row = snippets.firstIndex(where: { $0.id == selectedSnippet?.id }) { list.selectRowIndexes([row], byExtendingSelection: false) }
     }
     @objc private func saveSnippet() {
         guard var s = selectedSnippet else { return }
-        s.title = snippetTitle.stringValue.isEmpty ? "Untitled" : snippetTitle.stringValue
+        s.title = snippetTitle.stringValue.isEmpty ? Lang.t("ui.untitled") : snippetTitle.stringValue
         s.folder = snippetFolder.stringValue; s.body = snippetBody.string; s.tags = snippetTags.stringValue
         try? store.updateSnippet(s); selectedSnippet = s; reloadList()
     }
@@ -551,7 +552,7 @@ final class HistoryWindowController: NSObject, NSTableViewDataSource, NSTableVie
         let names = Template.variables(in: snippetBody.string)
         var values: [String: String] = [:]
         if !names.isEmpty {
-            let alert = NSAlert(); alert.messageText = "Fill in \(s.title)"; alert.addButton(withTitle: "Copy"); alert.addButton(withTitle: "Cancel")
+            let alert = NSAlert(); alert.messageText = Lang.t("ui.fillIn", ["title": s.title]); alert.addButton(withTitle: Lang.t("ui.copy")); alert.addButton(withTitle: Lang.t("ui.cancel"))
             let stack = NSStackView(); stack.orientation = .vertical; stack.alignment = .leading; stack.spacing = 6
             var fields: [(String, NSTextField)] = []
             for n in names {

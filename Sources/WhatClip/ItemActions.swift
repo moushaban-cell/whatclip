@@ -21,18 +21,18 @@ enum ItemActions {
             out.append(m)
         }
         if item.kind == .text || item.kind == .url || item.kind == .richText {
-            add("Edit text…") { editText(item, store: store, changed: changed) }
+            add(Lang.t("ui.editTextMore")) { editText(item, store: store, changed: changed) }
         }
-        add(item.pinned ? "Unpin" : "Pin") { try? store.setPinned(item.id, !item.pinned); changed() }
-        add(item.favorite ? "Remove from Favourites" : "Add to Favourites") { try? store.setFavorite(item.id, !item.favorite); changed() }
-        add("Delete…") { confirmDelete(item, store: store, changed: changed) }
+        add(item.pinned ? Lang.t("ui.unpin") : Lang.t("ui.pin")) { try? store.setPinned(item.id, !item.pinned); changed() }
+        add(item.favorite ? Lang.t("ui.unfav") : Lang.t("ui.fav")) { try? store.setFavorite(item.id, !item.favorite); changed() }
+        add(Lang.t("ui.deleteMore")) { confirmDelete(item, store: store, changed: changed) }
         return out
     }
 
-    /// "Run action" items for a text item: each of the person's own actions. The output becomes a new item.
+    /// Lang.t("ui.runAction") items for a text item: each of the person's own actions. The output becomes a new item.
     static func actionItems(for item: ClipItem, actions: [UserAction], store: ClipStore, changed: @escaping () -> Void) -> [NSMenuItem] {
         guard item.kind == .text || item.kind == .url || item.kind == .richText, !actions.isEmpty else { return [] }
-        let parent = NSMenuItem(title: "Run action", action: nil, keyEquivalent: "")
+        let parent = NSMenuItem(title: Lang.t("ui.runAction"), action: nil, keyEquivalent: "")
         let sub = NSMenu()
         for act in actions {
             let a = ItemAction {
@@ -42,8 +42,8 @@ enum ItemActions {
                         let text = out.trimmingCharacters(in: .newlines)
                         if !text.isEmpty { _ = try? store.add(text: text, sourceBundleID: item.sourceBundleID); changed() }
                     case .failure:
-                        let alert = NSAlert(); alert.messageText = "The action “\(act.name)” did not finish"
-                        alert.informativeText = "Check the command in Settings. Nothing was added."; alert.runModal()
+                        let alert = NSAlert(); alert.messageText = Lang.t("ui.actionFailed", ["name": act.name])
+                        alert.informativeText = Lang.t("ui.actionFailedInfo"); alert.runModal()
                     }
                 }
             }
@@ -58,9 +58,9 @@ enum ItemActions {
     /// Edits the text of a text item in a sheet. A text that already exists in history is refused, with a message.
     static func editText(_ item: ClipItem, store: ClipStore, changed: @escaping () -> Void) {
         let alert = NSAlert()
-        alert.messageText = "Edit text"
-        alert.informativeText = "Change the text of this item. It stays in the same place in your history."
-        alert.addButton(withTitle: "Save"); alert.addButton(withTitle: "Cancel")
+        alert.messageText = Lang.t("ui.editText")
+        alert.informativeText = Lang.t("ui.editTextInfo")
+        alert.addButton(withTitle: Lang.t("ui.save")); alert.addButton(withTitle: Lang.t("ui.cancel"))
         let scroll = NSScrollView(frame: NSRect(x: 0, y: 0, width: 420, height: 160))
         scroll.hasVerticalScroller = true; scroll.borderType = .bezelBorder
         let text = NSTextView(frame: NSRect(x: 0, y: 0, width: 400, height: 160))
@@ -74,16 +74,16 @@ enum ItemActions {
         guard !new.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else { return }
         do { try store.updateText(item.id, to: new); changed() }
         catch {
-            let a = NSAlert(); a.messageText = "That text is already in your history"
-            a.informativeText = "Nothing was changed."; a.runModal()
+            let a = NSAlert(); a.messageText = Lang.t("ui.duplicate")
+            a.informativeText = Lang.t("ui.nothingChanged"); a.runModal()
         }
     }
 
     /// Deletes one item after a confirmation. Pinned and favourite items are deleted too, when you confirm.
     static func confirmDelete(_ item: ClipItem, store: ClipStore, changed: @escaping () -> Void) {
-        let a = NSAlert(); a.messageText = "Delete this item?"
-        a.informativeText = "It is removed from your history and cannot be undone."
-        a.addButton(withTitle: "Delete"); a.addButton(withTitle: "Cancel")
+        let a = NSAlert(); a.messageText = Lang.t("ui.deleteItemQ")
+        a.informativeText = Lang.t("ui.deleteItemInfo")
+        a.addButton(withTitle: Lang.t("ui.delete")); a.addButton(withTitle: Lang.t("ui.cancel"))
         a.buttons.first?.hasDestructiveAction = true
         guard a.runModal() == .alertFirstButtonReturn else { return }
         try? store.delete(item.id); changed()

@@ -7,7 +7,7 @@ import WhatClipCore
 final class EmojiPanelController: NSObject, NSSearchFieldDelegate {
     private let window: NSWindow
     private let search = NSSearchField()
-    private let categories = NSSegmentedControl(labels: ["Smileys", "People", "Nature", "Food", "Travel", "Objects", "Symbols"], trackingMode: .selectOne, target: nil, action: nil)
+    private let categories = NSSegmentedControl(labels: [Lang.t("ui.cat.smileys"), Lang.t("ui.cat.people"), Lang.t("ui.cat.nature"), Lang.t("ui.cat.food"), Lang.t("ui.cat.travel"), Lang.t("ui.cat.objects"), Lang.t("ui.cat.symbols")], trackingMode: .selectOne, target: nil, action: nil)
     private let grid = NSStackView()
     private let scroll = NSScrollView()
     private let copy: (String) -> Void
@@ -28,9 +28,9 @@ final class EmojiPanelController: NSObject, NSSearchFieldDelegate {
         window = NSWindow(contentRect: NSRect(x: 0, y: 0, width: 520, height: 420),
                           styleMask: [.titled, .closable, .miniaturizable, .resizable], backing: .buffered, defer: false)
         super.init()
-        window.title = "Emoji and symbols"; window.isReleasedWhenClosed = false; window.center()
+        window.title = Lang.t("ui.emojiTitle"); window.isReleasedWhenClosed = false; window.center()
         window.minSize = NSSize(width: 380, height: 300)
-        search.placeholderString = "Search emoji and symbols"; search.delegate = self
+        search.placeholderString = Lang.t("ui.emojiSearch"); search.delegate = self
         categories.selectedSegment = 0; categories.target = self; categories.action = #selector(categoryChanged)
         grid.orientation = .vertical; grid.alignment = .leading; grid.spacing = 6
         // The grid sits at the top of the scroll view and fills its width; the page grows with the symbols.
@@ -49,6 +49,7 @@ final class EmojiPanelController: NSObject, NSSearchFieldDelegate {
         let root = NSStackView(views: [top, scroll]); root.orientation = .vertical; root.alignment = .leading; root.spacing = 8
         root.translatesAutoresizingMaskIntoConstraints = false
         window.contentView = root
+        root.userInterfaceLayoutDirection = Lang.isRightToLeft ? .rightToLeft : .leftToRight
         NSLayoutConstraint.activate([search.widthAnchor.constraint(equalTo: root.widthAnchor, constant: -24),
                                      scroll.widthAnchor.constraint(equalTo: root.widthAnchor)])
         show(category: 0)
@@ -84,7 +85,7 @@ final class EmojiPanelController: NSObject, NSSearchFieldDelegate {
             b.toolTip = Self.name(of: sym)
             row?.addArrangedSubview(b)
         }
-        if symbols.isEmpty { grid.addArrangedSubview(NSTextField(labelWithString: "No matches")) }
+        if symbols.isEmpty { grid.addArrangedSubview(NSTextField(labelWithString: Lang.t("ui.noMatches"))) }
     }
 
     @objc private func pick(_ sender: NSButton) {

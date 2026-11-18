@@ -16,7 +16,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
     var syncTimer: Timer?
     let hotKey = HotKey()
     var hotKeyOK = false
-    var hotKeyStatus = "Not registered yet."
+    var hotKeyStatus = Lang.t("ui.hk.notRegistered")
     let menu = NSMenu()
     /// The stack: copies collected in order while a stack is running (session only).
     var stack: [ClipItem] = []
@@ -119,8 +119,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
     }
     func hotKeyChangedBySettings() {
         if !applyHotKey() {
-            let a = NSAlert(); a.messageText = "That shortcut is already in use"
-            a.informativeText = "Another app uses it. Pick a different shortcut in Settings, for example ⌘⌥V."; a.runModal()
+            let a = NSAlert(); a.messageText = Lang.t("ui.shortcutInUse")
+            a.informativeText = Lang.t("ui.shortcutInUseInfo"); a.runModal()
         }
     }
 
@@ -140,12 +140,12 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
 
     func applicationDockMenu(_ sender: NSApplication) -> NSMenu? {
         let m = NSMenu()
-        for (title, action) in [("Open Clipboard Picker", #selector(openPicker)), ("Open History Window", #selector(openHistory)),
-                                ("Pause Capturing", #selector(pauseForever)), ("Settings…", #selector(openSettings))] {
+        for (title, action) in [(Lang.t("ui.m.openPicker"), #selector(openPicker)), (Lang.t("ui.m.openHistory"), #selector(openHistory)),
+                                (Lang.t("ui.m.pauseCapturing"), #selector(pauseForever)), (Lang.t("ui.m.dock.settings"), #selector(openSettings))] {
             let it = NSMenuItem(title: title, action: action, keyEquivalent: ""); it.target = self; m.addItem(it)
         }
         m.addItem(.separator())
-        let q = NSMenuItem(title: "Quit WhatClip", action: #selector(quit), keyEquivalent: ""); q.target = self; m.addItem(q)
+        let q = NSMenuItem(title: Lang.t("ui.m.quit"), action: #selector(quit), keyEquivalent: ""); q.target = self; m.addItem(q)
         return m
     }
 
@@ -176,74 +176,74 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
         menu.removeAllItems()
         add(Lang.t("menu.openPicker") + "   ⇧⌘X", #selector(openPicker))
         add(Lang.t("menu.openHistory"), #selector(openHistory))
-        add("Emoji and symbols…", #selector(openEmoji))
+        add(Lang.t("ui.m.emoji"), #selector(openEmoji))
         menu.addItem(.separator())
 
         let recent = (try? store.list(limit: 8)) ?? []
-        if recent.isEmpty { disabled("Nothing copied yet") }
+        if recent.isEmpty { disabled(Lang.t("ui.nothingYet")) }
         for i in recent { let m = NSMenuItem(title: PickerController.oneLine(i.listTitle), action: #selector(pasteRecent(_:)), keyEquivalent: ""); m.target = self; m.representedObject = i; m.image = NSImage(systemSymbolName: i.kind.symbol, accessibilityDescription: nil); menu.addItem(m) }
         menu.addItem(.separator())
 
-        submenu("Stack", stackMenu())
-        submenu("Capture", captureMenu())
-        submenu("Snippets", snippetsMenu())
-        submenu("Boards", boardsMenu())
-        submenu("Pause capturing", pauseMenu())
-        add(monitor.policy.ignoreNextCopy ? "Ignoring the next copy" : "Ignore next copy", #selector(ignoreNext))
-        if monitor.settings.requireTouchID { add(Authentication.isUnlocked ? "Lock history now" : "History is locked", #selector(lockHistory)) }
+        submenu(Lang.t("ui.menu.stack"), stackMenu())
+        submenu(Lang.t("ui.menu.capture"), captureMenu())
+        submenu(Lang.t("ui.snippets"), snippetsMenu())
+        submenu(Lang.t("ui.boards"), boardsMenu())
+        submenu(Lang.t("ui.menu.pause"), pauseMenu())
+        add(monitor.policy.ignoreNextCopy ? Lang.t("ui.m.ignoring") : Lang.t("ui.m.ignoreNext"), #selector(ignoreNext))
+        if monitor.settings.requireTouchID { add(Authentication.isUnlocked ? Lang.t("ui.lockNow") : Lang.t("ui.locked"), #selector(lockHistory)) }
         menu.addItem(.separator())
-        add("Clear history (keeps pinned)", #selector(clearHistory))
+        add(Lang.t("ui.m.clearHistory"), #selector(clearHistory))
         menu.addItem(.separator())
         add(Lang.t("menu.settings"), #selector(openSettings))
-        add("Set up permissions…", #selector(openOnboarding))
-        add("Help and about", #selector(openHelp))
+        add(Lang.t("ui.m.setup"), #selector(openOnboarding))
+        add(Lang.t("ui.m.help"), #selector(openHelp))
         add(Lang.t("menu.quit"), #selector(quit), key: "q")
     }
 
     private func stackMenu() -> NSMenu {
         let m = NSMenu()
-        m.addItem(item(stackOn ? "Stop collecting copies" : "Start collecting copies", #selector(toggleStack)))
-        m.addItem(item("Paste next (\(stack.count) waiting)", #selector(pasteNextStack), enabled: !stack.isEmpty))
+        m.addItem(item(stackOn ? Lang.t("ui.m.stopStack") : Lang.t("ui.m.startStack"), #selector(toggleStack)))
+        m.addItem(item(Lang.t("ui.m.pasteNext", ["n": "\(stack.count)"]), #selector(pasteNextStack), enabled: !stack.isEmpty))
         m.addItem(.separator())
         for sep in [Separator.newline, .comma, .space] {
-            let it = item("Paste all, \(sep.title.lowercased())", #selector(pasteAllStack(_:)), enabled: !stack.isEmpty)
+            let it = item(Lang.t("ui.m.pasteAll", ["sep": Lang.t("sep." + sep.rawValue).lowercased()]), #selector(pasteAllStack(_:)), enabled: !stack.isEmpty)
             it.representedObject = sep.rawValue
             m.addItem(it)
         }
-        m.addItem(item("Clear stack", #selector(clearStack), enabled: !stack.isEmpty))
+        m.addItem(item(Lang.t("ui.m.clearStack"), #selector(clearStack), enabled: !stack.isEmpty))
         return m
     }
     private func captureMenu() -> NSMenu {
         let m = NSMenu()
-        m.addItem(item("Screenshot of an area", #selector(screenshot)))
-        m.addItem(item(gif.isRecording ? "Stop GIF recording" : "Record a 5-second GIF", #selector(recordGIF)))
-        m.addItem(item("Annotate the latest image", #selector(annotateLatest)))
+        m.addItem(item(Lang.t("ui.m.screenshot"), #selector(screenshot)))
+        m.addItem(item(gif.isRecording ? Lang.t("ui.m.stopGif") : Lang.t("ui.m.gif"), #selector(recordGIF)))
+        m.addItem(item(Lang.t("ui.m.annotate"), #selector(annotateLatest)))
         return m
     }
     private func snippetsMenu() -> NSMenu {
         let m = NSMenu()
         let snippets = (try? store.snippets()) ?? []
         for s in snippets.prefix(12) { let it = item(s.title, #selector(insertSnippet(_:))); it.representedObject = s.id; m.addItem(it) }
-        if snippets.isEmpty { m.addItem(item("No snippets yet", nil, enabled: false)) }
+        if snippets.isEmpty { m.addItem(item(Lang.t("ui.noSnippets"), nil, enabled: false)) }
         m.addItem(.separator())
-        m.addItem(item("Manage snippets…", #selector(manageSnippets)))
+        m.addItem(item(Lang.t("ui.m.manageSnippets"), #selector(manageSnippets)))
         return m
     }
     private func boardsMenu() -> NSMenu {
         let m = NSMenu()
         let boards = (try? store.boards()) ?? []
         for b in boards { let it = item(b.name, #selector(openBoard(_:))); it.representedObject = b.id; m.addItem(it) }
-        if boards.isEmpty { m.addItem(item("No boards yet", nil, enabled: false)) }
+        if boards.isEmpty { m.addItem(item(Lang.t("ui.noBoards"), nil, enabled: false)) }
         return m
     }
     private func pauseMenu() -> NSMenu {
         let m = NSMenu()
         if monitor.isPaused {
-            m.addItem(item("Resume capturing", #selector(resumeCapture)))
+            m.addItem(item(Lang.t("ui.m.resume"), #selector(resumeCapture)))
         } else {
-            m.addItem(item("For 5 minutes", #selector(pause5)))
-            m.addItem(item("For 1 hour", #selector(pause60)))
-            m.addItem(item("Until I turn it back on", #selector(pauseForever)))
+            m.addItem(item(Lang.t("ui.m.for5"), #selector(pause5)))
+            m.addItem(item(Lang.t("ui.m.for1h"), #selector(pause60)))
+            m.addItem(item(Lang.t("ui.m.untilOn"), #selector(pauseForever)))
         }
         return m
     }
@@ -305,7 +305,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
             let data = try Transfer.export(store)
             try data.write(to: url, options: .atomic)
             try FileManager.default.setAttributes([.posixPermissions: 0o600], ofItemAtPath: url.path)
-            let a = NSAlert(); a.messageText = "History exported"; a.informativeText = "Images and files are not included. Keep the file private: it contains your copied text."; a.runModal()
+            let a = NSAlert(); a.messageText = Lang.t("ui.exported"); a.informativeText = Lang.t("ui.exportedInfo"); a.runModal()
         } catch { let a = NSAlert(error: error); a.runModal() }
     }
     /// File ▸ Import History…: adds the text items from a WhatClip export.
@@ -314,9 +314,9 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
         guard panel.runModal() == .OK, let url = panel.url else { return }
         do {
             let n = try Transfer.importData(Data(contentsOf: url), into: store)
-            let a = NSAlert(); a.messageText = "Imported \(n) items"; a.runModal()
+            let a = NSAlert(); a.messageText = Lang.t("ui.imported", ["n": "\(n)"]); a.runModal()
         } catch {
-            let a = NSAlert(); a.messageText = "That file is not a WhatClip history export"; a.runModal()
+            let a = NSAlert(); a.messageText = Lang.t("ui.notExport"); a.runModal()
         }
     }
     @objc func recordGIF() {
@@ -326,7 +326,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
                 guard let self else { return }
                 if let item = try? self.store.add(kind: .gif, label: "GIF \(size)", payload: data, payloadType: "com.compuserve.gif") { self.monitor.restore(item) }
             }
-            if !ok { let a = NSAlert(); a.messageText = "GIF recording needs Screen Recording permission"; a.informativeText = "Allow WhatClip in System Settings → Privacy & Security → Screen Recording, then try again."; a.runModal() }
+            if !ok { let a = NSAlert(); a.messageText = Lang.t("ui.gifPerm"); a.informativeText = Lang.t("ui.gifPermInfo"); a.runModal() }
         }
     }
     @objc func annotateLatest() {
@@ -355,7 +355,7 @@ extension AppDelegate {
         } else if let text = pboard.string(forType: .string), !text.isEmpty {
             _ = try? store.add(text: text)
         } else {
-            error.pointee = "Nothing to save." as NSString
+            error.pointee = Lang.t("ui.nothingToSave") as NSString
         }
     }
 }

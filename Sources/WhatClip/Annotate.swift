@@ -11,7 +11,7 @@ final class AnnotateController: NSObject {
     private let canvas: CanvasView
     private let store: ClipStore
     private let monitor: PasteboardMonitor
-    private let tool = NSSegmentedControl(labels: ["Pen", "Line", "Rectangle", "Arrow"], trackingMode: .selectOne, target: nil, action: nil)
+    private let tool = NSSegmentedControl(labels: [Lang.t("ui.ann.pen"), Lang.t("ui.ann.line"), Lang.t("ui.ann.rect"), Lang.t("ui.ann.arrow")], trackingMode: .selectOne, target: nil, action: nil)
 
     init?(imageData: Data, store: ClipStore, monitor: PasteboardMonitor) {
         guard let image = NSImage(data: imageData) else { return nil }
@@ -22,7 +22,7 @@ final class AnnotateController: NSObject {
         window = NSWindow(contentRect: NSRect(x: 0, y: 0, width: max(w, 420), height: h + 60), styleMask: [.titled, .closable, .resizable], backing: .buffered, defer: false)
         canvas = CanvasView(image: image, shown: NSSize(width: w, height: h))
         super.init()
-        window.title = "Annotate screenshot"; window.isReleasedWhenClosed = false; window.center()
+        window.title = Lang.t("ui.annotateTitle"); window.isReleasedWhenClosed = false; window.center()
         tool.selectedSegment = 0; tool.target = self; tool.action = #selector(toolChanged)
         canvas.tool = .pen
         let undo = NSButton(title: "Undo", target: self, action: #selector(undoTapped)); undo.keyEquivalent = "z"; undo.keyEquivalentModifierMask = [.command]
@@ -31,6 +31,7 @@ final class AnnotateController: NSObject {
         let bar = NSStackView(views: [tool, undo, clear, save]); bar.spacing = 10; bar.edgeInsets = NSEdgeInsets(top: 10, left: 12, bottom: 10, right: 12)
         let root = NSStackView(views: [bar, canvas]); root.orientation = .vertical; root.alignment = .leading
         window.contentView = root
+        root.userInterfaceLayoutDirection = Lang.isRightToLeft ? .rightToLeft : .leftToRight
     }
 
     func show() { window.makeKeyAndOrderFront(nil); NSApp.activate(ignoringOtherApps: true) }
@@ -41,7 +42,7 @@ final class AnnotateController: NSObject {
 
     @objc private func saveTapped() {
         guard let png = canvas.renderPNG() else { return }
-        if let item = try? store.add(kind: .image, label: "Annotated image", payload: png, payloadType: "public.png") {
+        if let item = try? store.add(kind: .image, label: Lang.t("ui.annotatedImage"), payload: png, payloadType: "public.png") {
             monitor.restore(item)
         }
         window.close()

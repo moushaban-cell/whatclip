@@ -17,7 +17,14 @@ enum Lang {
     static var isRightToLeft: Bool { current == "ar" }
 
     static func t(_ key: String) -> String {
-        table[current]?[key] ?? table["en"]?[key] ?? key
+        table[current]?[key] ?? uiTable[current]?[key] ?? table["en"]?[key] ?? uiTable["en"]?[key] ?? key
+    }
+
+    /// Fills the {name} placeholders of a translated string.
+    static func t(_ key: String, _ args: [String: String]) -> String {
+        var s = t(key)
+        for (name, value) in args { s = s.replacingOccurrences(of: "{\(name)}", with: value) }
+        return s
     }
 
     static let table: [String: [String: String]] = [

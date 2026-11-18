@@ -17,27 +17,27 @@ final class SettingsWindowController: NSObject, NSWindowDelegate {
     private let gifSecondsPop = NSPopUpButton()
     private let gifFPSPop = NSPopUpButton()
     private let shortcutLabel = NSTextField(labelWithString: "")
-    private let shortcutButton = NSButton(title: "Change shortcut…", target: nil, action: nil)
+    private let shortcutButton = NSButton(title: Lang.t("ui.changeShortcut"), target: nil, action: nil)
     private var shortcutMonitor: Any?
-    private let showInDock = NSButton(checkboxWithTitle: "Show WhatClip in the Dock (off: menu bar only)", target: nil, action: nil)
-    private let clearOnQuit = NSButton(checkboxWithTitle: "Clear history when WhatClip quits (keeps pinned items)", target: nil, action: nil)
-    private let fuzzy = NSButton(checkboxWithTitle: "Fuzzy search (letters in order, any gaps)", target: nil, action: nil)
+    private let showInDock = NSButton(checkboxWithTitle: Lang.t("ui.set.dock"), target: nil, action: nil)
+    private let clearOnQuit = NSButton(checkboxWithTitle: Lang.t("ui.set.clearQuit"), target: nil, action: nil)
+    private let fuzzy = NSButton(checkboxWithTitle: Lang.t("ui.set.fuzzy"), target: nil, action: nil)
     private let ignoredField = NSTextField()
-    private let encrypt = NSButton(checkboxWithTitle: "Encrypt stored images and files (key kept in your Keychain)", target: nil, action: nil)
-    private let touchID = NSButton(checkboxWithTitle: "Ask for Touch ID or my Mac password before opening the main app", target: nil, action: nil)
-    private let autoPaste = NSButton(checkboxWithTitle: "Paste automatically after I choose an item (needs Accessibility)", target: nil, action: nil)
+    private let encrypt = NSButton(checkboxWithTitle: Lang.t("ui.set.encrypt"), target: nil, action: nil)
+    private let touchID = NSButton(checkboxWithTitle: Lang.t("ui.set.touch"), target: nil, action: nil)
+    private let autoPaste = NSButton(checkboxWithTitle: Lang.t("ui.set.autoPaste"), target: nil, action: nil)
     private let actionsView = NSTextView()
     private let actionsScroll = NSScrollView()
     private let syncField = NSTextField()
-    private let chooseSync = NSButton(title: "Choose folder…", target: nil, action: nil)
-    private let updates = NSButton(checkboxWithTitle: "Check once a day for a new version (one request to GitHub, no personal data)", target: nil, action: nil)
-    private let loginItem = NSButton(checkboxWithTitle: "Start WhatClip when I log in", target: nil, action: nil)
-    private let ocr = NSButton(checkboxWithTitle: "Read text in copied images on this Mac (searchable)", target: nil, action: nil)
+    private let chooseSync = NSButton(title: Lang.t("ui.chooseFolder"), target: nil, action: nil)
+    private let updates = NSButton(checkboxWithTitle: Lang.t("ui.set.updates"), target: nil, action: nil)
+    private let loginItem = NSButton(checkboxWithTitle: Lang.t("ui.set.login"), target: nil, action: nil)
+    private let ocr = NSButton(checkboxWithTitle: Lang.t("ui.set.ocr"), target: nil, action: nil)
     private let status = NSTextField(labelWithString: "")
     private let shortcutStatus = NSTextField(labelWithString: "")
-    /// The hot-key registration status, in words (for example "Active" or "Used by another app").
+    /// The hot-key registration status, in words (for example Lang.t("ui.active") or Lang.t("ui.usedByOther")).
     var hotKeyStatus = ""
-    private let lifetimes: [(String, Double)] = [("10 seconds", 10), ("1 minute", 60), ("5 minutes", 300), ("1 hour", 3600)]
+    private let lifetimes: [(String, Double)] = [(Lang.t("ui.dur.10s"), 10), (Lang.t("ui.dur.1m"), 60), (Lang.t("ui.dur.5m"), 300), (Lang.t("ui.dur.1h"), 3600)]
 
     init(monitor: PasteboardMonitor) {
         self.monitor = monitor
@@ -76,14 +76,14 @@ final class SettingsWindowController: NSObject, NSWindowDelegate {
         func hint(_ t: String) -> NSTextField { let l = NSTextField(wrappingLabelWithString: t); l.font = .systemFont(ofSize: 11); l.textColor = .secondaryLabelColor; l.preferredMaxLayoutWidth = 480; return l }
         func row(_ t: String, _ v: NSView) -> NSStackView { let r = NSStackView(views: [NSTextField(labelWithString: t), v]); r.spacing = 10; return r }
         excluded.isRichText = false; excluded.font = .monospacedSystemFont(ofSize: 12, weight: .regular); excluded.isAutomaticQuoteSubstitutionEnabled = false
-        excluded.setAccessibilityLabel("Excluded apps, bundle identifiers")
+        excluded.setAccessibilityLabel(Lang.t("ui.a11y.excluded"))
         actionsView.isVerticallyResizable = true; actionsView.isHorizontallyResizable = false; actionsView.autoresizingMask = [.width]
         actionsView.textContainer?.widthTracksTextView = true; actionsView.font = .monospacedSystemFont(ofSize: 12, weight: .regular)
         actionsView.isAutomaticQuoteSubstitutionEnabled = false; actionsView.textColor = .labelColor; actionsView.backgroundColor = .textBackgroundColor
         actionsScroll.documentView = actionsView; actionsScroll.hasVerticalScroller = true; actionsScroll.borderType = .bezelBorder
         actionsScroll.heightAnchor.constraint(equalToConstant: 80).isActive = true
         actionsScroll.widthAnchor.constraint(greaterThanOrEqualToConstant: 380).isActive = true
-        syncField.placeholderString = "No folder chosen (sync is off)"; syncField.isEditable = false
+        syncField.placeholderString = Lang.t("ui.noFolder"); syncField.isEditable = false
         syncField.widthAnchor.constraint(greaterThanOrEqualToConstant: 300).isActive = true
         chooseSync.target = self; chooseSync.action = #selector(pickSyncFolder)
         // Size the text to the box, so the list shows (a text view needs this to lay out inside a scroll view).
@@ -94,9 +94,9 @@ final class SettingsWindowController: NSObject, NSWindowDelegate {
         excludedScroll.heightAnchor.constraint(equalToConstant: 96).isActive = true
         excludedScroll.widthAnchor.constraint(greaterThanOrEqualToConstant: 380).isActive = true
 
-        secretAction.addItems(withTitles: ["Remove after a while", "Don't keep it at all", "Keep it like any other copy"])
+        secretAction.addItems(withTitles: [Lang.t("ui.secret.remove"), Lang.t("ui.secret.never"), Lang.t("ui.secret.keep")])
         lifetime.addItems(withTitles: lifetimes.map(\.0))
-        retention.addItems(withTitles: Retention.allCases.map(\.title))
+        retention.addItems(withTitles: Retention.allCases.map { Lang.t("ret." + $0.rawValue) })
         maxItems.placeholderString = "500"; maxItems.alignment = .right
         maxItems.widthAnchor.constraint(equalToConstant: 80).isActive = true
         ignoredField.placeholderString = "^\\d{6}$"
@@ -104,40 +104,40 @@ final class SettingsWindowController: NSObject, NSWindowDelegate {
 
         // General: how WhatClip looks, opens and starts.
         let general = page([
-            label("Picker shortcut"), NSStackView(views: [shortcutLabel, shortcutButton]),
-            hint("Press Change, then the new key combination. It needs Command, Option or Control."),
+            label(Lang.t("ui.set.pickerShortcut")), NSStackView(views: [shortcutLabel, shortcutButton]),
+            hint(Lang.t("ui.set.pressChange")),
             shortcutStatus,
-            label("Look and behaviour"),
-            row("Appearance", appearancePop), row("Open the picker", placementPop),
+            label(Lang.t("ui.set.lookBehaviour")),
+            row(Lang.t("ui.set.appearance"), appearancePop), row(Lang.t("ui.set.openPicker"), placementPop),
             autoPaste, showInDock, fuzzy, clearOnQuit, loginItem, updates,
-            label("Your actions (one per line: Name | shell command)"), actionsScroll,
-            hint("A command receives the item's text on standard input. Its output becomes a new item. Actions run only when you choose them."),
-            label("Optional sync through a folder"), NSStackView(views: [syncField, chooseSync]),
-            hint("Pick a folder, for example in iCloud Drive. WhatClip keeps a copy of your text history there and merges the others. No account needed."),
-            label("Screen recording"),
-            row("GIF length", gifSecondsPop), row("GIF frames per second", gifFPSPop),
+            label(Lang.t("ui.set.actionsLabel")), actionsScroll,
+            hint(Lang.t("ui.set.actionsHint")),
+            label(Lang.t("ui.set.syncLabel")), NSStackView(views: [syncField, chooseSync]),
+            hint(Lang.t("ui.set.syncHint")),
+            label(Lang.t("ui.set.screenRec")),
+            row(Lang.t("ui.set.gifLength"), gifSecondsPop), row(Lang.t("ui.set.gifFps"), gifFPSPop),
         ])
         // History: what is kept, for how long, and what is never recorded.
         let history = page([
-            label("Keep history"), row("Keep items for", retention), row("Maximum number of items", maxItems),
-            label("Copied secrets (keys, tokens, card numbers)"), secretAction,
-            row("Remove them after", lifetime),
-            hint("Secrets are shown masked in the picker. They can be removed on a timer or never kept."),
-            label("Apps that are never recorded"), excludedScroll,
-            hint("One app bundle identifier per line, for example com.example.app. Password managers are already listed."),
-            label("Never record text matching"), ignoredField,
-            hint("Separate several patterns with spaces (a pattern cannot contain a space). Example for one-time codes: ^\\d{6}$"),
+            label(Lang.t("ui.set.keepHistory")), row(Lang.t("ui.set.keepFor"), retention), row(Lang.t("ui.set.maxItems"), maxItems),
+            label(Lang.t("ui.set.secrets")), secretAction,
+            row(Lang.t("ui.set.removeAfter"), lifetime),
+            hint(Lang.t("ui.set.secretsHint")),
+            label(Lang.t("ui.set.excludedApps")), excludedScroll,
+            hint(Lang.t("ui.set.excludedHint")),
+            label(Lang.t("ui.set.ignored")), ignoredField,
+            hint(Lang.t("ui.set.ignoredHint")),
         ])
         // Privacy: encryption, locks and on-device reading of images.
         let privacy = page([
-            label("Privacy and security"), encrypt, touchID, ocr,
-            hint("Encryption keeps the key in your login Keychain. Turning it on does not change items you already saved."),
-            hint("With the lock on, the main app (History, Snippets, Settings) asks once and stays open for 15 minutes. The ⇧⌘X picker never asks, so pasting stays one step. Lock history now in the menu locks the app at once."),
+            label(Lang.t("ui.set.privacy")), encrypt, touchID, ocr,
+            hint(Lang.t("ui.set.encryptHint")),
+            hint(Lang.t("ui.set.lockHint")),
         ])
 
         let tabs = NSTabView()
         tabs.tabViewType = .topTabsBezelBorder
-        for (title, view) in [("General", general), ("History", history), ("Privacy", privacy)] {
+        for (title, view) in [(Lang.t("ui.tab.general"), general), (Lang.t("ui.history"), history), (Lang.t("ui.tab.privacy"), privacy)] {
             let item = NSTabViewItem(identifier: title); item.label = title
             let host = NSView(); view.translatesAutoresizingMaskIntoConstraints = false; host.addSubview(view)
             NSLayoutConstraint.activate([view.topAnchor.constraint(equalTo: host.topAnchor), view.bottomAnchor.constraint(equalTo: host.bottomAnchor),
@@ -149,7 +149,7 @@ final class SettingsWindowController: NSObject, NSWindowDelegate {
         if let t = ProcessInfo.processInfo.environment["WHATCLIP_TAB"], let i = Int(t) { tabs.selectTabViewItem(at: i) }
 
         // Save bar: always visible under the tabs.
-        let save = NSButton(title: "Save", target: self, action: #selector(saveTapped)); save.keyEquivalent = "\r"; save.bezelStyle = .rounded
+        let save = NSButton(title: Lang.t("ui.save"), target: self, action: #selector(saveTapped)); save.keyEquivalent = "\r"; save.bezelStyle = .rounded
         let bar = NSStackView(views: [status, save]); bar.spacing = 12; bar.edgeInsets = NSEdgeInsets(top: 8, left: 22, bottom: 12, right: 22)
         status.textColor = .secondaryLabelColor
         let root = NSStackView(views: [tabs, bar]); root.orientation = .vertical; root.alignment = .leading; root.spacing = 0
@@ -165,7 +165,7 @@ final class SettingsWindowController: NSObject, NSWindowDelegate {
 
     /// Records the next key combination with Command, Option or Control, and saves it as the picker shortcut.
     @objc private func recordShortcut() {
-        shortcutLabel.stringValue = "Press the new shortcut (Esc to cancel)…"
+        shortcutLabel.stringValue = Lang.t("ui.set.pressNew")
         if let m = shortcutMonitor { NSEvent.removeMonitor(m) }
         shortcutMonitor = NSEvent.addLocalMonitorForEvents(matching: .keyDown) { [weak self] e in
             guard let self else { return e }
@@ -180,7 +180,7 @@ final class SettingsWindowController: NSObject, NSWindowDelegate {
             var s = self.monitor.settings
             s.hotKeyCode = Int(e.keyCode); s.hotKeyModifiers = carbon
             self.endRecording()
-            do { try self.monitor.update(s); self.status.stringValue = "Shortcut saved." } catch { self.status.stringValue = "Could not save the shortcut." }
+            do { try self.monitor.update(s); self.status.stringValue = Lang.t("ui.set.shortcutSaved") } catch { self.status.stringValue = Lang.t("ui.set.shortcutFail") }
             self.load()
             return nil
         }
@@ -196,7 +196,7 @@ final class SettingsWindowController: NSObject, NSWindowDelegate {
         if mods & 256 != 0 { s += "⌘" }
         let keys: [Int: String] = [0: "A", 1: "S", 2: "D", 3: "F", 4: "H", 5: "G", 6: "Z", 7: "X", 8: "C", 9: "V", 11: "B", 12: "Q", 13: "W", 14: "E", 15: "R",
                                    16: "Y", 17: "T", 31: "O", 32: "U", 34: "I", 35: "P", 37: "L", 38: "J", 40: "K", 45: "N", 46: "M", 29: "0", 18: "1", 19: "2", 20: "3", 21: "4", 23: "5", 22: "6", 26: "7", 28: "8", 25: "9"]
-        return s + (keys[code] ?? "key \(code)")
+        return s + (keys[code] ?? Lang.t("ui.keyFallback", ["code": "\(code)"]))
     }
 
     private func load() {
@@ -206,16 +206,16 @@ final class SettingsWindowController: NSObject, NSWindowDelegate {
         lifetime.selectItem(at: lifetimes.firstIndex { $0.1 == s.secretLifetimeSeconds } ?? 1)
         retention.selectItem(at: Retention.allCases.firstIndex(of: s.retention) ?? 0)
         maxItems.stringValue = String(s.maxItems)
-        gifSecondsPop.removeAllItems(); gifSecondsPop.addItems(withTitles: ["3 seconds", "5 seconds", "10 seconds", "15 seconds"])
+        gifSecondsPop.removeAllItems(); gifSecondsPop.addItems(withTitles: [Lang.t("ui.dur.3s"), Lang.t("ui.dur.5s"), Lang.t("ui.dur.10s"), Lang.t("ui.dur.15s")])
         gifSecondsPop.selectItem(at: [3, 5, 10, 15].firstIndex(of: s.gifSeconds) ?? 1)
-        gifFPSPop.removeAllItems(); gifFPSPop.addItems(withTitles: ["5 (smallest)", "8", "12", "15 (smoothest)"])
+        gifFPSPop.removeAllItems(); gifFPSPop.addItems(withTitles: [Lang.t("ui.gif.smallest"), "8", "12", Lang.t("ui.gif.smoothest")])
         gifFPSPop.selectItem(at: [5, 8, 12, 15].firstIndex(of: s.gifFramesPerSecond) ?? 1)
-        shortcutLabel.stringValue = "Show picker: " + Self.describe(code: s.hotKeyCode, mods: s.hotKeyModifiers)
+        shortcutLabel.stringValue = Lang.t("ui.set.showPicker") + Self.describe(code: s.hotKeyCode, mods: s.hotKeyModifiers)
         shortcutButton.target = self; shortcutButton.action = #selector(recordShortcut)
         shortcutStatus.stringValue = hotKeyStatus; shortcutStatus.font = .systemFont(ofSize: 11); shortcutStatus.textColor = .secondaryLabelColor
-        appearancePop.removeAllItems(); appearancePop.addItems(withTitles: AppearanceChoice.allCases.map(\.title))
+        appearancePop.removeAllItems(); appearancePop.addItems(withTitles: AppearanceChoice.allCases.map { Lang.t("app." + $0.rawValue) })
         appearancePop.selectItem(at: AppearanceChoice.allCases.firstIndex(of: s.appearance) ?? 0)
-        placementPop.removeAllItems(); placementPop.addItems(withTitles: PopupPlacement.allCases.map(\.title))
+        placementPop.removeAllItems(); placementPop.addItems(withTitles: PopupPlacement.allCases.map { Lang.t("place." + $0.rawValue) })
         placementPop.selectItem(at: PopupPlacement.allCases.firstIndex(of: s.popupPlacement) ?? 0)
         showInDock.state = s.showInDock ? .on : .off
         actionsView.string = s.actionsText
@@ -251,10 +251,10 @@ final class SettingsWindowController: NSObject, NSWindowDelegate {
         s.recognizeText = ocr.state == .on; s.launchAtLogin = loginItem.state == .on
         let raw = maxItems.stringValue.trimmingCharacters(in: .whitespaces)
         if !raw.isEmpty {
-            guard let n = Int(raw), (10...5_000).contains(n) else { status.stringValue = "Enter a whole number from 10 to 5000."; return }
+            guard let n = Int(raw), (10...5_000).contains(n) else { status.stringValue = Lang.t("ui.set.badNumber"); return }
             s.maxItems = n
         }
-        do { try monitor.update(s); status.stringValue = "Saved." }
-        catch { status.stringValue = "Could not save: \(error.localizedDescription)" }
+        do { try monitor.update(s); status.stringValue = Lang.t("ui.set.saved") }
+        catch { status.stringValue = Lang.t("ui.set.couldNotSave", ["error": error.localizedDescription]) }
     }
 }

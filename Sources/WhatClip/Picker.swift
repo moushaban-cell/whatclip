@@ -17,7 +17,7 @@ private final class KeyPanel: NSPanel {
 final class PickerController: NSObject, NSSearchFieldDelegate, NSTableViewDataSource, NSTableViewDelegate, NSMenuDelegate, @preconcurrency QLPreviewPanelDataSource {
     enum Filter: Int, CaseIterable {
         case all, text, links, images, files, pinned, favorites
-        var title: String { ["All", "Text", "Links", "Images", "Files", "Pinned", "Favourites"][rawValue] }
+        @MainActor var title: String { [Lang.t("ui.all"), Lang.t("ui.text"), Lang.t("ui.links"), Lang.t("ui.images"), Lang.t("ui.files"), Lang.t("ui.pinned"), Lang.t("ui.favourites")][rawValue] }
         func keeps(_ i: ClipItem) -> Bool {
             switch self {
             case .all: true
@@ -43,7 +43,7 @@ final class PickerController: NSObject, NSSearchFieldDelegate, NSTableViewDataSo
     private let emptyHost = NSView()
     private var listPaneView = NSView()
     private let shelf = ShelfController()
-    private let cardsButton = NSButton(title: "Cards", target: nil, action: nil)
+    private let cardsButton = NSButton(title: Lang.t("ui.cards"), target: nil, action: nil)
     private var cardsOn = false
     private let appPop = NSPopUpButton()
     private var appIDs: [String] = []
@@ -66,12 +66,12 @@ final class PickerController: NSObject, NSSearchFieldDelegate, NSTableViewDataSo
         panel.collectionBehavior = [.canJoinAllSpaces, .fullScreenAuxiliary]
         panel.onCommand = { [weak self] e in self?.command(e) ?? false }
 
-        field.placeholderString = "Search clipboard history"; field.delegate = self; field.font = .systemFont(ofSize: 15)
-        field.setAccessibilityLabel("Search clipboard history")
+        field.placeholderString = Lang.t("ui.a11y.search"); field.delegate = self; field.font = .systemFont(ofSize: 15)
+        field.setAccessibilityLabel(Lang.t("ui.a11y.search"))
         filters.target = self; filters.action = #selector(filterChanged); filters.selectedSegment = 0
         datePop.addItems(withTitles: ["Any time", "Last hour", "Today", "Last 7 days"]); datePop.target = self; datePop.action = #selector(reloadFromControl)
         appPop.target = self; appPop.action = #selector(reloadFromControl); appPop.setAccessibilityLabel("Filter by app")
-        datePop.setAccessibilityLabel("Filter by date")
+        datePop.setAccessibilityLabel(Lang.t("ui.a11y.date"))
         filters.segmentStyle = .texturedRounded
 
         let col = NSTableColumn(identifier: .init("row")); col.resizingMask = .autoresizingMask; table.addTableColumn(col)
@@ -84,7 +84,7 @@ final class PickerController: NSObject, NSSearchFieldDelegate, NSTableViewDataSo
         shelf.scroll.widthAnchor.constraint(equalToConstant: 360).isActive = true
         shelf.onSelect = { [weak self] i in self?.table.selectRowIndexes([i], byExtendingSelection: false); self?.updatePreview() }
         cardsButton.setButtonType(.toggle); cardsButton.bezelStyle = .rounded; cardsButton.target = self; cardsButton.action = #selector(toggleCards)
-        cardsButton.setAccessibilityLabel("Show as cards")
+        cardsButton.setAccessibilityLabel(Lang.t("ui.a11y.showCards"))
 
         preview.isEditable = false; preview.font = .systemFont(ofSize: 13); preview.textContainerInset = NSSize(width: 10, height: 10)
         preview.isVerticallyResizable = true; preview.isHorizontallyResizable = false; preview.autoresizingMask = [.width]
@@ -120,6 +120,7 @@ final class PickerController: NSObject, NSSearchFieldDelegate, NSTableViewDataSo
         stack.edgeInsets = NSEdgeInsets(top: 34, left: 14, bottom: 12, right: 14)
         stack.translatesAutoresizingMaskIntoConstraints = false
         panel.contentView = stack
+        stack.userInterfaceLayoutDirection = Lang.isRightToLeft ? .rightToLeft : .leftToRight
         field.widthAnchor.constraint(equalTo: stack.widthAnchor, constant: -24).isActive = true
         body.widthAnchor.constraint(equalTo: stack.widthAnchor, constant: -24).isActive = true
         // The body grows with the window (340 is the starting height, not a fixed one).
@@ -146,7 +147,7 @@ final class PickerController: NSObject, NSSearchFieldDelegate, NSTableViewDataSo
         reload()
         if locked {
             Task { @MainActor in
-                let ok = await Authentication.unlock(reason: "Open your clipboard history")
+                let ok = await Authentication.unlock(reason: Lang.t("ui.reasonOpen"))
                 self.locked = !ok
                 self.reload()
             }
@@ -207,13 +208,13 @@ final class PickerController: NSObject, NSSearchFieldDelegate, NSTableViewDataSo
         let current = appPop.indexOfSelectedItem > 0 ? appIDs[safe: appPop.indexOfSelectedItem - 1] : nil
         appIDs = (try? store.sourceApps()) ?? []
         appPop.removeAllItems()
-        appPop.addItem(withTitle: "Any app")
+        appPop.addItem(withTitle: Lang.t("ui.anyApp"))
         for id in appIDs { appPop.addItem(withTitle: Design.appName(id) ?? id) }
         if let current, let i = appIDs.firstIndex(of: current) { appPop.selectItem(at: i + 1) }
     }
 
     func reload() {
-        if locked { items = []; table.reloadData(); preview.string = "Locked. Unlock with Touch ID or your Mac password."; previewImage.isHidden = true; return }
+        if locked { items = []; table.reloadData(); preview.string = Lang.t("ui.lockedPicker"); previewImage.isHidden = true; return }
         var found = (try? store.list(query: monitor.settings.fuzzySearch ? "" : field.stringValue, limit: 500, filter: storeFilter())) ?? []
         if monitor.settings.fuzzySearch, !field.stringValue.isEmpty { found = found.filter { FuzzyMatch.matches(field.stringValue, in: $0.text) } }
         items = found.filter(filter.keeps)
@@ -232,9 +233,9 @@ final class PickerController: NSObject, NSSearchFieldDelegate, NSTableViewDataSo
     private func updateEmptyState() {
         emptyHost.subviews.forEach { $0.removeFromSuperview() }
         guard items.isEmpty else { emptyHost.isHidden = true; return }
-        let text = !field.stringValue.isEmpty ? "Nothing matches “\(field.stringValue)”"
-            : (filter == .all ? "Nothing copied yet" : "Nothing in \(filter.title.lowercased()) yet")
-        let detail = field.stringValue.isEmpty ? "Copy some text, a link or an image and it appears here." : "Try a shorter search, or clear the filters."
+        let text = !field.stringValue.isEmpty ? Lang.t("ui.noMatch", ["q": field.stringValue])
+            : (filter == .all ? Lang.t("ui.nothingYet") : Lang.t("ui.nothingIn", ["kind": filter.title.lowercased()]))
+        let detail = field.stringValue.isEmpty ? Lang.t("ui.copyHint") : Lang.t("ui.tryShorter")
         let view = Design.emptyState(symbol: "doc.on.clipboard", title: text, detail: detail)
         view.translatesAutoresizingMaskIntoConstraints = false
         emptyHost.addSubview(view)
@@ -293,7 +294,7 @@ final class PickerController: NSObject, NSSearchFieldDelegate, NSTableViewDataSo
 
     private func addToQueue() {
         guard let item = selected else { return }
-        queue.append(item); status.stringValue = "Added to queue (\(queue.count))"
+        queue.append(item); status.stringValue = Lang.t("ui.addedQueue", ["n": "\(queue.count)"])
     }
     /// Puts the next queued item on the clipboard and pastes it (when Accessibility allows). Used from the menu.
     func pasteNextFromQueue() -> Bool {
@@ -342,7 +343,7 @@ final class PickerController: NSObject, NSSearchFieldDelegate, NSTableViewDataSo
     private func extractText() {
         guard let i = selected, i.kind == .image || i.kind == .gif else { return }
         let text = store.ocrText(for: i.id)
-        guard !text.isEmpty else { status.stringValue = "No text found in this image"; return }
+        guard !text.isEmpty else { status.stringValue = Lang.t("ui.noTextImage"); return }
         _ = try? store.add(text: text, sourceBundleID: i.sourceBundleID); reload()
     }
 
@@ -420,7 +421,7 @@ final class PickerController: NSObject, NSSearchFieldDelegate, NSTableViewDataSo
             return
         }
         previewImage.isHidden = true; preview.isHidden = false
-        preview.string = i.secretKinds.isEmpty ? String(i.listTitle.prefix(4000)) : "Hidden secret (\(i.secretKinds.map(\.rawValue).joined(separator: ", ")))\nSaved as masked text in the list."
+        preview.string = i.secretKinds.isEmpty ? String(i.listTitle.prefix(4000)) : Lang.t("ui.hiddenSecret", ["kinds": i.secretKinds.map(\.rawValue).joined(separator: ", ")]) + "\n" + Lang.t("ui.hiddenSecretMasked")
     }
 
     static func oneLine(_ s: String) -> String {
