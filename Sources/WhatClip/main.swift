@@ -92,6 +92,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
                 self.menu.popUp(positioning: nil, at: NSPoint(x: 0, y: b.bounds.height), in: b)
             }
         case "history": history.show()
+        case "snippets": history.show(section: .snippets)
         case "cards": history.showCards()
         case "pickercards":
             DispatchQueue.main.asyncAfter(deadline: .now() + 2) { [weak self] in self?.picker.showCards() }

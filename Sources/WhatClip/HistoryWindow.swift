@@ -234,7 +234,8 @@ final class HistoryWindowController: NSObject, NSTableViewDataSource, NSTableVie
             }
             relayoutAboutPage()
         }
-        let plain = !isSettings && !isAbout && !isTools
+        // Item actions apply to history items only; Snippets has its own editor.
+        let plain = !isSettings && !isAbout && !isTools && section != .snippets
         previewScroll.isHidden = !plain
         previewImage.isHidden = true
         snippetBox.isHidden = true
