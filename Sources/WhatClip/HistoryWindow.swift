@@ -79,6 +79,8 @@ final class HistoryWindowController: NSObject, NSTableViewDataSource, NSTableVie
         search.placeholderString = "Search"; search.delegate = self
         list.headerView = nil; list.dataSource = self; list.delegate = self; list.rowHeight = Design.rowHeight
         list.allowsMultipleSelection = true; list.setAccessibilityLabel("Items")
+        // Keyboard: Return or a double-click copies the selected item; arrows move through the list (built into the table).
+        list.target = self; list.doubleAction = #selector(copyItem)
         list.addTableColumn(NSTableColumn(identifier: .init("item")))
         list.setAccessibilityLabel("Items")
         listScroll.documentView = list; listScroll.hasVerticalScroller = true; listScroll.borderType = .noBorder
@@ -431,6 +433,9 @@ final class HistoryWindowController: NSObject, NSTableViewDataSource, NSTableVie
     private var annotators: [AnnotateController] = []
 
     @objc private func copyItem() { guard let i = selectedItem else { return }; monitor.restore(i) }
+
+    /// ⌘F from the menu: move the cursor to the search field.
+    @objc func focusSearch() { window.makeKeyAndOrderFront(nil); window.makeFirstResponder(search) }
     @objc private func togglePin() { guard let i = selectedItem else { return }; try? store.setPinned(i.id, !i.pinned); reloadList() }
     @objc private func deleteItem() {
         // Batch delete: every selected row goes, after one confirmation when more than one is selected.

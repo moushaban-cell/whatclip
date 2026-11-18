@@ -234,6 +234,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
         picker.show(anchor: anchor)
     }
     @objc func openHistory() { history.show() }
+    @objc func focusSearch() { history.show(); history.focusSearch() }
     @objc func openSettings() { history.show(section: .settings) }
     @objc func openOnboarding() { onboarding.show() }
     @objc func openHelp() { NSWorkspace.shared.open(URL(string: "https://github.com/moushaban-cell/whatclip")!) }
