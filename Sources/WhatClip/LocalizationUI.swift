@@ -291,6 +291,7 @@ extension Lang {
         "ui.favourite": "Favourite",
         "ui.deleteNItems": "Delete {n} items",
         "ui.set.watchShots": "Add screenshots I take with the Mac's tool to my history",
+        "tour.permissions.intro": "Tick what you want. Nothing is switched on unless you tick it, and you can change any of these later in Settings.",
     ]
     private static let uiL1: [String: String] = [
         "ui.editTextMore": "编辑文本…",
@@ -568,6 +569,7 @@ extension Lang {
         "ui.favourite": "收藏",
         "ui.deleteNItems": "删除 {n} 个项目",
         "ui.set.watchShots": "把我用 Mac 截图工具拍的截图加入历史记录",
+        "tour.permissions.intro": "勾选您需要的项目。未勾选的不会开启，之后可以在设置中随时更改。",
     ]
     private static let uiL2: [String: String] = [
         "ui.editTextMore": "टेक्स्ट संपादित करें…",
@@ -845,6 +847,7 @@ extension Lang {
         "ui.favourite": "पसंदीदा",
         "ui.deleteNItems": "{n} आइटम हटाएँ",
         "ui.set.watchShots": "मैं Mac के टूल से जो स्क्रीनशॉट लेता हूँ, उन्हें इतिहास में जोड़ें",
+        "tour.permissions.intro": "जो चाहिए उस पर टिक करें। टिक किए बिना कुछ भी चालू नहीं होता, और बाद में सेटिंग्स में इनमें से कुछ भी बदल सकते हैं।",
     ]
     private static let uiL3: [String: String] = [
         "ui.editTextMore": "Editar texto…",
@@ -1122,6 +1125,7 @@ extension Lang {
         "ui.favourite": "Favorito",
         "ui.deleteNItems": "Eliminar {n} elementos",
         "ui.set.watchShots": "Añadir al historial las capturas que hago con la herramienta del Mac",
+        "tour.permissions.intro": "Marca lo que quieras. No se activa nada sin marcarlo, y puedes cambiar cualquiera de estas opciones más tarde en Ajustes.",
     ]
     private static let uiL4: [String: String] = [
         "ui.editTextMore": "Modifier le texte…",
@@ -1399,6 +1403,7 @@ extension Lang {
         "ui.favourite": "Favori",
         "ui.deleteNItems": "Supprimer {n} éléments",
         "ui.set.watchShots": "Ajouter à l’historique les captures faites avec l’outil du Mac",
+        "tour.permissions.intro": "Cochez ce que vous voulez. Rien n’est activé sans case cochée, et vous pouvez modifier chacun de ces réglages plus tard dans Réglages.",
     ]
     private static let uiL5: [String: String] = [
         "ui.editTextMore": "تعديل النص…",
@@ -1676,6 +1681,7 @@ extension Lang {
         "ui.favourite": "مفضلة",
         "ui.deleteNItems": "حذف {n} عنصرًا",
         "ui.set.watchShots": "إضافة لقطات الشاشة التي ألتقطها بأداة Mac إلى السجل",
+        "tour.permissions.intro": "حدّد ما تريد. لا يُفعَّل أي شيء دون تحديده، ويمكنك تغيير أيٍّ من هذه الخيارات لاحقًا من الإعدادات.",
     ]
     private static let uiL6: [String: String] = [
         "ui.editTextMore": "টেক্সট সম্পাদনা করুন…",
@@ -1953,6 +1959,7 @@ extension Lang {
         "ui.favourite": "পছন্দ",
         "ui.deleteNItems": "{n}টি আইটেম মুছুন",
         "ui.set.watchShots": "Mac-এর টুল দিয়ে নেওয়া স্ক্রিনশট আমার ইতিহাসে যোগ করুন",
+        "tour.permissions.intro": "যা চান তা টিক দিন। টিক না দিলে কিছুই চালু হয় না, আর পরে সেটিংস থেকে এগুলোর যেকোনোটি বদলানো যায়।",
     ]
     private static let uiL7: [String: String] = [
         "ui.editTextMore": "Editar texto…",
@@ -2230,6 +2237,7 @@ extension Lang {
         "ui.favourite": "Favoritar",
         "ui.deleteNItems": "Excluir {n} itens",
         "ui.set.watchShots": "Adicionar ao histórico as capturas feitas com a ferramenta do Mac",
+        "tour.permissions.intro": "Marque o que quiser. Nada é ativado sem marcação, e você pode mudar qualquer uma dessas opções depois em Ajustes.",
     ]
     private static let uiL8: [String: String] = [
         "ui.editTextMore": "Изменить текст…",
@@ -2507,6 +2515,7 @@ extension Lang {
         "ui.favourite": "В избранное",
         "ui.deleteNItems": "Удалить элементов: {n}",
         "ui.set.watchShots": "Добавлять в историю снимки, сделанные инструментом Mac",
+        "tour.permissions.intro": "Отметьте нужное. Ничего не включается без отметки, и любой из этих пунктов можно изменить позже в настройках.",
     ]
     private static let uiL9: [String: String] = [
         "ui.editTextMore": "テキストを編集…",
@@ -2784,6 +2793,7 @@ extension Lang {
         "ui.favourite": "お気に入り",
         "ui.deleteNItems": "{n} 件の項目を削除",
         "ui.set.watchShots": "Mac の標準ツールで撮ったスクリーンショットを履歴に追加",
+        "tour.permissions.intro": "必要なものにチェックを入れてください。チェックしたものだけが有効になり、あとから設定でいつでも変更できます。",
     ]
     private static let uiL10: [String: String] = [
         "ui.editTextMore": "Text bearbeiten…",
@@ -3061,5 +3071,6 @@ extension Lang {
         "ui.favourite": "Favorit",
         "ui.deleteNItems": "{n} Einträge löschen",
         "ui.set.watchShots": "Mit dem Mac-Werkzeug aufgenommene Screenshots in den Verlauf aufnehmen",
+        "tour.permissions.intro": "Hake an, was du möchtest. Ohne Haken wird nichts eingeschaltet, und du kannst alles später in den Einstellungen ändern.",
     ]
 }

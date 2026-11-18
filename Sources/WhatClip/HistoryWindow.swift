@@ -225,6 +225,7 @@ final class HistoryWindowController: NSObject, NSTableViewDataSource, NSTableVie
             let page = aboutPage()
             aboutScroll.documentView = page
             page.widthAnchor.constraint(equalTo: aboutScroll.contentView.widthAnchor).isActive = true
+            page.heightAnchor.constraint(greaterThanOrEqualTo: aboutScroll.contentView.heightAnchor).isActive = true
         }
         let plain = !isSettings && !isAbout
         previewScroll.isHidden = !plain
@@ -274,7 +275,9 @@ final class HistoryWindowController: NSObject, NSTableViewDataSource, NSTableVie
 
         let sections: [NSView] = [head, divider(), builder, divider(), privacy, divider(), links]
         // The sections stacked from the top, aligned to the leading edge of the language (left, or right in Arabic).
-        let page = NSStackView(views: [head, divider(), builder, divider(), privacy, divider(), links])
+        // Sections go to the top of the page; the page is at least as tall as the pane, so nothing is centred.
+        let page = NSStackView()
+        for v in [head, divider(), builder, divider(), privacy, divider(), links] { page.addView(v, in: .top) }
         page.orientation = .vertical; page.alignment = .leading; page.spacing = 18
         page.edgeInsets = NSEdgeInsets(top: 28, left: 28, bottom: 28, right: 28)
         page.userInterfaceLayoutDirection = Lang.isRightToLeft ? .rightToLeft : .leftToRight
@@ -325,6 +328,7 @@ final class HistoryWindowController: NSObject, NSTableViewDataSource, NSTableVie
                 let h = NSTextField(labelWithString: title)
                 h.font = .systemFont(ofSize: 11, weight: .semibold); h.textColor = .secondaryLabelColor
                 h.lineBreakMode = .byTruncatingTail
+                h.alignment = Lang.isRightToLeft ? .right : .left
                 return h
             }
             let l = NSTextField(labelWithString: "")
@@ -333,6 +337,10 @@ final class HistoryWindowController: NSObject, NSTableViewDataSource, NSTableVie
                 out.append(NSAttributedString(string: "● ", attributes: [.foregroundColor: Self.colour(b.colorName), .font: NSFont.systemFont(ofSize: 13)]))
             }
             out.append(NSAttributedString(string: title, attributes: [.font: NSFont.systemFont(ofSize: 13)]))
+            // Arabic: the item text starts from the right, like the rest of the window.
+            let paragraph = NSMutableParagraphStyle(); paragraph.alignment = Lang.isRightToLeft ? .right : .left
+            out.addAttribute(.paragraphStyle, value: paragraph, range: NSRange(location: 0, length: out.length))
+            l.alignment = Lang.isRightToLeft ? .right : .left
             l.attributedStringValue = out
             l.lineBreakMode = .byTruncatingTail
             return l

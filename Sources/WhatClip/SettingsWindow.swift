@@ -158,6 +158,7 @@ final class SettingsWindowController: NSObject, NSWindowDelegate {
         let root = NSStackView(views: [tabs, bar]); root.orientation = .vertical; root.alignment = .leading; root.spacing = 0
         root.translatesAutoresizingMaskIntoConstraints = false
         rootView = root
+        if Lang.isRightToLeft { mirrorForRTL(root) }
         NSLayoutConstraint.activate([tabs.widthAnchor.constraint(equalTo: root.widthAnchor), bar.widthAnchor.constraint(equalTo: root.widthAnchor)])
     }
 

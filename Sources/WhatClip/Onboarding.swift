@@ -63,10 +63,15 @@ final class OnboardingWindowController: NSObject {
         return stack
     }
 
+    /// The tour changes language at once: its pages, buttons and title are built again in the chosen language.
     @objc private func languageChosen() {
         var s = monitor.settings
         s.language = Lang.names[max(0, languagePop.indexOfSelectedItem)].code
         try? monitor.update(s)
+        Lang.current = s.language
+        let at = step
+        build()
+        show(at)
     }
 
     private let shortcutLabel = NSTextField(labelWithString: "")
@@ -94,7 +99,7 @@ final class OnboardingWindowController: NSObject {
 
     /// Records the next combination and saves it; the app re-registers the hot key from the settings change.
     @objc private func changeShortcut() {
-        shortcutLabel.stringValue = "Press the new shortcut…"
+        shortcutLabel.stringValue = Lang.t("ui.set.pressNew")
         recorder.start(onRecord: { [weak self] code, mods in
             guard let self else { return }
             var s = self.monitor.settings
@@ -112,7 +117,7 @@ final class OnboardingWindowController: NSObject {
         let icon = NSImageView(image: NSImage(systemSymbolName: "checkmark.shield", accessibilityDescription: "Permissions") ?? NSImage())
         icon.contentTintColor = Design.accent; icon.symbolConfiguration = NSImage.SymbolConfiguration(pointSize: 40, weight: .regular)
         let head = NSTextField(labelWithString: Lang.t("tour.permissions.title")); head.font = .systemFont(ofSize: 22, weight: .semibold)
-        let intro = NSTextField(wrappingLabelWithString: "Tick what you want. Nothing is switched on unless you tick it, and you can change any of these later in Settings.")
+        let intro = NSTextField(wrappingLabelWithString: Lang.t("tour.permissions.intro"))
         intro.font = .systemFont(ofSize: 13); intro.textColor = .secondaryLabelColor; intro.preferredMaxLayoutWidth = 440
         var rows: [NSView] = [icon, head, intro]
         let items: [(String, String, String)] = [
@@ -163,6 +168,8 @@ final class OnboardingWindowController: NSObject {
     }
 
     private func build() {
+        window.title = Lang.t("tour.window")
+        back.title = Lang.t("tour.back")
         pages = [
             languagePage(),
             tourPage(symbol: "doc.on.clipboard", title: Lang.t("tour.copy.title"),
@@ -193,7 +200,7 @@ final class OnboardingWindowController: NSObject {
     }
 
     private func show(_ index: Int) {
-        step = max(0, min(index, pages.count - 1)); FileHandle.standardError.write(Data("DEBUG step=\(step) requested=\(index)\n".utf8))
+        step = max(0, min(index, pages.count - 1))
         pageHost.subviews.forEach { $0.removeFromSuperview() }
         let page = pages[step]
         pageHost.addSubview(page)
@@ -214,7 +221,6 @@ final class OnboardingWindowController: NSObject {
 
     @objc private func goBack() { show(step - 1) }
     @objc private func goNext() {
-        FileHandle.standardError.write(Data("DEBUG goNext \(Thread.callStackSymbols.prefix(8).joined(separator: " | "))\n".utf8))
         if step == pages.count - 1 { done() } else { show(step + 1) }
     }
 

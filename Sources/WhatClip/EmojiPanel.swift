@@ -50,6 +50,7 @@ final class EmojiPanelController: NSObject, NSSearchFieldDelegate {
         root.translatesAutoresizingMaskIntoConstraints = false
         window.contentView = root
         root.userInterfaceLayoutDirection = Lang.isRightToLeft ? .rightToLeft : .leftToRight
+        if Lang.isRightToLeft { mirrorForRTL(root) }
         NSLayoutConstraint.activate([search.widthAnchor.constraint(equalTo: root.widthAnchor, constant: -24),
                                      scroll.widthAnchor.constraint(equalTo: root.widthAnchor)])
         show(category: 0)
