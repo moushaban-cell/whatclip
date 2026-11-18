@@ -75,7 +75,8 @@ final class CardSurface: NSView {
     var onDoubleClick: (() -> Void)?
     override func mouseDown(with event: NSEvent) {
         super.mouseDown(with: event)          // selects the card as before
-        if event.clickCount == 2 { onDoubleClick?() }
+        // As in Windows: a click on a card pastes it at the place the mouse is, in the app that was in front.
+        if event.clickCount == 1 { onDoubleClick?() }
     }
 }
 

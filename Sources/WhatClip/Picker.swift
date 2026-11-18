@@ -143,6 +143,7 @@ final class PickerController: NSObject, NSSearchFieldDelegate, NSTableViewDataSo
 
     /// `anchor` is the status item's frame on screen, used for the "menu icon" placement.
     func show(anchor: NSRect? = nil, filter start: Filter = .all) {
+        lastOpened = Date()
         previousApp = NSWorkspace.shared.frontmostApplication
         field.stringValue = ""; filter = start; filters.selectedSegment = start.rawValue
         // The picker (⌘X) never asks for Touch ID: quick paste must stay one step. The lock guards the main app (history, Settings).
@@ -162,6 +163,9 @@ final class PickerController: NSObject, NSSearchFieldDelegate, NSTableViewDataSo
     func close() { panel.orderOut(nil); Self.cleanPreviews() }
     /// True while the picker is on screen.
     var isOpen: Bool { panel.isVisible }
+    /// True for a moment after the picker was asked to open. Activating the app then must not open the main window.
+    var openedRecently: Bool { Date().timeIntervalSince(lastOpened) < 2 }
+    private var lastOpened = Date.distantPast
 
     /// Puts the picker where the person chose: under the menu icon, at the pointer, or in the middle of the screen.
     private func place(anchor: NSRect?) {

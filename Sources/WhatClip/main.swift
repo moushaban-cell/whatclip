@@ -141,7 +141,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
     /// Clicking the Dock icon with no window open brings up the history.
     func applicationShouldHandleReopen(_ sender: NSApplication, hasVisibleWindows flag: Bool) -> Bool {
         // Opening the picker activates the app; that must not open the main window as well.
-        if !flag && !picker.isOpen { history.show() }
+        if !flag && !picker.isOpen && !picker.openedRecently { history.show() }
         return true
     }
 
