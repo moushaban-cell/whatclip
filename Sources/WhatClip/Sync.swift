@@ -14,10 +14,11 @@ enum FolderSync {
         let file = dir.appendingPathComponent(fileName)
         if let attrs = try? FileManager.default.attributesOfItem(atPath: file.path),
            let modified = attrs[.modificationDate] as? Date,
-           modified > (UserDefaults.standard.object(forKey: "whatclip.lastSyncRead") as? Date ?? .distantPast),
-           let data = try? Data(contentsOf: file) {
-            _ = try? Transfer.importData(data, into: store)
-            UserDefaults.standard.set(Date(), forKey: "whatclip.lastSyncRead")
+           modified > (UserDefaults.standard.object(forKey: "whatclip.lastSyncRead") as? Date ?? .distantPast) {
+            // Only a successful import counts as read. If the file cannot be read or imported, leave it alone:
+            // overwriting it would drop the other Mac's changes.
+            guard let data = try? Data(contentsOf: file), (try? Transfer.importData(data, into: store)) != nil else { return }
+            UserDefaults.standard.set(modified, forKey: "whatclip.lastSyncRead")
         }
         if let data = try? Transfer.export(store) {
             try? data.write(to: file, options: .atomic)
@@ -78,6 +79,9 @@ enum UpdateCheck {
 
 /// Runs one of the person's own actions on a text item. The command gets the text on standard input and its output becomes a new item.
 enum ActionRunner {
+    /// Holds output read on a background thread. Only that thread writes it, and the caller reads it after the read has finished.
+    private final class OutputBox: @unchecked Sendable { var data = Data() }
+
     static func run(command: String, input: String) async -> Result<String, Error> {
         await withCheckedContinuation { cont in
             let p = Process()
@@ -85,17 +89,34 @@ enum ActionRunner {
             p.arguments = ["-c", command]
             let inPipe = Pipe(), outPipe = Pipe()
             p.standardInput = inPipe; p.standardOutput = outPipe; p.standardError = outPipe
-            p.terminationHandler = { _ in
-                let out = String(decoding: outPipe.fileHandleForReading.readDataToEndOfFile(), as: UTF8.self)
-                cont.resume(returning: p.terminationStatus == 0 ? .success(out) : .failure(CocoaError(.executableRuntimeMismatch)))
+            // Read the output while the command runs. Reading only after it exits would block a command whose output
+            // fills the pipe, and the command would never exit.
+            let output = OutputBox()
+            let readDone = DispatchGroup()
+            readDone.enter()
+            DispatchQueue.global().async {
+                output.data = outPipe.fileHandleForReading.readDataToEndOfFile()
+                readDone.leave()
+            }
+            p.terminationHandler = { proc in
+                readDone.notify(queue: .global()) {
+                    let out = String(decoding: output.data, as: UTF8.self)
+                    cont.resume(returning: proc.terminationStatus == 0 ? .success(out) : .failure(CocoaError(.executableRuntimeMismatch)))
+                }
             }
             do {
                 try p.run()
-                // A command may finish without reading its input; writing to it then must not crash the app.
-                let fd = inPipe.fileHandleForWriting.fileDescriptor
-                _ = Array(input.utf8).withUnsafeBytes { Darwin.write(fd, $0.baseAddress, $0.count) }
-                try? inPipe.fileHandleForWriting.close()
-            } catch { cont.resume(returning: .failure(error)) }
+                // Write the input off the calling thread, so a command that does not read it cannot block the app.
+                let bytes = Array(input.utf8)
+                let writer = inPipe.fileHandleForWriting
+                DispatchQueue.global().async {
+                    _ = bytes.withUnsafeBytes { Darwin.write(writer.fileDescriptor, $0.baseAddress, $0.count) }
+                    try? writer.close()
+                }
+            } catch {
+                readDone.wait()
+                cont.resume(returning: .failure(error))
+            }
         }
     }
 }

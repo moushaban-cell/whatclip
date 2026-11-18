@@ -87,7 +87,15 @@ enum SelfTest {
         // Not automated: need a person or the screen
         lines.append("SKIP screenshot and GIF: need Screen Recording and a visible selection")
         lines.append("SKIP emoji panel, Settings, Setup windows: open windows, checked by eye")
-        write(lines, dataDir)
+        // Action runner with output and input larger than a pipe buffer: it must finish, not hang.
+        let big = String(repeating: "x", count: 200_000)
+        Task { @MainActor in
+            let result = await ActionRunner.run(command: "head -c 300000 /dev/zero | tr '\\0' a", input: big)
+            var ok = false
+            if case .success(let out) = result { ok = out.count == 300_000 }
+            lines.append((ok ? "PASS " : "FAIL ") + "action runner handles large input and output")
+            write(lines, dataDir)
+        }
     }
 
     static func write(_ lines: [String], _ dir: URL) {
