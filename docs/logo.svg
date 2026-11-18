@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024" width="1024" height="1024">
+  <!-- WhatClip app icon. Flat colours, no gradients. Teal #14595F, white #FFFFFF, amber #F2B233. -->
+  <rect x="0" y="0" width="1024" height="1024" rx="224" fill="#14595F"/>
+  <rect x="270" y="200" width="484" height="640" rx="56" fill="#FFFFFF"/>
+  <rect x="400" y="150" width="224" height="110" rx="30" fill="#F2B233"/>
+  <rect x="340" y="400" width="344" height="44" rx="22" fill="#14595F"/>
+  <rect x="340" y="520" width="344" height="44" rx="22" fill="#14595F"/>
+  <rect x="340" y="640" width="220" height="44" rx="22" fill="#14595F"/>
+</svg>

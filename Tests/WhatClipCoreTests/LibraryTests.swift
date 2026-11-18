@@ -1,0 +1,58 @@
+import Testing
+import Foundation
+@testable import WhatClipCore
+
+@Suite struct TemplateTests {
+    @Test func findsVariablesInOrderOnce() {
+        #expect(Template.variables(in: "Hi {{ name }}, {{company}} and {{name}} {{ }}") == ["name", "company"])
+    }
+    @Test func rendersAndLeavesMissingAlone() {
+        #expect(Template.render("Hi {{name}}, {{topic}}", values: ["name": "Ada"]) == "Hi Ada, {{topic}}")
+        #expect(Template.render("no vars", values: [:]) == "no vars")
+    }
+}
+
+@Suite struct LibraryStoreTests {
+    @Test func snippetsRoundTripAndSearch() throws {
+        let s = try ClipStore()
+        let a = try s.addSnippet(title: "Reply", body: "Thanks {{name}}", folder: "mail")
+        _ = try s.addSnippet(title: "Sig", body: "Regards")
+        #expect(try s.snippets(query: "thanks").map(\.id) == [a.id])
+        var edited = a; edited.favorite = true; edited.title = "Reply 2"; try s.updateSnippet(edited)
+        #expect(try s.snippets().first?.title == "Reply 2")
+        try s.deleteSnippet(a.id)
+        #expect(try s.snippets().count == 1)
+    }
+    @Test func boardsHoldItemsAndDropThemWhenDeleted() throws {
+        let s = try ClipStore()
+        let it = try s.add(text: "keep this")
+        let b = try s.addBoard(name: "Work", color: "green")
+        try s.addToBoard(item: it.id, board: b.id)
+        try s.addToBoard(item: it.id, board: b.id)
+        #expect(try s.items(onBoard: b.id).map(\.text) == ["keep this"])
+        #expect(try s.boards().map(\.name) == ["Work"])
+        try s.delete(it.id)
+        #expect(try s.items(onBoard: b.id).isEmpty)
+        try s.deleteBoard(b.id)
+        #expect(try s.boards().isEmpty)
+    }
+}
+
+@Suite struct FilterTests {
+    final class Clock: @unchecked Sendable { var t = Date(timeIntervalSince1970: 1_800_000_000) }
+    @Test func favouritesDatesAndAppsFilter() throws {
+        let c = Clock()
+        let s = try ClipStore(now: { c.t })
+        let a = try s.add(text: "old from Notes", sourceBundleID: "com.apple.Notes")
+        c.t.addTimeInterval(7200)
+        _ = try s.add(text: "new from Safari", sourceBundleID: "com.apple.Safari")
+        try s.setFavorite(a.id, true)
+        #expect(try s.list(filter: .init(favoritesOnly: true)).map(\.text) == ["old from Notes"])
+        #expect(try s.list(filter: .init(source: "com.apple.Safari")).map(\.text) == ["new from Safari"])
+        #expect(try s.list(filter: .init(since: c.t.addingTimeInterval(-3600))).map(\.text) == ["new from Safari"])
+        #expect(try s.sourceApps() == ["com.apple.Safari", "com.apple.Notes"])
+        let b = try s.add(text: "batch one"); let d = try s.add(text: "batch two")
+        try s.delete([b.id, d.id])
+        #expect(try s.list().map(\.text) == ["new from Safari", "old from Notes"])
+    }
+}

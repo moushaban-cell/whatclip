@@ -1,0 +1,111 @@
+import Testing
+import Foundation
+@testable import WhatClipCore
+
+// Synthetic fixtures only: none of these are real keys or the user's clipboard.
+final class Clock: @unchecked Sendable { var t = Date(timeIntervalSince1970: 1_800_000_000); func tick(_ s: TimeInterval) { t = t.addingTimeInterval(s) } }
+
+@Suite struct StoreTests {
+    func makeStore(_ c: Clock) throws -> ClipStore { try ClipStore(now: { c.t }) }
+
+    @Test func duplicateMovesToTopInsteadOfAdding() throws {
+        let c = Clock(); let s = try makeStore(c)
+        try s.add(text: "alpha"); c.tick(1); try s.add(text: "beta"); c.tick(1)
+        let again = try s.add(text: "alpha")
+        #expect(again.useCount == 2)
+        #expect(try s.count() == 2)
+        #expect(try s.list().map(\.text) == ["alpha", "beta"])
+    }
+    @Test func searchNeedsEveryWordAndIgnoresCase() throws {
+        let c = Clock(); let s = try makeStore(c)
+        try s.add(text: "Quarterly Report Final"); try s.add(text: "report draft"); try s.add(text: "100% sure_thing")
+        #expect(try s.list(query: "report final").map(\.text) == ["Quarterly Report Final"])
+        #expect(try s.list(query: "REPORT").count == 2)
+        #expect(try s.list(query: "100%").count == 1, "percent is literal, not a wildcard")
+        #expect(try s.list(query: "sure_").count == 1)
+        #expect(try s.list(query: "s_re").count == 0, "underscore is literal")
+    }
+    @Test func pinnedFirstAndProtectedFromRetention() throws {
+        let c = Clock(); let s = try makeStore(c)
+        let old = try s.add(text: "keep me"); try s.setPinned(old.id, true)
+        for i in 0..<5 { c.tick(10); try s.add(text: "item \(i)") }
+        try s.enforceRetention(maxItems: 2, maxAgeDays: nil)
+        let texts = try s.list().map(\.text)
+        #expect(texts.first == "keep me")
+        #expect(texts.count == 3, "one pinned plus the two newest")
+        #expect(texts.contains("item 4") && texts.contains("item 3"))
+    }
+    @Test func ageLimitRemovesOldUnpinned() throws {
+        let c = Clock(); let s = try makeStore(c)
+        try s.add(text: "old"); c.tick(40 * 86_400); try s.add(text: "fresh")
+        let removed = try s.enforceRetention(maxItems: 100, maxAgeDays: 30)
+        #expect(removed == 1)
+        #expect(try s.list().map(\.text) == ["fresh"])
+    }
+    @Test func expiringItemsDisappearAndAreHiddenBeforeCleanup() throws {
+        let c = Clock(); let s = try makeStore(c)
+        try s.add(text: "temp", expiresIn: 60, secretKinds: [.jwt]); try s.add(text: "stay")
+        c.tick(61)
+        #expect(try s.list().map(\.text) == ["stay"], "expired items are hidden immediately")
+        #expect(try s.enforceRetention(maxItems: 100, maxAgeDays: nil) == 1)
+        #expect(try s.count() == 1)
+    }
+    @Test func pinningStopsExpiry() throws {
+        let c = Clock(); let s = try makeStore(c)
+        let it = try s.add(text: "temp", expiresIn: 60); try s.setPinned(it.id, true)
+        c.tick(120); try s.enforceRetention(maxItems: 10, maxAgeDays: nil)
+        #expect(try s.count() == 1)
+    }
+    @Test func clearKeepsPinnedByDefault() throws {
+        let c = Clock(); let s = try makeStore(c)
+        let a = try s.add(text: "a"); try s.add(text: "b"); try s.setPinned(a.id, true)
+        try s.clear(); #expect(try s.list().map(\.text) == ["a"])
+        try s.clear(keepPinned: false); #expect(try s.count() == 0)
+    }
+    @Test func fileStoreSurvivesReopenAndIsPrivate() throws {
+        let dir = FileManager.default.temporaryDirectory.appendingPathComponent("whatclip-test-\(UUID().uuidString)")
+        try FileManager.default.createDirectory(at: dir, withIntermediateDirectories: true); defer { try? FileManager.default.removeItem(at: dir) }
+        let path = dir.appendingPathComponent("h.sqlite").path
+        do { let s = try ClipStore(path: path); try s.add(text: "persisted") }
+        let s2 = try ClipStore(path: path)
+        #expect(try s2.list().map(\.text) == ["persisted"])
+        let perms = try FileManager.default.attributesOfItem(atPath: path)[.posixPermissions] as? Int
+        #expect(perms == 0o600)
+    }
+}
+
+@Suite struct ClassifyTests {
+    @Test func urls() {
+        #expect(classify("https://example.com/a?b=1") == .url)
+        #expect(classify("  https://example.com  ") == .url)
+        #expect(classify("see https://example.com") == .text)
+        #expect(classify("example.com") == .text)
+        #expect(classify("hello") == .text)
+    }
+    @Test func fingerprintStable() { #expect(fingerprint(of: "a") == fingerprint(of: "a")); #expect(fingerprint(of: "a") != fingerprint(of: "b")) }
+}
+
+@Suite struct PolicyTests {
+    @Test func markersAreRespected() {
+        let p = PrivacyPolicy()
+        #expect(p.decide(text: "x", types: [PasteboardMarker.concealed], sourceBundleID: nil) == .skip(.concealed))
+        #expect(p.decide(text: "x", types: [PasteboardMarker.transient], sourceBundleID: nil) == .skip(.transient))
+        #expect(p.decide(text: "x", types: [PasteboardMarker.autoGenerated], sourceBundleID: nil) == .skip(.autoGenerated))
+        #expect(p.decide(text: "x", types: ["public.utf8-plain-text"], sourceBundleID: nil) == .capture)
+    }
+    @Test func pauseIgnoreNextExclusionsAndEmpty() {
+        var p = PrivacyPolicy(); p.excludedBundleIDs = ["com.example.vault"]
+        #expect(p.decide(text: "x", types: [], sourceBundleID: "com.example.vault") == .skip(.excludedApp))
+        #expect(p.decide(text: "  \n", types: [], sourceBundleID: nil) == .skip(.empty))
+        p.ignoreNextCopy = true; #expect(p.decide(text: "x", types: [], sourceBundleID: nil) == .skip(.ignoreNext))
+        p.ignoreNextCopy = false; p.paused = true; #expect(p.decide(text: "x", types: [], sourceBundleID: nil) == .skip(.paused))
+        p.paused = false; p.maxCharacters = 3; #expect(p.decide(text: "abcd", types: [], sourceBundleID: nil) == .skip(.tooLarge))
+    }
+    @Test func secretsExpireSkipOrKeep() {
+        var p = PrivacyPolicy()
+        let fake = "AKIAABCDEFGHIJKLMNOP"   // synthetic, matches the AWS shape only
+        #expect(p.decide(text: fake, types: [], sourceBundleID: nil) == .captureExpiring(seconds: 60, because: [.awsAccessKey]))
+        p.secretAction = .skip; #expect(p.decide(text: fake, types: [], sourceBundleID: nil) == .skip(.secret))
+        p.secretAction = .keep; #expect(p.decide(text: fake, types: [], sourceBundleID: nil) == .capture)
+    }
+}
