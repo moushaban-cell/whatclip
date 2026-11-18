@@ -3,7 +3,7 @@
 ## 1.0.0
 First complete release, source only, private repository.
 - Capture of text, links, rich text, HTML, images, GIFs and files; restored in their original form.
-- Picker (default ⇧⌘X, changeable): search, filters, cards and list, previews, multi-select, Touch ID or password lock with a 15-minute session.
+- Picker (default ⌘X, changeable): search, filters, cards and list, previews, multi-select, Touch ID or password lock with a 15-minute session.
 - Auto-paste after choosing an item (needs the Accessibility permission).
 - Main window with History, Library, Snippets, Settings (General, History, Privacy) and About.
 - Stack, snippets with variables, boards, tags, favourites, text tools, smart actions, OCR search, annotation, area screenshots, GIF recording.
