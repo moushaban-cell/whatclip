@@ -71,6 +71,14 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
         UpdateCheck.runIfDue(enabled: monitor.settings.checkForUpdates, current: (Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String) ?? "0")
         if !monitor.settings.onboardingDone { onboarding.show() }
         // Testing aid: WHATCLIP_SHOW=picker, history or onboarding opens that window at launch.
+        // Self-test: runs the Capture and tools actions inside this app and writes selftest.txt in the data folder.
+        // The self-test deletes unpinned history, so it runs only on a data folder that was set up for testing (it holds a .selftest-ok file).
+        if ProcessInfo.processInfo.environment["WHATCLIP_SELFTEST"] != nil, SelfTest.isAllowed(in: dir) {
+            DispatchQueue.main.asyncAfter(deadline: .now() + 3) { [weak self] in
+                guard let self else { return }
+                SelfTest.run(app: self, dataDir: dir)
+            }
+        }
         switch ProcessInfo.processInfo.environment["WHATCLIP_SHOW"] {
         case "annotate":                     // the Annotate latest action, after launch
             DispatchQueue.main.asyncAfter(deadline: .now() + 2) { [weak self] in self?.annotateLatest() }

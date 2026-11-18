@@ -101,6 +101,7 @@ extension HistoryWindowController {
             let thumb = NSImageView()
             if let d = store.payloadData(for: item), let img = NSImage(data: d) { thumb.image = img }
             thumb.imageScaling = .scaleProportionallyUpOrDown; thumb.wantsLayer = true; thumb.layer?.cornerRadius = 6; thumb.layer?.masksToBounds = true
+            thumb.setAccessibilityLabel(item.listTitle)
             thumb.translatesAutoresizingMaskIntoConstraints = false
             thumb.widthAnchor.constraint(equalToConstant: 96).isActive = true
             thumb.heightAnchor.constraint(equalToConstant: 60).isActive = true
