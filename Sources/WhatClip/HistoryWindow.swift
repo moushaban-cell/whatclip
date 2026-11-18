@@ -151,6 +151,8 @@ final class HistoryWindowController: NSObject, NSTableViewDataSource, NSTableVie
         }
         // The toolbar (search and List/Cards) stays at the top; the items take the rest of the pane.
         let listArea = NSStackView(views: [listScroll, shelf.scroll]); listArea.orientation = .vertical; listArea.distribution = .fillEqually
+        // The list pane places this area by frame; without this its scroll view never gets a size and the rows never draw.
+        listArea.translatesAutoresizingMaskIntoConstraints = true
         listArea.setHuggingPriority(.defaultLow, for: .vertical)
         let listPane = ListPaneView(search: search, mode: viewMode, body: listArea)
         listPaneRef = listPane
