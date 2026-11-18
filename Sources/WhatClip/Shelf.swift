@@ -24,9 +24,6 @@ final class ShelfController: NSObject, NSCollectionViewDataSource, NSCollectionV
     var menuForItem: ((Int) -> NSMenu?)? { didSet { collection.menuForIndex = menuForItem } }
     /// A double-click on a card: the same as choosing the item (paste it).
     var onActivate: ((Int) -> Void)?
-    @objc private func cardDoubleClicked(_ g: NSClickGestureRecognizer) {
-        if let ip = collection.indexPathForItem(at: g.location(in: collection)) { onActivate?(ip.item) }
-    }
     let scroll = NSScrollView()
     var items: [ClipItem] = []
     var store: ClipStore?
@@ -41,9 +38,6 @@ final class ShelfController: NSObject, NSCollectionViewDataSource, NSCollectionV
         collection.collectionViewLayout = layout
         collection.register(CardView.self, forItemWithIdentifier: CardView.identifier)
         collection.dataSource = self; collection.delegate = self
-        let double = NSClickGestureRecognizer(target: self, action: #selector(cardDoubleClicked(_:)))
-        double.numberOfClicksRequired = 2
-        collection.addGestureRecognizer(double)
         collection.isSelectable = true; collection.allowsMultipleSelection = true
         collection.backgroundColors = [.textBackgroundColor]
         collection.setAccessibilityLabel("Clipboard cards")
@@ -65,6 +59,8 @@ final class ShelfController: NSObject, NSCollectionViewDataSource, NSCollectionV
     func collectionView(_ collectionView: NSCollectionView, itemForRepresentedObjectAt indexPath: IndexPath) -> NSCollectionViewItem {
         let item = collectionView.makeItem(withIdentifier: CardView.identifier, for: indexPath) as! CardView
         item.configure(items[indexPath.item], store: store)
+        let index = indexPath.item
+        item.onDoubleClick = { [weak self] in self?.onActivate?(index) }
         return item
     }
 
@@ -74,14 +70,27 @@ final class ShelfController: NSObject, NSCollectionViewDataSource, NSCollectionV
 }
 
 /// One card: a preview on top, the title and source under it.
+/// The card's own surface: it sees its clicks, so a double-click on the card is recognised here.
+final class CardSurface: NSView {
+    var onDoubleClick: (() -> Void)?
+    override func mouseDown(with event: NSEvent) {
+        super.mouseDown(with: event)          // selects the card as before
+        if event.clickCount == 2 { onDoubleClick?() }
+    }
+}
+
 final class CardView: NSCollectionViewItem {
     static let identifier = NSUserInterfaceItemIdentifier("card")
+    /// Set by the grid: runs when the card is double-clicked.
+    var onDoubleClick: (() -> Void)? { didSet { (view as? CardSurface)?.onDoubleClick = onDoubleClick } }
     private let preview = NSView()
     private let titleLabel = NSTextField(wrappingLabelWithString: "")
     private let subtitleLabel = NSTextField(labelWithString: "")
 
     override func loadView() {
-        view = NSView()
+        let surface = CardSurface()
+        surface.onDoubleClick = onDoubleClick
+        view = surface
         view.wantsLayer = true
         view.layer?.cornerRadius = 10
         view.layer?.backgroundColor = NSColor.controlBackgroundColor.cgColor

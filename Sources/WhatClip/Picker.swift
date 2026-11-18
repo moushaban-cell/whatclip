@@ -396,8 +396,9 @@ final class PickerController: NSObject, NSSearchFieldDelegate, NSTableViewDataSo
     static func sendPasteShortcut() { sendPaste() }
 
     private static func sendPaste() {
-        let src = CGEventSource(stateID: .combinedSessionState)
-        for down in [true, false] { let e = CGEvent(keyboardEventSource: src, virtualKey: 9, keyDown: down); e?.flags = .maskCommand; e?.post(tap: .cghidEventTap) }
+        // Only into another app: never into WhatClip itself.
+        guard NSWorkspace.shared.frontmostApplication?.bundleIdentifier != Bundle.main.bundleIdentifier else { return }
+        AutoPaste.postCommandV()
     }
 
     // MARK: table

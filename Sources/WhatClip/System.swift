@@ -86,15 +86,32 @@ enum AutoPaste {
 
     /// Brings the previous app forward, then sends ⌘V to it.
     static func paste(into app: NSRunningApplication?) {
-        // Forces the app the person was using to the front, then waits until it has focus before sending ⌘V.
+        // Forces the app the person was using to the front, then sends ⌘V only once that app really has focus.
+        // ⌘V is never sent while WhatClip itself is in front: that is how the picker and main window were opening.
         app?.activate(options: [.activateIgnoringOtherApps])
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.35) {
-            let src = CGEventSource(stateID: .combinedSessionState)
-            for down in [true, false] {
-                let e = CGEvent(keyboardEventSource: src, virtualKey: 9, keyDown: down)
-                e?.flags = .maskCommand
-                e?.post(tap: .cghidEventTap)
-            }
+        waitForFocus(app, attempts: 40)
+    }
+
+    private static func waitForFocus(_ target: NSRunningApplication?, attempts: Int) {
+        let front = NSWorkspace.shared.frontmostApplication
+        let ownID = Bundle.main.bundleIdentifier
+        if let target, front?.processIdentifier == target.processIdentifier {
+            postCommandV()
+        } else if attempts > 0 {
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.05) { waitForFocus(target, attempts: attempts - 1) }
+        } else if front?.bundleIdentifier != ownID {
+            postCommandV()                    // another app took focus: paste there
+        }
+        // Otherwise WhatClip still has focus and nothing is sent; the item stays on the clipboard for ⌘V.
+    }
+
+    /// Sends ⌘V to whatever app is in front.
+    static func postCommandV() {
+        let src = CGEventSource(stateID: .combinedSessionState)
+        for down in [true, false] {
+            let e = CGEvent(keyboardEventSource: src, virtualKey: 9, keyDown: down)
+            e?.flags = .maskCommand
+            e?.post(tap: .cghidEventTap)
         }
     }
 }
