@@ -373,6 +373,9 @@ if let first = runningCopies.first {
     exit(0)
 }
 
+// A pipe to a finished command must not end the app (SIGPIPE): errors are handled where they happen.
+signal(SIGPIPE, SIG_IGN)
+
 let app = NSApplication.shared
 let delegate = MainActor.assumeIsolated { AppDelegate() }
 app.delegate = delegate

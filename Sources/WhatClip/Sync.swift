@@ -91,7 +91,9 @@ enum ActionRunner {
             }
             do {
                 try p.run()
-                inPipe.fileHandleForWriting.write(Data(input.utf8))
+                // A command may finish without reading its input; writing to it then must not crash the app.
+                let fd = inPipe.fileHandleForWriting.fileDescriptor
+                _ = Array(input.utf8).withUnsafeBytes { Darwin.write(fd, $0.baseAddress, $0.count) }
                 try? inPipe.fileHandleForWriting.close()
             } catch { cont.resume(returning: .failure(error)) }
         }
