@@ -32,6 +32,8 @@ final class PickerController: NSObject, NSSearchFieldDelegate, NSTableViewDataSo
     }
 
     private let panel: KeyPanel
+    /// The picker window's size, for checks.
+    var panelSize: NSSize { panel.frame.size }
     private let field = NSSearchField()
     private let filters = NSSegmentedControl(labels: Filter.allCases.map(\.title), trackingMode: .selectOne, target: nil, action: nil)
     private let table = NSTableView()

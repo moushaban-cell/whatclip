@@ -98,6 +98,17 @@ enum SelfTest {
             return writer.string(forType: HistoryDrag.type) == String(item.id)
         }
 
+        // Picker style: changing the saved setting changes the picker's size the next time it opens, and back again
+        var styled = monitor.settings
+        styled.pickerStyle = .compact
+        try? monitor.update(styled)
+        app.picker.applyStyle()
+        check("compact style makes the picker small (360 x 380)") { app.picker.panelSize == NSSize(width: 360, height: 380) }
+        styled.pickerStyle = .full
+        try? monitor.update(styled)
+        app.picker.applyStyle()
+        check("full style restores the picker size (680 x 440)") { app.picker.panelSize == NSSize(width: 680, height: 440) }
+
         // Export and import round trip
         if let data = try? Transfer.export(store) {
             check("export produces data") { !data.isEmpty }
