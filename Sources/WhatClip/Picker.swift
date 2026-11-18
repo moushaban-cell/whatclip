@@ -145,7 +145,7 @@ final class PickerController: NSObject, NSSearchFieldDelegate, NSTableViewDataSo
     func show(anchor: NSRect? = nil, filter start: Filter = .all) {
         previousApp = NSWorkspace.shared.frontmostApplication
         field.stringValue = ""; filter = start; filters.selectedSegment = start.rawValue
-        // The picker (⇧⌘X) never asks for Touch ID: quick paste must stay one step. The lock guards the main app (history, Settings).
+        // The picker (⌘X) never asks for Touch ID: quick paste must stay one step. The lock guards the main app (history, Settings).
         locked = false
         place(anchor: anchor)
         NSApp.activate(ignoringOtherApps: true)
@@ -160,6 +160,8 @@ final class PickerController: NSObject, NSSearchFieldDelegate, NSTableViewDataSo
         }
     }
     func close() { panel.orderOut(nil); Self.cleanPreviews() }
+    /// True while the picker is on screen.
+    var isOpen: Bool { panel.isVisible }
 
     /// Puts the picker where the person chose: under the menu icon, at the pointer, or in the middle of the screen.
     private func place(anchor: NSRect?) {

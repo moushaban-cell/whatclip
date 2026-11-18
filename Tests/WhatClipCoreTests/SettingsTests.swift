@@ -92,7 +92,7 @@ import Foundation
         var s = WhatClipSettings.default
         s.gifSeconds = 99; s.gifFramesPerSecond = 3; s.hotKeyModifiers = 0
         s.clamped()
-        #expect(s.gifSeconds == 15 && s.gifFramesPerSecond == 8 && s.hotKeyModifiers == 768)
+        #expect(s.gifSeconds == 15 && s.gifFramesPerSecond == 8 && s.hotKeyModifiers == 256)
         let back = try JSONDecoder().decode(WhatClipSettings.self, from: JSONEncoder().encode(s))
         #expect(back == s)
     }

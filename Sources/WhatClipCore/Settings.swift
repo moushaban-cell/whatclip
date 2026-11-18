@@ -65,13 +65,13 @@ public struct WhatClipSettings: Sendable, Codable, Equatable {
         excludedBundleIDs: BundleIDList.defaultExcluded, secretAction: .expire,
         secretLifetimeSeconds: 60, retention: .quarter, maxItems: 500,
         encryptPayloads: false, requireTouchID: false, launchAtLogin: false, recognizeText: true,
-        appearance: .system, popupPlacement: .menuIcon, clearOnQuit: false, fuzzySearch: true, ignoredPatterns: [], onboardingDone: false, showInDock: true, gifSeconds: 5, gifFramesPerSecond: 8, hotKeyCode: 7, hotKeyModifiers: 768, autoPaste: true, language: "en", actionsText: "", syncFolder: "", checkForUpdates: true)
+        appearance: .system, popupPlacement: .menuIcon, clearOnQuit: false, fuzzySearch: true, ignoredPatterns: [], onboardingDone: false, showInDock: true, gifSeconds: 5, gifFramesPerSecond: 8, hotKeyCode: 7, hotKeyModifiers: 256, autoPaste: true, language: "en", actionsText: "", syncFolder: "", checkForUpdates: true)
 
     public init(excludedBundleIDs: [String], secretAction: SecretAction, secretLifetimeSeconds: Double, retention: Retention, maxItems: Int,
                 encryptPayloads: Bool = false, requireTouchID: Bool = false, launchAtLogin: Bool = false, recognizeText: Bool = true,
                 appearance: AppearanceChoice = .system, popupPlacement: PopupPlacement = .menuIcon, clearOnQuit: Bool = false,
                 fuzzySearch: Bool = true, ignoredPatterns: [String] = [], onboardingDone: Bool = false, showInDock: Bool = true,
-                gifSeconds: Int = 5, gifFramesPerSecond: Int = 8, hotKeyCode: Int = 7, hotKeyModifiers: Int = 768, autoPaste: Bool = true, language: String = "en",
+                gifSeconds: Int = 5, gifFramesPerSecond: Int = 8, hotKeyCode: Int = 7, hotKeyModifiers: Int = 256, autoPaste: Bool = true, language: String = "en",
                 actionsText: String = "", syncFolder: String = "", checkForUpdates: Bool = true, watchScreenshots: Bool = true) {
         self.actionsText = actionsText; self.syncFolder = syncFolder; self.checkForUpdates = checkForUpdates; self.watchScreenshots = watchScreenshots
         self.language = language; self.autoPaste = autoPaste; self.gifSeconds = gifSeconds; self.gifFramesPerSecond = gifFramesPerSecond; self.hotKeyCode = hotKeyCode; self.hotKeyModifiers = hotKeyModifiers
@@ -134,7 +134,7 @@ public struct WhatClipSettings: Sendable, Codable, Equatable {
         if !Self.supportedLanguages.contains(language) { language = "en" }
         gifSeconds = min(max(gifSeconds, 2), 15)
         gifFramesPerSecond = [5, 8, 12, 15].contains(gifFramesPerSecond) ? gifFramesPerSecond : 8
-        if hotKeyModifiers & 0x0F00 == 0 { hotKeyModifiers = 768 }   // a shortcut needs command or control or option
+        if hotKeyModifiers & 0x0F00 == 0 { hotKeyModifiers = 256 }   // a shortcut needs command or control or option
         maxItems = min(max(maxItems, 10), 5_000)
         excludedBundleIDs = Array(Set(excludedBundleIDs.filter { BundleIDList.parse($0) == [$0] })).sorted()
     }

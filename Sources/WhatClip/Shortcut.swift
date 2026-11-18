@@ -26,6 +26,6 @@ final class ShortcutRecorder {
     }
     func stop() { if let m = monitor { NSEvent.removeMonitor(m) }; monitor = nil }
 
-    /// A readable name for a shortcut, for example "⇧⌘X".
+    /// A readable name for a shortcut, for example "⌘X".
     static func describe(code: Int, mods: Int) -> String { SettingsWindowController.describe(code: code, mods: mods) }
 }

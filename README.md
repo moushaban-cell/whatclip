@@ -20,7 +20,7 @@ Everything you copy, searchable and one shortcut away. Stays on your Mac. No acc
 
 macOS forgets whatever you copied before. WhatClip remembers it, so you can get back the link, the snippet or the image you copied an hour ago, without digging through old windows.
 
-- **Press ⇧⌘X** and the picker opens under the menu-bar icon. Type to search, press Return to paste.
+- **Press ⌘X** and the picker opens under the menu-bar icon. Type to search, press Return to paste.
 - **Private by design.** Copies from password managers and Keychain Access are never recorded. Copied API keys, tokens and card numbers are hidden and removed after a timer.
 - **Everything is yours.** The history lives in your user folder, with optional encryption. Nothing is uploaded.
 
@@ -85,7 +85,7 @@ WhatClip makes no network requests, has no account and collects no telemetry. Yo
 
 | Shortcut | Action |
 |---|---|
-| ⇧⌘X | Open the picker (you can change it in Settings) |
+| ⌘X | Open the picker (you can change it in Settings) |
 | Return / ⇧Return | Paste / paste as plain text |
 | ⌘1–9 | Choose a visible item |
 | ⌘P / ⌘D | Pin / favourite |
