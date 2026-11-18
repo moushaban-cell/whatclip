@@ -225,9 +225,6 @@ final class HistoryWindowController: NSObject, NSTableViewDataSource, NSTableVie
             let page = aboutPage()
             aboutScroll.documentView = page
             page.widthAnchor.constraint(equalTo: aboutScroll.contentView.widthAnchor).isActive = true
-            // As tall as the pane, so the scroll view does not centre the sections; they stay at the top.
-            let fill = page.heightAnchor.constraint(equalTo: aboutScroll.contentView.heightAnchor); fill.priority = .defaultHigh
-            fill.isActive = true
         }
         let plain = !isSettings && !isAbout
         previewScroll.isHidden = !plain
@@ -252,7 +249,7 @@ final class HistoryWindowController: NSObject, NSTableViewDataSource, NSTableVie
             let b = NSButton(title: title, target: AboutActions.shared, action: action); b.bezelStyle = .inline; return b
         }
         func section(_ views: [NSView]) -> NSStackView {
-            let s = NSStackView(views: views); s.orientation = .vertical; s.alignment = .width; s.spacing = 8
+            let s = NSStackView(views: views); s.orientation = .vertical; s.alignment = .leading; s.spacing = 8
             s.userInterfaceLayoutDirection = Lang.isRightToLeft ? .rightToLeft : .leftToRight
             return s
         }
@@ -276,12 +273,11 @@ final class HistoryWindowController: NSObject, NSTableViewDataSource, NSTableVie
                              link(Lang.t("ui.about.donate"), #selector(AboutActions.openSupport))])
 
         let sections: [NSView] = [head, divider(), builder, divider(), privacy, divider(), links]
-        // Stacked from the top (top gravity), each section filling the width; text follows the language direction.
-        let page = NSStackView()
-        page.orientation = .vertical; page.alignment = .width; page.spacing = 18
+        // The sections stacked from the top, aligned to the leading edge of the language (left, or right in Arabic).
+        let page = NSStackView(views: [head, divider(), builder, divider(), privacy, divider(), links])
+        page.orientation = .vertical; page.alignment = .leading; page.spacing = 18
         page.edgeInsets = NSEdgeInsets(top: 28, left: 28, bottom: 28, right: 28)
         page.userInterfaceLayoutDirection = Lang.isRightToLeft ? .rightToLeft : .leftToRight
-        for v in sections { page.addView(v, in: .top) }
         page.translatesAutoresizingMaskIntoConstraints = false
         if Lang.isRightToLeft { mirrorForRTL(page) }
         return page
