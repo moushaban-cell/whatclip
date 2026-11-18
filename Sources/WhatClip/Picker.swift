@@ -58,7 +58,7 @@ final class PickerController: NSObject, NSSearchFieldDelegate, NSTableViewDataSo
     init(store: ClipStore, monitor: PasteboardMonitor) {
         self.store = store; self.monitor = monitor
         panel = KeyPanel(contentRect: NSRect(x: 0, y: 0, width: 680, height: 440),
-                         styleMask: [.titled, .fullSizeContentView, .nonactivatingPanel, .utilityWindow, .resizable], backing: .buffered, defer: false)
+                         styleMask: [.titled, .closable, .miniaturizable, .resizable, .fullSizeContentView, .nonactivatingPanel], backing: .buffered, defer: false)
         panel.minSize = NSSize(width: 520, height: 340)
         super.init()
         panel.titleVisibility = .hidden; panel.titlebarAppearsTransparent = true; panel.isFloatingPanel = true
@@ -114,12 +114,17 @@ final class PickerController: NSObject, NSSearchFieldDelegate, NSTableViewDataSo
         let filterRow = NSStackView(views: [filters, datePop, appPop, cardsButton]); filterRow.spacing = 8
         let stack = NSStackView(views: [field, filterRow, body, NSStackView(views: [status, hint])])
         stack.orientation = .vertical; stack.alignment = .leading; stack.spacing = 8
-        stack.edgeInsets = NSEdgeInsets(top: 14, left: 14, bottom: 12, right: 14)
+        // Top inset clears the traffic-light buttons (close, minimise, zoom) that sit over the top edge.
+        stack.edgeInsets = NSEdgeInsets(top: 34, left: 14, bottom: 12, right: 14)
         stack.translatesAutoresizingMaskIntoConstraints = false
         panel.contentView = stack
         field.widthAnchor.constraint(equalTo: stack.widthAnchor, constant: -24).isActive = true
         body.widthAnchor.constraint(equalTo: stack.widthAnchor, constant: -24).isActive = true
-        body.heightAnchor.constraint(equalToConstant: 340).isActive = true
+        // The body grows with the window (340 is the starting height, not a fixed one).
+        let bodyHeight = body.heightAnchor.constraint(greaterThanOrEqualToConstant: 340)
+        bodyHeight.priority = .defaultHigh; bodyHeight.isActive = true
+        body.setContentHuggingPriority(.defaultLow, for: .vertical)
+        body.setContentCompressionResistancePriority(.defaultLow, for: .vertical)
     }
 
     var isVisible: Bool { panel.isVisible }
