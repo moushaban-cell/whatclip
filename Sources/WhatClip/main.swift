@@ -197,7 +197,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
         add(Lang.t("ui.m.emoji"), #selector(openEmoji))
         menu.addItem(.separator())
 
-        let recent = (try? store.list(limit: 8)) ?? []
+        let recent = readOrDefault("list", []) { try store.list(limit: 8) }
         if recent.isEmpty { disabled(Lang.t("ui.nothingYet")) }
         for i in recent { let m = NSMenuItem(title: PickerController.oneLine(i.listTitle), action: #selector(pasteRecent(_:)), keyEquivalent: ""); m.target = self; m.representedObject = i; m.image = NSImage(systemSymbolName: i.kind.symbol, accessibilityDescription: nil); menu.addItem(m) }
         menu.addItem(.separator())
@@ -240,7 +240,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
     }
     private func snippetsMenu() -> NSMenu {
         let m = NSMenu()
-        let snippets = (try? store.snippets()) ?? []
+        let snippets = readOrDefault("snippets", []) { try store.snippets() }
         for s in snippets.prefix(12) { let it = item(s.title, #selector(insertSnippet(_:))); it.representedObject = s.id; m.addItem(it) }
         if snippets.isEmpty { m.addItem(item(Lang.t("ui.noSnippets"), nil, enabled: false)) }
         m.addItem(.separator())
@@ -249,7 +249,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
     }
     private func boardsMenu() -> NSMenu {
         let m = NSMenu()
-        let boards = (try? store.boards()) ?? []
+        let boards = readOrDefault("boards", []) { try store.boards() }
         for b in boards { let it = item(b.name, #selector(openBoard(_:))); it.representedObject = b.id; m.addItem(it) }
         if boards.isEmpty { m.addItem(item(Lang.t("ui.noBoards"), nil, enabled: false)) }
         return m

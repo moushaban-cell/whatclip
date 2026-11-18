@@ -86,7 +86,7 @@ enum SelfTest {
         if let pinned = try? store.add(text: "selftest pinned"), let fav = try? store.add(text: "selftest fav"), (try? store.add(text: "selftest plain")) != nil {
             try? store.setPinned(pinned.id, true); try? store.setFavorite(fav.id, true)
             try? store.clear()
-            let texts = Set((try? store.list().map(\.text)) ?? [])
+            let texts = Set(readOrDefault("list", []) { try store.list().map(\.text) })
             check("clear history keeps pinned and favourite items") { texts.contains("selftest pinned") && texts.contains("selftest fav") && !texts.contains("selftest plain") }
         }
 

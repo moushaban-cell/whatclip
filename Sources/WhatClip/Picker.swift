@@ -230,7 +230,7 @@ final class PickerController: NSObject, NSSearchFieldDelegate, NSTableViewDataSo
     /// The board list, kept in step with the boards that exist. The chosen board stays chosen when the list changes.
     private func refreshBoardPopup() {
         let current = boardPop.indexOfSelectedItem > 0 ? boardIDs[safe: boardPop.indexOfSelectedItem - 1] : nil
-        let boards = (try? store.boards()) ?? []
+        let boards = readOrDefault("boards", []) { try store.boards() }
         boardPop.removeAllItems()
         boardPop.addItem(withTitle: Lang.t("ui.anyBoard"))
         boardIDs = boards.map(\.id)
@@ -241,7 +241,7 @@ final class PickerController: NSObject, NSSearchFieldDelegate, NSTableViewDataSo
     private func addSelectedToBoard() {
         let picked = table.selectedRowIndexes.compactMap { items[safe: $0] }
         guard !picked.isEmpty else { return }
-        let boards = (try? store.boards()) ?? []
+        let boards = readOrDefault("boards", []) { try store.boards() }
         guard !boards.isEmpty else {
             let alert = NSAlert(); alert.messageText = Lang.t("ui.board.noneYet"); alert.runModal(); return
         }
@@ -257,7 +257,7 @@ final class PickerController: NSObject, NSSearchFieldDelegate, NSTableViewDataSo
 
     private func refreshAppPopup() {
         let current = appPop.indexOfSelectedItem > 0 ? appIDs[safe: appPop.indexOfSelectedItem - 1] : nil
-        appIDs = (try? store.sourceApps()) ?? []
+        appIDs = readOrDefault("sourceApps", []) { try store.sourceApps() }
         appPop.removeAllItems()
         appPop.addItem(withTitle: Lang.t("ui.anyApp"))
         for id in appIDs { appPop.addItem(withTitle: Design.appName(id) ?? id) }
@@ -266,13 +266,13 @@ final class PickerController: NSObject, NSSearchFieldDelegate, NSTableViewDataSo
 
     func reload() {
         if locked { items = []; table.reloadData(); preview.string = Lang.t("ui.lockedPicker"); previewImage.isHidden = true; return }
-        var found = (try? store.list(query: monitor.settings.fuzzySearch ? "" : field.stringValue, limit: 500, filter: storeFilter())) ?? []
+        var found = readOrDefault("list", []) { try store.list(query: monitor.settings.fuzzySearch ? "" : field.stringValue, limit: 500, filter: storeFilter()) }
         if monitor.settings.fuzzySearch, !field.stringValue.isEmpty { found = found.filter { FuzzyMatch.matches(field.stringValue, in: $0.text) } }
         refreshAppPopup()
         refreshBoardPopup()
         // A chosen board shows only its items; the search text still applies to them.
         if boardPop.indexOfSelectedItem > 0, boardIDs.indices.contains(boardPop.indexOfSelectedItem - 1) {
-            let onBoard = (try? store.items(onBoard: boardIDs[boardPop.indexOfSelectedItem - 1])) ?? []
+            let onBoard = readOrDefault("items", []) { try store.items(onBoard: boardIDs[boardPop.indexOfSelectedItem - 1]) }
             let q = field.stringValue
             found = q.isEmpty ? onBoard : onBoard.filter { $0.text.localizedCaseInsensitiveContains(q) }
         }

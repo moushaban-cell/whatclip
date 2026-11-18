@@ -9,7 +9,7 @@ extension HistoryWindowController {
         var s: [(String, Section)] = [(Lang.t("ui.history"), .header), (Lang.t("ui.allItems"), .all), (Lang.t("ui.pinned"), .pinned), (Lang.t("ui.text"), .text), (Lang.t("ui.links"), .links),
                                       (Lang.t("ui.imagesGifs"), .images), (Lang.t("ui.files"), .files), (Lang.t("ui.textInImages"), .textInImages),
                                       (Lang.t("ui.library"), .header), (Lang.t("ui.favourites"), .library), (Lang.t("ui.snippets"), .snippets)]
-        let boards = (try? store.boards()) ?? []
+        let boards = readOrDefault("boards", []) { try store.boards() }
         s.append((Lang.t("ui.boards"), .header))
         for b in boards { s.append((b.name, .board(b.id))) }
         s.append(("+ " + Lang.t("ui.newBoard"), .addBoard))

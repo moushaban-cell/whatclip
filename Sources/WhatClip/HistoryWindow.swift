@@ -276,7 +276,7 @@ final class HistoryWindowController: NSObject, NSTableViewDataSource, NSTableVie
         if locked { items = []; list.reloadData(); showDetail(nil); preview.string = Lang.t("ui.lockedMain"); return }
         snippetsEmptyButton.isHidden = true   // only the Snippets branch shows it again
         if section == .snippets {
-            snippets = (try? store.snippets(query: search.stringValue)) ?? []
+            snippets = readOrDefault("snippets", []) { try store.snippets(query: search.stringValue) }
             list.reloadData()
             // With no snippets yet, the list offers one button to start the first snippet.
             snippetsEmptyButton.title = Lang.t("ui.newSnippet")
@@ -293,15 +293,15 @@ final class HistoryWindowController: NSObject, NSTableViewDataSource, NSTableVie
             return
         }
         switch section {
-        case .all: items = (try? store.list(query: search.stringValue, limit: 1000)) ?? []
-        case .pinned: items = ((try? store.list(query: search.stringValue, limit: 1000)) ?? []).filter(\.pinned)
-        case .text: items = ((try? store.list(query: search.stringValue, limit: 1000)) ?? []).filter { $0.kind == .text || $0.kind == .richText }
-        case .links: items = ((try? store.list(query: search.stringValue, limit: 1000)) ?? []).filter { $0.kind == .url }
-        case .images: items = ((try? store.list(query: search.stringValue, limit: 1000)) ?? []).filter { $0.kind == .image || $0.kind == .gif }
-        case .files: items = ((try? store.list(query: search.stringValue, limit: 1000)) ?? []).filter { $0.kind == .file }
-        case .board(let id): items = ((try? store.items(onBoard: id)) ?? []).filter { search.stringValue.isEmpty || $0.text.localizedCaseInsensitiveContains(search.stringValue) }
-        case .library: items = (try? store.list(query: search.stringValue, limit: 1000, filter: .init(favoritesOnly: true))) ?? []
-        case .textInImages: items = (try? store.list(query: search.stringValue, limit: 1000, filter: .init(hasText: true))) ?? []
+        case .all: items = readOrDefault("list", []) { try store.list(query: search.stringValue, limit: 1000) }
+        case .pinned: items = (readOrDefault("list", []) { try store.list(query: search.stringValue, limit: 1000) }).filter(\.pinned)
+        case .text: items = (readOrDefault("list", []) { try store.list(query: search.stringValue, limit: 1000) }).filter { $0.kind == .text || $0.kind == .richText }
+        case .links: items = (readOrDefault("list", []) { try store.list(query: search.stringValue, limit: 1000) }).filter { $0.kind == .url }
+        case .images: items = (readOrDefault("list", []) { try store.list(query: search.stringValue, limit: 1000) }).filter { $0.kind == .image || $0.kind == .gif }
+        case .files: items = (readOrDefault("list", []) { try store.list(query: search.stringValue, limit: 1000) }).filter { $0.kind == .file }
+        case .board(let id): items = (readOrDefault("items", []) { try store.items(onBoard: id) }).filter { search.stringValue.isEmpty || $0.text.localizedCaseInsensitiveContains(search.stringValue) }
+        case .library: items = readOrDefault("list", []) { try store.list(query: search.stringValue, limit: 1000, filter: .init(favoritesOnly: true)) }
+        case .textInImages: items = readOrDefault("list", []) { try store.list(query: search.stringValue, limit: 1000, filter: .init(hasText: true)) }
         case .snippets, .header, .addBoard, .settings, .about, .tools: break
         }
         list.reloadData()

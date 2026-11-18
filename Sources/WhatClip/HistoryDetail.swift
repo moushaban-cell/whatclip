@@ -44,7 +44,7 @@ extension HistoryWindowController {
     }
     func boardMenu() -> NSMenu {
         let m = NSMenu()
-        for b in (try? store.boards()) ?? [] {
+        for b in readOrDefault("boards", []) { try store.boards() } {
             let it = NSMenuItem(title: b.name, action: #selector(addToBoard(_:)), keyEquivalent: ""); it.target = self; it.representedObject = b.id; m.addItem(it)
         }
         m.addItem(.separator())

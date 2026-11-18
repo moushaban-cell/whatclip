@@ -150,3 +150,12 @@ func reportFailure(_ error: Error) {
     alert.informativeText = error.localizedDescription
     alert.runModal()
 }
+
+/// Runs a read from the store. On failure it logs the operation name and error (never the content) and returns the fallback,
+/// so the window shows an empty list and the failure can be found in the system log.
+func readOrDefault<T>(_ operation: String, _ fallback: T, _ body: () throws -> T) -> T {
+    do { return try body() } catch {
+        NSLog("WhatClip: read %@ failed: %@", operation, String(describing: error))
+        return fallback
+    }
+}

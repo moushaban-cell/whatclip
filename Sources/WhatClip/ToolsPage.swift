@@ -88,7 +88,7 @@ extension HistoryWindowController {
     func recentCapturesBlock() -> NSView {
         let heading = NSTextField(labelWithString: Lang.t("ui.capture.recent"))
         heading.font = .systemFont(ofSize: 13, weight: .semibold); heading.textColor = .secondaryLabelColor
-        let all: [ClipItem] = (try? store.list(limit: 300)) ?? []
+        let all: [ClipItem] = readOrDefault("list", []) { try store.list(limit: 300) }
         let isCapture: (ClipItem) -> Bool = { item in item.kind == .image || item.kind == .gif }
         let captures = all.filter(isCapture).prefix(6)
         var rows: [NSView] = [heading]
@@ -114,7 +114,7 @@ extension HistoryWindowController {
                 try? self?.store.setFavorite(item.id, !item.favorite); self?.updateChrome()
             })
             let boards = NSMenu()
-            for b in (try? store.boards()) ?? [] {
+            for b in readOrDefault("boards", []) { try store.boards() } {
                 boards.addItem(closureMenuItem(b.name) { [weak self] in
                     try? self?.store.addToBoard(item: item.id, board: b.id); self?.updateChrome()
                 })

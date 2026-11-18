@@ -30,7 +30,7 @@ final class ScreenshotWatcher {
     }
 
     private func names() -> [String] {
-        (try? FileManager.default.contentsOfDirectory(atPath: Self.folder.path)) ?? []
+        readOrDefault("contentsOfDirectory", []) { try FileManager.default.contentsOfDirectory(atPath: Self.folder.path) }
     }
 
     private func check() {
