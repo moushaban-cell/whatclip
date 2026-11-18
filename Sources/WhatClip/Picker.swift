@@ -276,10 +276,10 @@ final class PickerController: NSObject, NSSearchFieldDelegate, NSTableViewDataSo
         guard let item = selected else { return }
         if plain, item.kind != .file, item.kind != .image, item.kind != .gif { monitor.restore(item.text) } else { monitor.restore(item) }
         close()
-        // Direct paste needs the Accessibility permission. Without it the item is simply on the clipboard: press ⌘V.
-        if AXIsProcessTrusted() {
-            previousApp?.activate()
-            DispatchQueue.main.asyncAfter(deadline: .now() + 0.12) { Self.sendPaste() }
+        // Auto-paste: the item is on the clipboard now; paste it into the app the person was using.
+        // Without the Accessibility permission, WhatClip asks macOS for it, and the item stays on the clipboard for ⌘V.
+        if monitor.settings.autoPaste {
+            if AutoPaste.isTrusted { AutoPaste.paste(into: previousApp) } else { AutoPaste.requestTrust() }
         }
     }
 
