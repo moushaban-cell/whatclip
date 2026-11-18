@@ -26,14 +26,27 @@ enum KeyStore {
 }
 
 /// Touch ID or the Mac password, before the history is shown.
+/// One successful unlock is remembered for `sessionLength`, across the picker and the history window, so you are not asked on every open.
+/// "Lock history now" in the menu forgets it at once.
+@MainActor
 enum Authentication {
+    static let sessionLength: TimeInterval = 15 * 60
+    private static var unlockedUntil: Date?
+
+    static var isUnlocked: Bool { (unlockedUntil ?? .distantPast) > Date() }
+
+    static func lockNow() { unlockedUntil = nil }
+
     static func unlock(reason: String) async -> Bool {
+        if isUnlocked { return true }
         let ctx = LAContext()
         var err: NSError?
         guard ctx.canEvaluatePolicy(.deviceOwnerAuthentication, error: &err) else { return true }   // no password set on this Mac
-        return await withCheckedContinuation { cont in
+        let ok = await withCheckedContinuation { (cont: CheckedContinuation<Bool, Never>) in
             ctx.evaluatePolicy(.deviceOwnerAuthentication, localizedReason: reason) { ok, _ in cont.resume(returning: ok) }
         }
+        if ok { unlockedUntil = Date().addingTimeInterval(sessionLength) }
+        return ok
     }
 }
 

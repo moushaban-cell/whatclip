@@ -163,6 +163,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
         submenu("Boards", boardsMenu())
         submenu("Pause capturing", pauseMenu())
         add(monitor.policy.ignoreNextCopy ? "Ignoring the next copy" : "Ignore next copy", #selector(ignoreNext))
+        if monitor.settings.requireTouchID { add(Authentication.isUnlocked ? "Lock history now" : "History is locked", #selector(lockHistory)) }
         menu.addItem(.separator())
         add("Clear history (keeps pinned)", #selector(clearHistory))
         menu.addItem(.separator())
@@ -239,6 +240,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
     @objc func quit() { NSApp.terminate(nil) }
     @objc func pasteRecent(_ s: NSMenuItem) { if let i = s.representedObject as? ClipItem { monitor.restore(i) } }
     @objc func ignoreNext() { monitor.policy.ignoreNextCopy = true }
+    @objc func lockHistory() { picker.close(); history.lockNow() }
     @objc func clearHistory() { try? store.clear() }
     @objc func pause5() { monitor.pause(for: 300) }
     @objc func pause60() { monitor.pause(for: 3600) }

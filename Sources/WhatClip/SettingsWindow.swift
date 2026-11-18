@@ -109,6 +109,7 @@ final class SettingsWindowController: NSObject, NSWindowDelegate {
         let privacy = page([
             label("Privacy and security"), encrypt, touchID, ocr,
             hint("Encryption keeps the key in your login Keychain. Turning it on does not change items you already saved."),
+            hint("With the lock on, one unlock lasts 15 minutes across the picker and the history window. Lock history now in the menu locks it at once."),
         ])
 
         let tabs = NSTabView()
