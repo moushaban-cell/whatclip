@@ -71,3 +71,29 @@ enum Screenshot {
         try? p.run()
     }
 }
+
+/// Pastes the chosen item into the app the person was using. Needs the Accessibility permission for WhatClip.
+/// Without it, the item stays on the clipboard and the person presses ⌘V.
+@MainActor
+enum AutoPaste {
+    static var isTrusted: Bool { AXIsProcessTrusted() }
+
+    /// Asks macOS to show its Accessibility prompt (once per launch is enough; WhatClip then appears in the list to switch on).
+    static func requestTrust() {
+        let options = ["AXTrustedCheckOptionPrompt": true] as CFDictionary
+        _ = AXIsProcessTrustedWithOptions(options)
+    }
+
+    /// Brings the previous app forward, then sends ⌘V to it.
+    static func paste(into app: NSRunningApplication?) {
+        app?.activate()
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.15) {
+            let src = CGEventSource(stateID: .combinedSessionState)
+            for down in [true, false] {
+                let e = CGEvent(keyboardEventSource: src, virtualKey: 9, keyDown: down)
+                e?.flags = .maskCommand
+                e?.post(tap: .cghidEventTap)
+            }
+        }
+    }
+}

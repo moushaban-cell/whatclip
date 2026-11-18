@@ -46,19 +46,21 @@ public struct WhatClipSettings: Sendable, Codable, Equatable {
     /// The picker shortcut: a virtual key code and Carbon modifier bits (command 256, shift 512, option 2048, control 4096).
     public var hotKeyCode: Int
     public var hotKeyModifiers: Int
+    /// After choosing an item, paste it into the app you were using (needs the Accessibility permission).
+    public var autoPaste: Bool
 
     public static let `default` = WhatClipSettings(
         excludedBundleIDs: BundleIDList.defaultExcluded, secretAction: .expire,
         secretLifetimeSeconds: 60, retention: .quarter, maxItems: 500,
         encryptPayloads: false, requireTouchID: false, launchAtLogin: false, recognizeText: true,
-        appearance: .system, popupPlacement: .menuIcon, clearOnQuit: false, fuzzySearch: true, ignoredPatterns: [], onboardingDone: false, showInDock: true, gifSeconds: 5, gifFramesPerSecond: 8, hotKeyCode: 7, hotKeyModifiers: 768)
+        appearance: .system, popupPlacement: .menuIcon, clearOnQuit: false, fuzzySearch: true, ignoredPatterns: [], onboardingDone: false, showInDock: true, gifSeconds: 5, gifFramesPerSecond: 8, hotKeyCode: 7, hotKeyModifiers: 768, autoPaste: true)
 
     public init(excludedBundleIDs: [String], secretAction: SecretAction, secretLifetimeSeconds: Double, retention: Retention, maxItems: Int,
                 encryptPayloads: Bool = false, requireTouchID: Bool = false, launchAtLogin: Bool = false, recognizeText: Bool = true,
                 appearance: AppearanceChoice = .system, popupPlacement: PopupPlacement = .menuIcon, clearOnQuit: Bool = false,
                 fuzzySearch: Bool = true, ignoredPatterns: [String] = [], onboardingDone: Bool = false, showInDock: Bool = true,
-                gifSeconds: Int = 5, gifFramesPerSecond: Int = 8, hotKeyCode: Int = 7, hotKeyModifiers: Int = 768) {
-        self.gifSeconds = gifSeconds; self.gifFramesPerSecond = gifFramesPerSecond; self.hotKeyCode = hotKeyCode; self.hotKeyModifiers = hotKeyModifiers
+                gifSeconds: Int = 5, gifFramesPerSecond: Int = 8, hotKeyCode: Int = 7, hotKeyModifiers: Int = 768, autoPaste: Bool = true) {
+        self.autoPaste = autoPaste; self.gifSeconds = gifSeconds; self.gifFramesPerSecond = gifFramesPerSecond; self.hotKeyCode = hotKeyCode; self.hotKeyModifiers = hotKeyModifiers
         self.showInDock = showInDock
         self.appearance = appearance; self.popupPlacement = popupPlacement; self.clearOnQuit = clearOnQuit
         self.fuzzySearch = fuzzySearch; self.ignoredPatterns = ignoredPatterns; self.onboardingDone = onboardingDone
@@ -76,7 +78,7 @@ public struct WhatClipSettings: Sendable, Codable, Equatable {
 
     enum CodingKeys: String, CodingKey {
         case excludedBundleIDs, secretAction, secretLifetimeSeconds, retention, maxItems, encryptPayloads, requireTouchID, launchAtLogin, recognizeText
-        case appearance, popupPlacement, clearOnQuit, fuzzySearch, ignoredPatterns, onboardingDone, showInDock, gifSeconds, gifFramesPerSecond, hotKeyCode, hotKeyModifiers
+        case appearance, popupPlacement, clearOnQuit, fuzzySearch, ignoredPatterns, onboardingDone, showInDock, gifSeconds, gifFramesPerSecond, hotKeyCode, hotKeyModifiers, autoPaste
     }
 
     /// Tolerant: a missing or wrong field takes its default instead of failing the whole file.
@@ -103,7 +105,8 @@ public struct WhatClipSettings: Sendable, Codable, Equatable {
             gifSeconds: (try? c?.decode(Int.self, forKey: .gifSeconds)) ?? d.gifSeconds,
             gifFramesPerSecond: (try? c?.decode(Int.self, forKey: .gifFramesPerSecond)) ?? d.gifFramesPerSecond,
             hotKeyCode: (try? c?.decode(Int.self, forKey: .hotKeyCode)) ?? d.hotKeyCode,
-            hotKeyModifiers: (try? c?.decode(Int.self, forKey: .hotKeyModifiers)) ?? d.hotKeyModifiers)
+            hotKeyModifiers: (try? c?.decode(Int.self, forKey: .hotKeyModifiers)) ?? d.hotKeyModifiers,
+            autoPaste: (try? c?.decode(Bool.self, forKey: .autoPaste)) ?? d.autoPaste)
     }
 
     /// Keeps numbers in sensible ranges and drops invalid bundle identifiers.

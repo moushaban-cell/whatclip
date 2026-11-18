@@ -25,6 +25,7 @@ final class SettingsWindowController: NSObject, NSWindowDelegate {
     private let ignoredField = NSTextField()
     private let encrypt = NSButton(checkboxWithTitle: "Encrypt stored images and files (key kept in your Keychain)", target: nil, action: nil)
     private let touchID = NSButton(checkboxWithTitle: "Ask for Touch ID or my Mac password before opening history", target: nil, action: nil)
+    private let autoPaste = NSButton(checkboxWithTitle: "Paste automatically after I choose an item (needs Accessibility)", target: nil, action: nil)
     private let loginItem = NSButton(checkboxWithTitle: "Start WhatClip when I log in", target: nil, action: nil)
     private let ocr = NSButton(checkboxWithTitle: "Read text in copied images on this Mac (searchable)", target: nil, action: nil)
     private let status = NSTextField(labelWithString: "")
@@ -94,7 +95,7 @@ final class SettingsWindowController: NSObject, NSWindowDelegate {
             shortcutStatus,
             label("Look and behaviour"),
             row("Appearance", appearancePop), row("Open the picker", placementPop),
-            showInDock, fuzzy, clearOnQuit, loginItem,
+            autoPaste, showInDock, fuzzy, clearOnQuit, loginItem,
             label("Screen recording"),
             row("GIF length", gifSecondsPop), row("GIF frames per second", gifFPSPop),
         ])
@@ -194,6 +195,7 @@ final class SettingsWindowController: NSObject, NSWindowDelegate {
         placementPop.removeAllItems(); placementPop.addItems(withTitles: PopupPlacement.allCases.map(\.title))
         placementPop.selectItem(at: PopupPlacement.allCases.firstIndex(of: s.popupPlacement) ?? 0)
         showInDock.state = s.showInDock ? .on : .off
+        autoPaste.state = s.autoPaste ? .on : .off
         clearOnQuit.state = s.clearOnQuit ? .on : .off; fuzzy.state = s.fuzzySearch ? .on : .off
         ignoredField.stringValue = s.ignoredPatterns.joined(separator: "  ")
         encrypt.state = s.encryptPayloads ? .on : .off; touchID.state = s.requireTouchID ? .on : .off
@@ -211,6 +213,7 @@ final class SettingsWindowController: NSObject, NSWindowDelegate {
         s.appearance = AppearanceChoice.allCases[max(0, appearancePop.indexOfSelectedItem)]
         s.popupPlacement = PopupPlacement.allCases[max(0, placementPop.indexOfSelectedItem)]
         s.showInDock = showInDock.state == .on
+        s.autoPaste = autoPaste.state == .on
         s.gifSeconds = [3, 5, 10, 15][max(0, gifSecondsPop.indexOfSelectedItem)]
         s.gifFramesPerSecond = [5, 8, 12, 15][max(0, gifFPSPop.indexOfSelectedItem)]
         s.clearOnQuit = clearOnQuit.state == .on; s.fuzzySearch = fuzzy.state == .on

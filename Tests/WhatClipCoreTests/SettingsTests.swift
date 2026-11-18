@@ -97,3 +97,13 @@ import Foundation
         #expect(back == s)
     }
 }
+
+@Suite struct AutoPasteSettingTests {
+    @Test func autoPasteDefaultsOnAndSurvivesBadData() throws {
+        #expect(WhatClipSettings.default.autoPaste == true)
+        let off = try JSONDecoder().decode(WhatClipSettings.self, from: Data(#"{"autoPaste":false}"#.utf8))
+        #expect(off.autoPaste == false)
+        let bad = try JSONDecoder().decode(WhatClipSettings.self, from: Data(#"{"autoPaste":"maybe"}"#.utf8))
+        #expect(bad.autoPaste == true)
+    }
+}
