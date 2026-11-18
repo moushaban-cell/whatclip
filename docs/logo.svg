@@ -1,9 +1,11 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024" width="1024" height="1024">
-  <!-- WhatClip app icon. Flat colours, no gradients. Teal #14595F, white #FFFFFF, amber #F2B233. -->
+  <!-- WhatClip app icon 2.0: a stack of cards (everything kept, one on top). Teal #14595F, light teal #7FC3C9, white, amber #F2B233. Flat, no gradients. -->
   <rect x="0" y="0" width="1024" height="1024" rx="224" fill="#14595F"/>
-  <rect x="270" y="200" width="484" height="640" rx="56" fill="#FFFFFF"/>
-  <rect x="400" y="150" width="224" height="110" rx="30" fill="#F2B233"/>
-  <rect x="340" y="400" width="344" height="44" rx="22" fill="#14595F"/>
-  <rect x="340" y="520" width="344" height="44" rx="22" fill="#14595F"/>
-  <rect x="340" y="640" width="220" height="44" rx="22" fill="#14595F"/>
+  <rect x="330" y="236" width="400" height="520" rx="56" fill="#7FC3C9" opacity="0.55" transform="rotate(-9 530 496)"/>
+  <rect x="310" y="262" width="400" height="520" rx="56" fill="#A8DDE2" transform="rotate(5 510 522)"/>
+  <rect x="290" y="210" width="440" height="580" rx="60" fill="#FFFFFF"/>
+  <rect x="402" y="158" width="216" height="104" rx="30" fill="#F2B233"/>
+  <rect x="352" y="366" width="320" height="40" rx="20" fill="#14595F"/>
+  <rect x="352" y="466" width="320" height="40" rx="20" fill="#14595F"/>
+  <rect x="352" y="566" width="200" height="40" rx="20" fill="#14595F"/>
 </svg>
