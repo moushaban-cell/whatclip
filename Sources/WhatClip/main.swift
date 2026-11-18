@@ -12,6 +12,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
     var history: HistoryWindowController!
     var onboarding: OnboardingWindowController!
     let gif = GIFRecorder()
+    var emoji: EmojiPanelController!
     let hotKey = HotKey()
     var hotKeyOK = false
     var hotKeyStatus = "Not registered yet."
@@ -37,6 +38,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
         picker = PickerController(store: store, monitor: monitor)
         settings = SettingsWindowController(monitor: monitor)
         history = HistoryWindowController(store: store, monitor: monitor)
+        emoji = EmojiPanelController(copy: { [weak self] text in self?.monitor.restore(text) })
         history.settingsRoot = settings.rootView
         onboarding = OnboardingWindowController(monitor: monitor)
         monitor.onChange = { [weak self] in self?.copyHappened() }
@@ -73,6 +75,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
             DispatchQueue.main.asyncAfter(deadline: .now() + 2) { [weak self] in self?.picker.showCards() }
         case "onboarding": onboarding.show()
         case "settings": history.show(section: .settings)
+        case "emoji": emoji.show()
         default: break
         }
     }
@@ -151,6 +154,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
         menu.removeAllItems()
         add(Lang.t("menu.openPicker") + "   ⇧⌘X", #selector(openPicker))
         add(Lang.t("menu.openHistory"), #selector(openHistory))
+        add("Emoji and symbols…", #selector(openEmoji))
         menu.addItem(.separator())
 
         let recent = (try? store.list(limit: 8)) ?? []
@@ -235,6 +239,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
         picker.show(anchor: anchor)
     }
     @objc func openHistory() { history.show() }
+    @objc func openEmoji() { emoji.show() }
     @objc func focusSearch() { history.show(); history.focusSearch() }
     @objc func openSettings() { history.show(section: .settings) }
     @objc func openOnboarding() { onboarding.show() }
