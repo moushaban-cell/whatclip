@@ -213,6 +213,7 @@ final class HistoryWindowController: NSObject, NSTableViewDataSource, NSTableVie
         // While locked, Settings and About are hidden too: the lock covers the whole app, not only the list.
         let isSettings = section == .settings && !locked, isAbout = section == .about && !locked, isTools = section == .tools && !locked
         listPaneRef?.isHidden = isSettings || isAbout || isTools || locked
+        (listPaneRef as? ListPaneView)?.guide.stringValue = sectionGuide()
         settingsHost.isHidden = !isSettings
         aboutScroll.isHidden = !(isAbout || isTools)
         if isSettings, let root = settingsRoot, root.superview !== settingsHost {
@@ -679,10 +680,15 @@ final class ListPaneView: NSView {
     private let search: NSView
     private let mode: NSView
     private let body: NSView
+    /// One line that says what the section is for, under the search bar.
+    let guide = NSTextField(wrappingLabelWithString: "")
     init(search: NSView, mode: NSView, body: NSView) {
         self.search = search; self.mode = mode; self.body = body
         super.init(frame: .zero)
-        addSubview(search); addSubview(mode); addSubview(body)
+        guide.font = .systemFont(ofSize: 12); guide.textColor = .secondaryLabelColor
+        guide.alignment = Lang.isRightToLeft ? .right : .left
+        guide.maximumNumberOfLines = 2; guide.preferredMaxLayoutWidth = 0
+        addSubview(search); addSubview(mode); addSubview(guide); addSubview(body)
     }
     required init?(coder: NSCoder) { nil }
     override var isFlipped: Bool { true }
@@ -696,7 +702,8 @@ final class ListPaneView: NSView {
         let searchX = rtl ? margin + modeWidth + gap : margin
         mode.frame = NSRect(x: modeX, y: 10, width: modeWidth, height: rowHeight)
         search.frame = NSRect(x: searchX, y: 10, width: searchWidth, height: rowHeight)
-        body.frame = NSRect(x: 0, y: rowHeight + 18, width: bounds.width, height: max(0, bounds.height - rowHeight - 18))
+        guide.frame = NSRect(x: margin, y: 44, width: max(0, bounds.width - 2 * margin), height: 30)
+        body.frame = NSRect(x: 0, y: 80, width: bounds.width, height: max(0, bounds.height - 80))
     }
 }
 
@@ -725,3 +732,22 @@ func mirrorForRTL(_ view: NSView) {
     for sub in view.subviews { mirrorForRTL(sub) }
 }
 
+
+extension HistoryWindowController {
+    /// What the current sidebar section is for, in the person's language.
+    func sectionGuide() -> String {
+        switch section {
+        case .all: return Lang.t("ui.help.all")
+        case .pinned: return Lang.t("ui.help.pinned")
+        case .text: return Lang.t("ui.help.text")
+        case .links: return Lang.t("ui.help.links")
+        case .images: return Lang.t("ui.help.images")
+        case .files: return Lang.t("ui.help.files")
+        case .textInImages: return Lang.t("ui.help.textInImages")
+        case .library: return Lang.t("ui.help.favourites")
+        case .board: return Lang.t("ui.help.board")
+        case .snippets: return Lang.t("ui.help.snippets")
+        default: return ""
+        }
+    }
+}
