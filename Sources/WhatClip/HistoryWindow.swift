@@ -3,7 +3,7 @@ import WhatClipCore
 
 /// The full history window: sidebar (filters, boards, snippets), the list, a preview and actions on the selected item.
 @MainActor
-final class HistoryWindowController: NSObject, NSTableViewDataSource, NSTableViewDelegate, NSSearchFieldDelegate {
+final class HistoryWindowController: NSObject, NSTableViewDataSource, NSTableViewDelegate, NSSearchFieldDelegate, NSMenuDelegate {
     enum Section: Equatable { case header, all, library, pinned, text, links, images, files, textInImages, board(Int64), snippets, settings, about }
 
     private let window: NSWindow
@@ -81,6 +81,7 @@ final class HistoryWindowController: NSObject, NSTableViewDataSource, NSTableVie
         list.allowsMultipleSelection = true; list.setAccessibilityLabel("Items")
         // Keyboard: Return or a double-click copies the selected item; arrows move through the list (built into the table).
         list.target = self; list.doubleAction = #selector(copyItem)
+        let rowMenu = NSMenu(); rowMenu.delegate = self; list.menu = rowMenu
         list.addTableColumn(NSTableColumn(identifier: .init("item")))
         list.setAccessibilityLabel("Items")
         listScroll.documentView = list; listScroll.hasVerticalScroller = true; listScroll.borderType = .noBorder
@@ -205,8 +206,9 @@ final class HistoryWindowController: NSObject, NSTableViewDataSource, NSTableVie
 
     /// Shows the settings or About pane for their sections, and the list and preview for every other section.
     private func updateChrome() {
-        let isSettings = section == .settings, isAbout = section == .about
-        listPaneRef?.isHidden = isSettings || isAbout
+        // While locked, Settings and About are hidden too: the lock covers the whole app, not only the list.
+        let isSettings = section == .settings && !locked, isAbout = section == .about && !locked
+        listPaneRef?.isHidden = isSettings || isAbout || locked
         settingsHost.isHidden = !isSettings
         aboutScroll.isHidden = !isAbout
         if isSettings, let root = settingsRoot, root.superview !== settingsHost {
@@ -239,8 +241,8 @@ final class HistoryWindowController: NSObject, NSTableViewDataSource, NSTableVie
     func reloadList() {
         updateChrome()
         // Settings and About own the whole detail pane: nothing else to load.
-        if section == .settings || section == .about { return }
-        if locked { items = []; list.reloadData(); showDetail(nil); return }
+        if !locked && (section == .settings || section == .about) { return }
+        if locked { items = []; list.reloadData(); showDetail(nil); preview.string = "Locked. Unlock with Touch ID or your Mac password to see your history and settings."; return }
         if section == .snippets {
             snippets = (try? store.snippets(query: search.stringValue)) ?? []
             list.reloadData()
@@ -296,6 +298,14 @@ final class HistoryWindowController: NSObject, NSTableViewDataSource, NSTableVie
             t.lineBreakMode = .byTruncatingTail; return t
         }
         return Design.row(for: items[row], store: store)
+    }
+
+    /// Right-click on a list row: edit, pin, favourite or delete that item.
+    func menuNeedsUpdate(_ menu: NSMenu) {
+        menu.removeAllItems()
+        guard section != .settings, section != .about, section != .snippets, items.indices.contains(list.clickedRow) else { return }
+        let item = items[list.clickedRow]
+        for m in ItemActions.menuItems(for: item, store: store, changed: { [weak self] in self?.reloadList() }) { menu.addItem(m) }
     }
 
     /// Headers in the sidebar are labels, not destinations.

@@ -48,3 +48,16 @@ import Foundation
         #expect(BoardColor.allCases.count == 6)
     }
 }
+
+@Suite struct EditItemTests {
+    @Test func editChangesTextAndRefusesDuplicates() throws {
+        let s = try ClipStore()
+        let a = try s.add(text: "first draft")
+        _ = try s.add(text: "second")
+        try s.updateText(a.id, to: "first draft, corrected")
+        #expect(try s.list().map(\.text).contains("first draft, corrected"))
+        #expect(throws: (any Error).self) { try s.updateText(a.id, to: "second") }
+        try s.updateText(a.id, to: "https://example.com/edited")
+        #expect(try s.list().first { $0.id == a.id }?.kind == .url)
+    }
+}

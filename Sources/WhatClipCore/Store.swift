@@ -244,6 +244,17 @@ public final class ClipStore: @unchecked Sendable {
         try? run("SELECT tags FROM items WHERE id=?", [.int(id)]) { out = self.revealed(String(cString: sqlite3_column_text($0, 0))) }
         return out.split(separator: ",").map(String.init)
     }
+    /// Edits the text of a text item. Duplicates are refused (another item already has this text), so nothing is merged silently.
+    public func updateText(_ id: Int64, to newText: String) throws {
+        lock.lock(); defer { lock.unlock() }
+        let fp = fingerprint(of: newText)
+        var taken: Int64?
+        try run("SELECT id FROM items WHERE fingerprint=? AND id<>?", [.text(fp), .int(id)]) { taken = sqlite3_column_int64($0, 0) }
+        if taken != nil { throw StoreError.sql("duplicate") }
+        try run("UPDATE items SET text=?, fingerprint=?, kind=? WHERE id=?",
+                [.text(try stored(newText)), .text(fp), .text(classify(newText).rawValue), .int(id)])
+    }
+
     public func setFavorite(_ id: Int64, _ on: Bool) throws {
         lock.lock(); defer { lock.unlock() }
         try run("UPDATE items SET favorite=? WHERE id=?", [.int(on ? 1 : 0), .int(id)])

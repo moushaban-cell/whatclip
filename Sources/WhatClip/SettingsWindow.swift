@@ -24,7 +24,7 @@ final class SettingsWindowController: NSObject, NSWindowDelegate {
     private let fuzzy = NSButton(checkboxWithTitle: "Fuzzy search (letters in order, any gaps)", target: nil, action: nil)
     private let ignoredField = NSTextField()
     private let encrypt = NSButton(checkboxWithTitle: "Encrypt stored images and files (key kept in your Keychain)", target: nil, action: nil)
-    private let touchID = NSButton(checkboxWithTitle: "Ask for Touch ID or my Mac password before opening history", target: nil, action: nil)
+    private let touchID = NSButton(checkboxWithTitle: "Ask for Touch ID or my Mac password before opening the main app", target: nil, action: nil)
     private let autoPaste = NSButton(checkboxWithTitle: "Paste automatically after I choose an item (needs Accessibility)", target: nil, action: nil)
     private let loginItem = NSButton(checkboxWithTitle: "Start WhatClip when I log in", target: nil, action: nil)
     private let ocr = NSButton(checkboxWithTitle: "Read text in copied images on this Mac (searchable)", target: nil, action: nil)
@@ -114,7 +114,7 @@ final class SettingsWindowController: NSObject, NSWindowDelegate {
         let privacy = page([
             label("Privacy and security"), encrypt, touchID, ocr,
             hint("Encryption keeps the key in your login Keychain. Turning it on does not change items you already saved."),
-            hint("With the lock on, one unlock lasts 15 minutes across the picker and the history window. Lock history now in the menu locks it at once."),
+            hint("With the lock on, the main app (History, Snippets, Settings) asks once and stays open for 15 minutes. The ⇧⌘X picker never asks, so pasting stays one step. Lock history now in the menu locks the app at once."),
         ])
 
         let tabs = NSTabView()

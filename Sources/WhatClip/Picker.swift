@@ -14,7 +14,7 @@ private final class KeyPanel: NSPanel {
 
 /// The Windows-style picker: search, filters, previews, number shortcuts, pins, a paste queue and plain-text paste.
 @MainActor
-final class PickerController: NSObject, NSSearchFieldDelegate, NSTableViewDataSource, NSTableViewDelegate, @preconcurrency QLPreviewPanelDataSource {
+final class PickerController: NSObject, NSSearchFieldDelegate, NSTableViewDataSource, NSTableViewDelegate, NSMenuDelegate, @preconcurrency QLPreviewPanelDataSource {
     enum Filter: Int, CaseIterable {
         case all, text, links, images, files, pinned, favorites
         var title: String { ["All", "Text", "Links", "Images", "Files", "Pinned", "Favourites"][rawValue] }
@@ -76,6 +76,7 @@ final class PickerController: NSObject, NSSearchFieldDelegate, NSTableViewDataSo
 
         let col = NSTableColumn(identifier: .init("row")); col.resizingMask = .autoresizingMask; table.addTableColumn(col)
         table.headerView = nil; table.dataSource = self; table.delegate = self; table.rowHeight = Design.rowHeight
+        let rowMenu = NSMenu(); rowMenu.delegate = self; table.menu = rowMenu
         table.target = self; table.doubleAction = #selector(doubleClicked); table.allowsMultipleSelection = true; table.setAccessibilityLabel("Clipboard items")
         listScroll.documentView = table; listScroll.hasVerticalScroller = true; listScroll.borderType = .noBorder
         shelf.scroll.isHidden = true
@@ -136,7 +137,8 @@ final class PickerController: NSObject, NSSearchFieldDelegate, NSTableViewDataSo
     func show(anchor: NSRect? = nil, filter start: Filter = .all) {
         previousApp = NSWorkspace.shared.frontmostApplication
         field.stringValue = ""; filter = start; filters.selectedSegment = start.rawValue
-        locked = monitor.settings.requireTouchID
+        // The picker (⇧⌘X) never asks for Touch ID: quick paste must stay one step. The lock guards the main app (history, Settings).
+        locked = false
         place(anchor: anchor)
         NSApp.activate(ignoringOtherApps: true)
         panel.makeKeyAndOrderFront(nil); panel.makeFirstResponder(field)
@@ -389,6 +391,14 @@ final class PickerController: NSObject, NSSearchFieldDelegate, NSTableViewDataSo
     }
 
     func tableViewSelectionDidChange(_ notification: Notification) { updatePreview() }
+
+    /// Right-click on a row: edit, pin, favourite or delete that item.
+    func menuNeedsUpdate(_ menu: NSMenu) {
+        menu.removeAllItems()
+        guard let row = table.clickedRow as Int?, items.indices.contains(row) else { return }
+        let item = items[row]
+        for m in ItemActions.menuItems(for: item, store: store, changed: { [weak self] in self?.reload() }) { menu.addItem(m) }
+    }
 
     private func updatePreview() {
         guard let i = selected else { preview.string = ""; previewImage.isHidden = true; return }

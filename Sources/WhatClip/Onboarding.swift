@@ -80,25 +80,62 @@ final class OnboardingWindowController: NSObject {
         }, onCancel: { [weak self] in self?.refreshShortcutLabel() })
     }
 
-    /// The last page: the two optional permissions, each with a button that opens the right System Settings pane.
+    private var packChecks: [String: NSButton] = [:]
+    private var packStatus: [String: NSTextField] = [:]
+
+    /// The last page: every permission in one pack. Each has its status and a checkbox; "Set up WhatClip" asks for the ticked ones together.
     private func permissionsPage() -> NSView {
-        func row(_ head: String, _ why: String, _ action: Selector) -> NSStackView {
-            let h = NSTextField(labelWithString: head); h.font = .systemFont(ofSize: 13, weight: .semibold)
-            let w = NSTextField(wrappingLabelWithString: why); w.font = .systemFont(ofSize: 12); w.textColor = .secondaryLabelColor; w.preferredMaxLayoutWidth = 440
-            let b = NSButton(title: "Open System Settings", target: self, action: action); b.bezelStyle = .rounded
-            let r = NSStackView(views: [h, w, b]); r.orientation = .vertical; r.alignment = .leading; r.spacing = 4
-            return r
-        }
-        let icon = NSImageView(image: NSImage(systemSymbolName: "lock.shield", accessibilityDescription: "Permissions") ?? NSImage())
+        let icon = NSImageView(image: NSImage(systemSymbolName: "checkmark.shield", accessibilityDescription: "Permissions") ?? NSImage())
         icon.contentTintColor = Design.accent; icon.symbolConfiguration = NSImage.SymbolConfiguration(pointSize: 40, weight: .regular)
-        let head = NSTextField(labelWithString: "Two optional permissions"); head.font = .systemFont(ofSize: 22, weight: .semibold)
-        let intro = NSTextField(wrappingLabelWithString: "WhatClip works without either. Turn them on only for the features you want.")
+        let head = NSTextField(labelWithString: "Set up WhatClip"); head.font = .systemFont(ofSize: 22, weight: .semibold)
+        let intro = NSTextField(wrappingLabelWithString: "Tick what you want. Nothing is switched on unless you tick it, and you can change any of these later in Settings.")
         intro.font = .systemFont(ofSize: 13); intro.textColor = .secondaryLabelColor; intro.preferredMaxLayoutWidth = 440
-        let stack = NSStackView(views: [icon, head, intro,
-            row("Accessibility", "Lets WhatClip press ⌘V for you after you choose an item. Without it, press ⌘V yourself.", #selector(openAccessibility)),
-            row("Screen Recording", "Needed only for screenshots and GIF recording.", #selector(openScreenRecording))])
-        stack.orientation = .vertical; stack.alignment = .centerX; stack.spacing = 14
+        var rows: [NSView] = [icon, head, intro]
+        let items: [(String, String, String)] = [
+            ("accessibility", "Paste automatically", "Accessibility: presses ⌘V in the app you were using after you choose an item."),
+            ("screen", "Screenshots and GIFs", "Screen Recording: needed only for screenshots and GIF recording."),
+            ("touch", "Touch ID or password lock", "Asks for Touch ID or your Mac password before the history opens. Uses no extra permission."),
+            ("login", "Start at login", "Opens WhatClip when you log in. Turn it off any time in Settings."),
+        ]
+        for (key, title, why) in items {
+            let check = NSButton(checkboxWithTitle: title, target: nil, action: nil)
+            check.state = key == "accessibility" ? .on : .off
+            let status = NSTextField(labelWithString: statusText(for: key))
+            status.font = .systemFont(ofSize: 11); status.textColor = .tertiaryLabelColor
+            let w = NSTextField(wrappingLabelWithString: why); w.font = .systemFont(ofSize: 12); w.textColor = .secondaryLabelColor; w.preferredMaxLayoutWidth = 420
+            let row = NSStackView(views: [check, status, w]); row.orientation = .vertical; row.alignment = .leading; row.spacing = 2
+            packChecks[key] = check; packStatus[key] = status
+            rows.append(row)
+        }
+        let setUp = NSButton(title: "Set up WhatClip", target: self, action: #selector(setUpPack)); setUp.bezelStyle = .rounded
+        rows.append(setUp)
+        let stack = NSStackView(views: rows); stack.orientation = .vertical; stack.alignment = .centerX; stack.spacing = 12
         return stack
+    }
+
+    /// The live state of one permission, in words.
+    private func statusText(for key: String) -> String {
+        switch key {
+        case "accessibility": return AutoPaste.isTrusted ? "On" : "Off"
+        case "screen": return CGPreflightScreenCaptureAccess() ? "On" : "Off"
+        case "touch": return monitor.settings.requireTouchID ? "On" : "Off"
+        case "login": return monitor.settings.launchAtLogin ? "On" : "Off"
+        default: return ""
+        }
+    }
+
+    /// Asks for everything ticked, in one go. macOS shows its own prompts for Accessibility and Screen Recording.
+    @objc private func setUpPack() {
+        var s = monitor.settings
+        if packChecks["touch"]?.state == .on { s.requireTouchID = true }
+        if packChecks["login"]?.state == .on { s.launchAtLogin = true }
+        if packChecks["accessibility"]?.state == .on, !AutoPaste.isTrusted { AutoPaste.requestTrust() }
+        if packChecks["screen"]?.state == .on, !CGPreflightScreenCaptureAccess() { _ = CGRequestScreenCaptureAccess() }
+        s.autoPaste = packChecks["accessibility"]?.state == .on
+        s.onboardingDone = true
+        try? monitor.update(s)
+        for (key, field) in packStatus { field.stringValue = statusText(for: key) }
+        window.close()
     }
 
     private func build() {
