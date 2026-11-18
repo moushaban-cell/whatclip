@@ -19,6 +19,8 @@ final class HistoryWindowController: NSObject, NSTableViewDataSource, NSTableVie
     let list = NSTableView()
     private let search = NSSearchField()
     private let listScroll = NSScrollView()
+    /// Shown over the empty Snippets list: starts a new snippet. It sits on the scroll view, so it stays put while the list scrolls.
+    let snippetsEmptyButton = NSButton(title: "", target: nil, action: nil)
     /// Settings (from the Settings module) and the About text: shown in the detail pane when their sidebar item is chosen.
     var settingsRoot: NSView?
     private let settingsHost = NSView()
@@ -95,6 +97,11 @@ final class HistoryWindowController: NSObject, NSTableViewDataSource, NSTableVie
         list.addTableColumn(NSTableColumn(identifier: .init("item")))
         list.setAccessibilityLabel(Lang.t("ui.a11y.items"))
         listScroll.documentView = list; listScroll.hasVerticalScroller = true; listScroll.borderType = .noBorder
+        snippetsEmptyButton.bezelStyle = .rounded; snippetsEmptyButton.controlSize = .large
+        snippetsEmptyButton.isHidden = true
+        // Plain frame and autoresizing: the button keeps its size and stays centred as the list pane changes size.
+        snippetsEmptyButton.autoresizingMask = [.minXMargin, .maxXMargin, .minYMargin, .maxYMargin]
+        listScroll.addSubview(snippetsEmptyButton)
 
         preview.isEditable = false; preview.font = .systemFont(ofSize: 14); preview.textContainerInset = NSSize(width: 14, height: 14)
         preview.isVerticallyResizable = true; preview.isHorizontallyResizable = false; preview.autoresizingMask = [.width]
@@ -266,9 +273,20 @@ final class HistoryWindowController: NSObject, NSTableViewDataSource, NSTableVie
         // Settings and About own the whole detail pane: nothing else to load.
         if !locked && (section == .settings || section == .about || section == .tools) { return }
         if locked { items = []; list.reloadData(); showDetail(nil); preview.string = Lang.t("ui.lockedMain"); return }
+        snippetsEmptyButton.isHidden = true   // only the Snippets branch shows it again
         if section == .snippets {
             snippets = (try? store.snippets(query: search.stringValue)) ?? []
             list.reloadData()
+            // With no snippets yet, the list offers one button to start the first snippet.
+            snippetsEmptyButton.title = Lang.t("ui.newSnippet")
+            snippetsEmptyButton.target = self; snippetsEmptyButton.action = #selector(newSnippet)
+            snippetsEmptyButton.isHidden = !snippets.isEmpty
+            if snippets.isEmpty {
+                let size = snippetsEmptyButton.intrinsicContentSize
+                snippetsEmptyButton.frame = NSRect(x: max(0, (listScroll.bounds.width - size.width) / 2),
+                                                   y: max(0, (listScroll.bounds.height - size.height) / 2),
+                                                   width: size.width, height: size.height)
+            }
             snippetBox.isHidden = selectedSnippet == nil; previewScroll.isHidden = selectedSnippet != nil
             if selectedSnippet == nil { preview.string = Lang.t("ui.chooseSnippet") }
             return
