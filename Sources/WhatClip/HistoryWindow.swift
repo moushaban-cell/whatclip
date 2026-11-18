@@ -583,7 +583,8 @@ final class HistoryWindowController: NSObject, NSTableViewDataSource, NSTableVie
         let alert = NSAlert(); alert.messageText = Lang.t("ui.board.delete"); alert.informativeText = Lang.t("ui.board.deleteInfo")
         alert.addButton(withTitle: Lang.t("ui.delete")); alert.addButton(withTitle: Lang.t("ui.cancel"))
         guard alert.runModal() == .alertFirstButtonReturn else { return }
-        try? store.deleteBoard(id); section = .all; reloadSidebar(); reloadList()
+        do { try store.deleteBoard(id) } catch { reportFailure(error) }
+        section = .all; reloadSidebar(); reloadList()
     }
 
     @objc private func copyItem() { guard let i = selectedItem else { return }; monitor.restore(i) }
@@ -600,7 +601,8 @@ final class HistoryWindowController: NSObject, NSTableViewDataSource, NSTableVie
             a.addButton(withTitle: Lang.t("ui.delete")); a.addButton(withTitle: Lang.t("ui.cancel"))
             guard a.runModal() == .alertFirstButtonReturn else { return }
         }
-        try? store.delete(picked); reloadList()
+        do { try store.delete(picked) } catch { reportFailure(error) }
+        reloadList()
     }
     @objc private func editTags() {
         guard let i = selectedItem else { return }
@@ -672,7 +674,8 @@ final class HistoryWindowController: NSObject, NSTableViewDataSource, NSTableVie
     }
     @objc private func deleteSnippet() {
         guard let s = selectedSnippet else { return }
-        try? store.deleteSnippet(s.id); selectedSnippet = nil; reloadList()
+        do { try store.deleteSnippet(s.id) } catch { reportFailure(error) }
+        selectedSnippet = nil; reloadList()
     }
     /// Used by the menu bar: fill in and copy a snippet without opening the editor.
     func insertSnippetFromMenu(_ snip: Snippet) {

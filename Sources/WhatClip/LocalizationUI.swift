@@ -308,7 +308,6 @@ extension Lang {
         "ui.tools.d.ignore": "Skip the next copy and nothing else",
         "ui.tools.d.stack": "Collect copies, then paste them in order",
         "ui.tools.d.clearStack": "Empty the stack",
-        "ui.tools.d.clear": "Delete all items except pinned ones",
         "ui.tools.d.export": "Save your history as a file",
         "ui.tools.d.import": "Add items from a WhatClip export",
         "ui.tools.d.setup": "Permissions and the first-run tour",
@@ -341,6 +340,8 @@ extension Lang {
         "ui.board.noneYet": "No boards yet. Create one in the History window first.",
         "ui.capture.annotate": "Annotate",
         "ui.clearConfirm": "Clear history? Pinned and favourite items are kept.",
+        "ui.tools.d.clear": "Delete all items except pinned and favourite ones",
+        "ui.errorGeneric": "WhatClip could not finish that. Nothing was changed.",
     ]
     private static let uiL1: [String: String] = [
         "ui.editTextMore": "编辑文本…",
@@ -635,7 +636,6 @@ extension Lang {
         "ui.tools.d.ignore": "只忽略下一次复制",
         "ui.tools.d.stack": "收集复制内容，然后按顺序粘贴",
         "ui.tools.d.clearStack": "清空堆栈",
-        "ui.tools.d.clear": "删除除已固定项目以外的所有项目",
         "ui.tools.d.export": "将历史记录保存为文件",
         "ui.tools.d.import": "从 WhatClip 导出文件添加项目",
         "ui.tools.d.setup": "权限与首次引导",
@@ -668,6 +668,8 @@ extension Lang {
         "ui.board.noneYet": "还没有看板。请先在历史记录窗口中创建一个。",
         "ui.capture.annotate": "标注",
         "ui.clearConfirm": "清空历史记录？置顶和收藏的项目会保留。",
+        "ui.tools.d.clear": "删除除置顶和收藏项目之外的所有项目",
+        "ui.errorGeneric": "WhatClip 无法完成此操作。未做任何更改。",
     ]
     private static let uiL2: [String: String] = [
         "ui.editTextMore": "टेक्स्ट संपादित करें…",
@@ -962,7 +964,6 @@ extension Lang {
         "ui.tools.d.ignore": "केवल अगली कॉपी छोड़ें",
         "ui.tools.d.stack": "कॉपी इकट्ठा करें, फिर क्रम से चिपकाएँ",
         "ui.tools.d.clearStack": "स्टैक खाली करें",
-        "ui.tools.d.clear": "पिन किए गए के अलावा सभी आइटम हटाएँ",
         "ui.tools.d.export": "इतिहास को फ़ाइल के रूप में सहेजें",
         "ui.tools.d.import": "WhatClip निर्यात से आइटम जोड़ें",
         "ui.tools.d.setup": "अनुमतियाँ और शुरुआती परिचय",
@@ -995,6 +996,8 @@ extension Lang {
         "ui.board.noneYet": "अभी कोई बोर्ड नहीं है। पहले इतिहास विंडो में एक बनाएँ।",
         "ui.capture.annotate": "एनोटेट करें",
         "ui.clearConfirm": "इतिहास साफ़ करें? पिन और पसंदीदा आइटम रहेंगे।",
+        "ui.tools.d.clear": "पिन और पसंदीदा आइटमों के अलावा सभी आइटम हटाएँ",
+        "ui.errorGeneric": "WhatClip यह पूरा नहीं कर सका। कुछ भी नहीं बदला गया।",
     ]
     private static let uiL3: [String: String] = [
         "ui.editTextMore": "Editar texto…",
@@ -1289,7 +1292,6 @@ extension Lang {
         "ui.tools.d.ignore": "Omite solo la próxima copia",
         "ui.tools.d.stack": "Reúne copias y pégalas en orden",
         "ui.tools.d.clearStack": "Vacía la pila",
-        "ui.tools.d.clear": "Borra todos los elementos excepto los fijados",
         "ui.tools.d.export": "Guarda tu historial como archivo",
         "ui.tools.d.import": "Añade elementos de una exportación de WhatClip",
         "ui.tools.d.setup": "Permisos y recorrido inicial",
@@ -1322,6 +1324,8 @@ extension Lang {
         "ui.board.noneYet": "Aún no hay tableros. Crea uno primero en la ventana de historial.",
         "ui.capture.annotate": "Anotar",
         "ui.clearConfirm": "¿Borrar el historial? Se conservan los elementos fijados y favoritos.",
+        "ui.tools.d.clear": "Borra todos los elementos excepto los fijados y favoritos",
+        "ui.errorGeneric": "WhatClip no pudo completar esto. No se cambió nada.",
     ]
     private static let uiL4: [String: String] = [
         "ui.editTextMore": "Modifier le texte…",
@@ -1616,7 +1620,6 @@ extension Lang {
         "ui.tools.d.ignore": "Ignorer uniquement la prochaine copie",
         "ui.tools.d.stack": "Collecter des copies puis les coller dans l’ordre",
         "ui.tools.d.clearStack": "Vider la pile",
-        "ui.tools.d.clear": "Supprimer tous les éléments sauf les épinglés",
         "ui.tools.d.export": "Enregistrer votre historique dans un fichier",
         "ui.tools.d.import": "Ajouter des éléments depuis un export WhatClip",
         "ui.tools.d.setup": "Autorisations et visite de démarrage",
@@ -1649,6 +1652,8 @@ extension Lang {
         "ui.board.noneYet": "Pas encore de tableau. Créez-en un d'abord dans la fenêtre d'historique.",
         "ui.capture.annotate": "Annoter",
         "ui.clearConfirm": "Effacer l'historique ? Les éléments épinglés et favoris sont conservés.",
+        "ui.tools.d.clear": "Supprime tous les éléments sauf les épinglés et les favoris",
+        "ui.errorGeneric": "WhatClip n'a pas pu terminer cette action. Rien n'a été modifié.",
     ]
     private static let uiL5: [String: String] = [
         "ui.editTextMore": "تعديل النص…",
@@ -1943,7 +1948,6 @@ extension Lang {
         "ui.tools.d.ignore": "تجاهل النسخة التالية فقط",
         "ui.tools.d.stack": "اجمع النسخ ثم الصقها بالترتيب",
         "ui.tools.d.clearStack": "أفرغ المكدّس",
-        "ui.tools.d.clear": "احذف كل العناصر ما عدا المثبّتة",
         "ui.tools.d.export": "احفظ سجلك كملف",
         "ui.tools.d.import": "أضف عناصر من تصدير WhatClip",
         "ui.tools.d.setup": "الأذونات والجولة الأولى",
@@ -1976,6 +1980,8 @@ extension Lang {
         "ui.board.noneYet": "لا توجد لوحات بعد. أنشئ لوحة أولاً من نافذة السجل.",
         "ui.capture.annotate": "تعليق",
         "ui.clearConfirm": "مسح السجل؟ تبقى العناصر المثبتة والمفضلة.",
+        "ui.tools.d.clear": "حذف كل العناصر ما عدا المثبتة والمفضلة",
+        "ui.errorGeneric": "تعذّر على WhatClip إكمال ذلك. لم يتغير شيء.",
     ]
     private static let uiL6: [String: String] = [
         "ui.editTextMore": "টেক্সট সম্পাদনা করুন…",
@@ -2270,7 +2276,6 @@ extension Lang {
         "ui.tools.d.ignore": "শুধু পরের কপিটি বাদ দিন",
         "ui.tools.d.stack": "কপি জমিয়ে ক্রম অনুযায়ী পেস্ট করুন",
         "ui.tools.d.clearStack": "স্ট্যাক খালি করুন",
-        "ui.tools.d.clear": "পিন করা ছাড়া সব আইটেম মুছুন",
         "ui.tools.d.export": "ইতিহাস ফাইল হিসেবে সংরক্ষণ করুন",
         "ui.tools.d.import": "WhatClip রপ্তানি থেকে আইটেম যোগ করুন",
         "ui.tools.d.setup": "অনুমতি ও প্রথমবারের পরিচিতি",
@@ -2303,6 +2308,8 @@ extension Lang {
         "ui.board.noneYet": "এখনও কোনো বোর্ড নেই। আগে ইতিহাস উইন্ডোতে একটি বোর্ড তৈরি করুন।",
         "ui.capture.annotate": "টীকা",
         "ui.clearConfirm": "ইতিহাস মুছবেন? পিন করা ও পছন্দের আইটেম থাকবে।",
+        "ui.tools.d.clear": "পিন ও পছন্দের আইটেম ছাড়া সব আইটেম মুছুন",
+        "ui.errorGeneric": "WhatClip এটি সম্পন্ন করতে পারেনি। কিছুই পরিবর্তন হয়নি।",
     ]
     private static let uiL7: [String: String] = [
         "ui.editTextMore": "Editar texto…",
@@ -2597,7 +2604,6 @@ extension Lang {
         "ui.tools.d.ignore": "Ignora apenas a próxima cópia",
         "ui.tools.d.stack": "Reúna cópias e cole-as na ordem",
         "ui.tools.d.clearStack": "Esvazie a pilha",
-        "ui.tools.d.clear": "Apague todos os itens, exceto os fixados",
         "ui.tools.d.export": "Salve seu histórico como arquivo",
         "ui.tools.d.import": "Adicione itens de uma exportação do WhatClip",
         "ui.tools.d.setup": "Permissões e tour inicial",
@@ -2630,6 +2636,8 @@ extension Lang {
         "ui.board.noneYet": "Ainda não há quadros. Crie um primeiro na janela de histórico.",
         "ui.capture.annotate": "Anotar",
         "ui.clearConfirm": "Limpar o histórico? Itens fixados e favoritos são mantidos.",
+        "ui.tools.d.clear": "Apaga todos os itens, exceto os fixados e favoritos",
+        "ui.errorGeneric": "O WhatClip não conseguiu concluir isso. Nada foi alterado.",
     ]
     private static let uiL8: [String: String] = [
         "ui.editTextMore": "Изменить текст…",
@@ -2924,7 +2932,6 @@ extension Lang {
         "ui.tools.d.ignore": "Пропустить только следующую копию",
         "ui.tools.d.stack": "Собирать копии и вставлять по порядку",
         "ui.tools.d.clearStack": "Очистить стопку",
-        "ui.tools.d.clear": "Удалить все элементы, кроме закреплённых",
         "ui.tools.d.export": "Сохранить историю в файл",
         "ui.tools.d.import": "Добавить элементы из экспорта WhatClip",
         "ui.tools.d.setup": "Разрешения и вводный тур",
@@ -2957,6 +2964,8 @@ extension Lang {
         "ui.board.noneYet": "Пока нет досок. Сначала создайте доску в окне истории.",
         "ui.capture.annotate": "Аннотировать",
         "ui.clearConfirm": "Очистить историю? Закреплённые и избранные элементы сохранятся.",
+        "ui.tools.d.clear": "Удалить все элементы, кроме закреплённых и избранных",
+        "ui.errorGeneric": "WhatClip не смог выполнить это. Ничего не изменилось.",
     ]
     private static let uiL9: [String: String] = [
         "ui.editTextMore": "テキストを編集…",
@@ -3251,7 +3260,6 @@ extension Lang {
         "ui.tools.d.ignore": "次のコピーだけ無視",
         "ui.tools.d.stack": "コピーを集めて順番に貼り付け",
         "ui.tools.d.clearStack": "スタックを空にする",
-        "ui.tools.d.clear": "ピン留め以外のすべての項目を削除",
         "ui.tools.d.export": "履歴をファイルに保存",
         "ui.tools.d.import": "WhatClipの書き出しから項目を追加",
         "ui.tools.d.setup": "権限と初回ガイド",
@@ -3284,6 +3292,8 @@ extension Lang {
         "ui.board.noneYet": "まだボードがありません。先に履歴ウィンドウでボードを作成してください。",
         "ui.capture.annotate": "注釈",
         "ui.clearConfirm": "履歴を消去しますか？ピン留めとお気に入りの項目は残ります。",
+        "ui.tools.d.clear": "ピン留めとお気に入り以外のすべての項目を削除",
+        "ui.errorGeneric": "WhatClip で完了できませんでした。何も変更されていません。",
     ]
     private static let uiL10: [String: String] = [
         "ui.editTextMore": "Text bearbeiten…",
@@ -3578,7 +3588,6 @@ extension Lang {
         "ui.tools.d.ignore": "Nur die nächste Kopie überspringen",
         "ui.tools.d.stack": "Kopien sammeln und der Reihe nach einfügen",
         "ui.tools.d.clearStack": "Stapel leeren",
-        "ui.tools.d.clear": "Alle Einträge außer angehefteten löschen",
         "ui.tools.d.export": "Verlauf als Datei sichern",
         "ui.tools.d.import": "Einträge aus einem WhatClip-Export hinzufügen",
         "ui.tools.d.setup": "Berechtigungen und Einführung",
@@ -3611,5 +3620,7 @@ extension Lang {
         "ui.board.noneYet": "Noch keine Boards. Lege zuerst eines im Verlauf-Fenster an.",
         "ui.capture.annotate": "Annotieren",
         "ui.clearConfirm": "Verlauf löschen? Angeheftete und Favoriten bleiben erhalten.",
+        "ui.tools.d.clear": "Alle Einträge außer angehefteten und Favoriten löschen",
+        "ui.errorGeneric": "WhatClip konnte das nicht abschließen. Nichts wurde geändert.",
     ]
 }

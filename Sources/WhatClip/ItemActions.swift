@@ -86,6 +86,7 @@ enum ItemActions {
         a.addButton(withTitle: Lang.t("ui.delete")); a.addButton(withTitle: Lang.t("ui.cancel"))
         a.buttons.first?.hasDestructiveAction = true
         guard a.runModal() == .alertFirstButtonReturn else { return }
-        try? store.delete(item.id); changed()
+        do { try store.delete(item.id) } catch { reportFailure(error) }
+        changed()
     }
 }

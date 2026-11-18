@@ -136,3 +136,12 @@ enum Design {
         return row
     }
 }
+
+/// Shows a plain failure message after an action could not finish. Used where a delete or clear would otherwise fail silently.
+@MainActor
+func reportFailure(_ error: Error) {
+    let alert = NSAlert()
+    alert.messageText = Lang.t("ui.errorGeneric")
+    alert.informativeText = error.localizedDescription
+    alert.runModal()
+}

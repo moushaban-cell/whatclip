@@ -125,7 +125,8 @@ extension HistoryWindowController {
                 let alert = NSAlert(); alert.messageText = Lang.t("ui.delete"); alert.informativeText = Lang.t("ui.deleteInfo")
                 alert.addButton(withTitle: Lang.t("ui.delete")); alert.addButton(withTitle: Lang.t("ui.cancel"))
                 guard alert.runModal() == .alertFirstButtonReturn else { return }
-                try? self.store.delete(item.id); self.updateChrome()
+                do { try self.store.delete(item.id) } catch { reportFailure(error) }
+                self.updateChrome()
             })
             let text = NSStackView(views: [title, buttons]); text.orientation = .vertical; text.alignment = .leading; text.spacing = 6
             let row = NSStackView(views: [thumb, text]); row.spacing = 12; row.alignment = .centerY

@@ -433,7 +433,8 @@ final class PickerController: NSObject, NSSearchFieldDelegate, NSTableViewDataSo
     private func deleteSelected() {
         let ids = table.selectedRowIndexes.compactMap { items[safe: $0]?.id }
         guard !ids.isEmpty else { return }
-        try? store.delete(ids); reload()
+        do { try store.delete(ids) } catch { reportFailure(error) }
+        reload()
     }
 
     static func sendPasteShortcut() { sendPaste() }

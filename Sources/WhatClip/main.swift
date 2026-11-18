@@ -298,7 +298,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
         let alert = NSAlert(); alert.messageText = Lang.t("ui.clearConfirm")
         alert.addButton(withTitle: Lang.t("ui.delete")); alert.addButton(withTitle: Lang.t("ui.cancel"))
         guard alert.runModal() == .alertFirstButtonReturn else { return }
-        try? store.clear(); picker.refreshIfVisible(); history.refreshIfVisible()
+        do { try store.clear() } catch { reportFailure(error) }
+        picker.refreshIfVisible(); history.refreshIfVisible()
     }
     @objc func pause5() { monitor.pause(for: 300) }
     @objc func pause60() { monitor.pause(for: 3600) }
