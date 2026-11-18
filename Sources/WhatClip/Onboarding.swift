@@ -183,6 +183,8 @@ final class OnboardingWindowController: NSObject {
         footer.edgeInsets = NSEdgeInsets(top: 0, left: 24, bottom: 18, right: 24)
         let root = NSStackView(views: [pageHost, footer]); root.orientation = .vertical; root.spacing = 0
         root.translatesAutoresizingMaskIntoConstraints = false
+        // Arabic: mirror the whole tour (buttons, dots, text) right to left.
+        root.userInterfaceLayoutDirection = Lang.isRightToLeft ? .rightToLeft : .leftToRight
         window.contentView = root
         NSLayoutConstraint.activate([pageHost.widthAnchor.constraint(equalTo: root.widthAnchor), footer.widthAnchor.constraint(equalTo: root.widthAnchor)])
         for p in pages { p.translatesAutoresizingMaskIntoConstraints = false }
