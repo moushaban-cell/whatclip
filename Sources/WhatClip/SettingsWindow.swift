@@ -13,6 +13,7 @@ final class SettingsWindowController: NSObject, NSWindowDelegate {
     private let retention = NSPopUpButton()
     private let maxItems = NSTextField()
     private let appearancePop = NSPopUpButton()
+    private let languagePop = NSPopUpButton()
     private let placementPop = NSPopUpButton()
     private let gifSecondsPop = NSPopUpButton()
     private let gifFPSPop = NSPopUpButton()
@@ -109,6 +110,7 @@ final class SettingsWindowController: NSObject, NSWindowDelegate {
             shortcutStatus,
             label(Lang.t("ui.set.lookBehaviour")),
             row(Lang.t("ui.set.appearance"), appearancePop), row(Lang.t("ui.set.openPicker"), placementPop),
+            row(Lang.t("ui.set.language"), languagePop), hint(Lang.t("ui.set.languageHint")),
             autoPaste, showInDock, fuzzy, clearOnQuit, loginItem, updates,
             label(Lang.t("ui.set.actionsLabel")), actionsScroll,
             hint(Lang.t("ui.set.actionsHint")),
@@ -213,6 +215,8 @@ final class SettingsWindowController: NSObject, NSWindowDelegate {
         shortcutLabel.stringValue = Lang.t("ui.set.showPicker") + Self.describe(code: s.hotKeyCode, mods: s.hotKeyModifiers)
         shortcutButton.target = self; shortcutButton.action = #selector(recordShortcut)
         shortcutStatus.stringValue = hotKeyStatus; shortcutStatus.font = .systemFont(ofSize: 11); shortcutStatus.textColor = .secondaryLabelColor
+        languagePop.removeAllItems(); languagePop.addItems(withTitles: Lang.names.map(\.name))
+        languagePop.selectItem(at: Lang.names.firstIndex { $0.code == s.language } ?? 0)
         appearancePop.removeAllItems(); appearancePop.addItems(withTitles: AppearanceChoice.allCases.map { Lang.t("app." + $0.rawValue) })
         appearancePop.selectItem(at: AppearanceChoice.allCases.firstIndex(of: s.appearance) ?? 0)
         placementPop.removeAllItems(); placementPop.addItems(withTitles: PopupPlacement.allCases.map { Lang.t("place." + $0.rawValue) })
@@ -237,6 +241,7 @@ final class SettingsWindowController: NSObject, NSWindowDelegate {
         s.secretLifetimeSeconds = lifetimes[max(0, lifetime.indexOfSelectedItem)].1
         s.retention = Retention.allCases[max(0, retention.indexOfSelectedItem)]
         s.appearance = AppearanceChoice.allCases[max(0, appearancePop.indexOfSelectedItem)]
+        s.language = Lang.names[max(0, languagePop.indexOfSelectedItem)].code
         s.popupPlacement = PopupPlacement.allCases[max(0, placementPop.indexOfSelectedItem)]
         s.showInDock = showInDock.state == .on
         s.actionsText = actionsView.string

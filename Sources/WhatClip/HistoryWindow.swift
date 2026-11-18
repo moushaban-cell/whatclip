@@ -221,7 +221,11 @@ final class HistoryWindowController: NSObject, NSTableViewDataSource, NSTableVie
             NSLayoutConstraint.activate([root.topAnchor.constraint(equalTo: settingsHost.topAnchor), root.bottomAnchor.constraint(equalTo: settingsHost.bottomAnchor),
                                          root.leadingAnchor.constraint(equalTo: settingsHost.leadingAnchor), root.trailingAnchor.constraint(equalTo: settingsHost.trailingAnchor)])
         }
-        if isAbout { aboutScroll.documentView = aboutText() }
+        if isAbout {
+            let page = aboutPage()
+            aboutScroll.documentView = page
+            page.widthAnchor.constraint(equalTo: aboutScroll.contentView.widthAnchor).isActive = true
+        }
         let plain = !isSettings && !isAbout
         previewScroll.isHidden = !plain
         previewImage.isHidden = true
@@ -230,15 +234,48 @@ final class HistoryWindowController: NSObject, NSTableViewDataSource, NSTableVie
         window.contentView?.needsLayout = true   // a pane was shown or hidden: place the panes again
     }
 
-    /// The About text: version from the app bundle, what the app does, and where the licence and notices are.
-    private func aboutText() -> NSTextView {
-        let v = (Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String) ?? "0.2.0"
-        let t = NSTextView(); t.isEditable = false; t.drawsBackground = false; t.textContainerInset = NSSize(width: 22, height: 22)
-        t.isVerticallyResizable = true; t.isHorizontallyResizable = false; t.autoresizingMask = [.width]
-        t.textContainer?.widthTracksTextView = true; t.minSize = NSSize(width: 0, height: 0); t.maxSize = NSSize(width: CGFloat.greatestFiniteMagnitude, height: CGFloat.greatestFiniteMagnitude)
-        t.string = [Lang.t("ui.aboutVersion", ["v": v]), "", Lang.t("ui.about.desc"), "", Lang.t("ui.about.open"), "", Lang.t("ui.about.licence")].joined(separator: "\n")
-        t.font = .systemFont(ofSize: 14); t.textColor = .labelColor
-        return t
+    /// The About page, in sections: the app, who built it, privacy, and the licence and links.
+    private func aboutPage() -> NSView {
+        let version = (Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String) ?? "0.2.0"
+        func heading(_ s: String) -> NSTextField {
+            let f = NSTextField(labelWithString: s); f.font = .systemFont(ofSize: 13, weight: .semibold); f.textColor = .secondaryLabelColor; return f
+        }
+        func body(_ s: String, weight: NSFont.Weight = .regular) -> NSTextField {
+            let f = NSTextField(wrappingLabelWithString: s); f.font = .systemFont(ofSize: 13, weight: weight); f.preferredMaxLayoutWidth = 520; return f
+        }
+        func link(_ title: String, _ action: Selector) -> NSButton {
+            let b = NSButton(title: title, target: AboutActions.shared, action: action); b.bezelStyle = .inline; return b
+        }
+        func section(_ views: [NSView]) -> NSStackView {
+            let s = NSStackView(views: views); s.orientation = .vertical; s.alignment = .leading; s.spacing = 8; return s
+        }
+        func divider() -> NSBox { let b = NSBox(); b.boxType = .separator; return b }
+
+        let icon = NSImageView(image: NSApp.applicationIconImage ?? NSImage())
+        icon.imageScaling = .scaleProportionallyUpOrDown
+        icon.widthAnchor.constraint(equalToConstant: 72).isActive = true; icon.heightAnchor.constraint(equalToConstant: 72).isActive = true
+        let title = NSTextField(labelWithString: "WhatClip"); title.font = .systemFont(ofSize: 26, weight: .bold)
+        let head = NSStackView(views: [icon, section([title, NSTextField(labelWithString: Lang.t("ui.aboutVersion", ["v": version])), body(Lang.t("ui.about.desc"))])])
+        head.orientation = .horizontal; head.alignment = .top; head.spacing = 16
+
+        let builder = section([heading(Lang.t("ui.about.builtBy")),
+                               body("Moustafa Mohamed Shabaan", weight: .semibold),
+                               body(Lang.t("ui.about.role")),
+                               heading(Lang.t("ui.about.contact")),
+                               link(AboutActions.email, #selector(AboutActions.sendEmail)),
+                               link("github.com/moushaban-cell", #selector(AboutActions.openGitHub))])
+        let privacy = section([heading(Lang.t("ui.about.privacyTitle")), body(Lang.t("ui.about.open"))])
+        let links = section([heading(Lang.t("ui.about.linksTitle")), body(Lang.t("ui.about.licence")),
+                             link(Lang.t("ui.about.donate"), #selector(AboutActions.openSupport))])
+
+        let page = NSStackView(views: [head, divider(), builder, divider(), privacy, divider(), links])
+        page.orientation = .vertical; page.alignment = .leading; page.spacing = 18
+        page.edgeInsets = NSEdgeInsets(top: 28, left: 28, bottom: 28, right: 28)
+        for v in page.arrangedSubviews where v is NSBox { v.widthAnchor.constraint(equalTo: page.widthAnchor, constant: -56).isActive = true }
+        page.userInterfaceLayoutDirection = Lang.isRightToLeft ? .rightToLeft : .leftToRight
+        page.alignment = Lang.isRightToLeft ? .trailing : .leading
+        page.translatesAutoresizingMaskIntoConstraints = false
+        return page
     }
 
     func reloadList() {
@@ -648,3 +685,15 @@ final class ListPaneView: NSView {
         body.frame = NSRect(x: 0, y: rowHeight + 18, width: bounds.width, height: max(0, bounds.height - rowHeight - 18))
     }
 }
+
+/// The links on the About page. The repository is private, so only public places are linked.
+@MainActor
+final class AboutActions: NSObject {
+    static let shared = AboutActions()
+    static let email = "mou.shabaan@gmail.com"
+
+    @objc func sendEmail() { NSWorkspace.shared.open(URL(string: "mailto:\(Self.email)")!) }
+    @objc func openGitHub() { NSWorkspace.shared.open(URL(string: "https://github.com/moushaban-cell")!) }
+    @objc func openSupport() { NSWorkspace.shared.open(URL(string: "https://github.com/sponsors/moushaban-cell")!) }
+}
+

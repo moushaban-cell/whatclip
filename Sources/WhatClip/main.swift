@@ -83,6 +83,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
             DispatchQueue.main.asyncAfter(deadline: .now() + 2) { [weak self] in self?.picker.showCards() }
         case "onboarding": onboarding.show()
         case "settings": history.show(section: .settings)
+        case "about": history.show(section: .about)
         case "emoji": emoji.show()
         default: break
         }
