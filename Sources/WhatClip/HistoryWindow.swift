@@ -273,7 +273,7 @@ final class HistoryWindowController: NSObject, NSTableViewDataSource, NSTableVie
                                link("github.com/moushaban-cell", #selector(AboutActions.openGitHub))])
         let privacy = section([heading(Lang.t("ui.about.privacyTitle")), body(Lang.t("ui.about.open"))])
         let links = section([heading(Lang.t("ui.about.linksTitle")), body(Lang.t("ui.about.licence")),
-                             link(Lang.t("ui.about.donate"), #selector(AboutActions.openSupport))])
+                             ])
 
         let sections: [NSView] = [head, divider(), builder, divider(), privacy, divider(), links]
         // The sections stacked from the top, aligned to the leading edge of the language (left, or right in Arabic).
@@ -715,7 +715,6 @@ final class AboutActions: NSObject {
 
     @objc func sendEmail() { NSWorkspace.shared.open(URL(string: "mailto:\(Self.email)")!) }
     @objc func openGitHub() { NSWorkspace.shared.open(URL(string: "https://github.com/moushaban-cell")!) }
-    @objc func openSupport() { NSWorkspace.shared.open(URL(string: "https://github.com/sponsors/moushaban-cell")!) }
 }
 
 

@@ -115,10 +115,6 @@ Set `WHATCLIP_SIGN_ID` to the name of your local code-signing certificate to kee
 
 Issues and pull requests are welcome. Read [CONTRIBUTING.md](CONTRIBUTING.md) and [CODE_OF_CONDUCT.md](CODE_OF_CONDUCT.md). Report security problems privately as described in [SECURITY.md](SECURITY.md).
 
-## Support
-
-WhatClip is free for noncommercial use. If it helps you, you can support its development at [github.com/sponsors/moushaban-cell](https://github.com/sponsors/moushaban-cell).
-
 ## Licence and credits
 
 Free for any noncommercial use under the [PolyForm Noncommercial 1.0.0 licence](LICENSE). Commercial use needs a separate written licence from the copyright holder. Some included code is MIT-licensed; see [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md). WhatClip was built after reading how other MIT clipboard managers work, including Maccy, Clipy, Flycut, FlowClip, pesty, ClipHistory, open-paste, Kelsiito/clipboard and clipflow. No code was copied from them. Third-party notices are in [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md).
