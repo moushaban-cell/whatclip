@@ -339,6 +339,7 @@ extension Lang {
         "ui.anyBoard": "All boards",
         "ui.hint.board": "board",
         "ui.board.noneYet": "No boards yet. Create one in the History window first.",
+        "ui.capture.annotate": "Annotate",
     ]
     private static let uiL1: [String: String] = [
         "ui.editTextMore": "编辑文本…",
@@ -664,6 +665,7 @@ extension Lang {
         "ui.anyBoard": "所有看板",
         "ui.hint.board": "看板",
         "ui.board.noneYet": "还没有看板。请先在历史记录窗口中创建一个。",
+        "ui.capture.annotate": "标注",
     ]
     private static let uiL2: [String: String] = [
         "ui.editTextMore": "टेक्स्ट संपादित करें…",
@@ -989,6 +991,7 @@ extension Lang {
         "ui.anyBoard": "सभी बोर्ड",
         "ui.hint.board": "बोर्ड",
         "ui.board.noneYet": "अभी कोई बोर्ड नहीं है। पहले इतिहास विंडो में एक बनाएँ।",
+        "ui.capture.annotate": "एनोटेट करें",
     ]
     private static let uiL3: [String: String] = [
         "ui.editTextMore": "Editar texto…",
@@ -1314,6 +1317,7 @@ extension Lang {
         "ui.anyBoard": "Todos los tableros",
         "ui.hint.board": "tablero",
         "ui.board.noneYet": "Aún no hay tableros. Crea uno primero en la ventana de historial.",
+        "ui.capture.annotate": "Anotar",
     ]
     private static let uiL4: [String: String] = [
         "ui.editTextMore": "Modifier le texte…",
@@ -1639,6 +1643,7 @@ extension Lang {
         "ui.anyBoard": "Tous les tableaux",
         "ui.hint.board": "tableau",
         "ui.board.noneYet": "Pas encore de tableau. Créez-en un d'abord dans la fenêtre d'historique.",
+        "ui.capture.annotate": "Annoter",
     ]
     private static let uiL5: [String: String] = [
         "ui.editTextMore": "تعديل النص…",
@@ -1964,6 +1969,7 @@ extension Lang {
         "ui.anyBoard": "كل اللوحات",
         "ui.hint.board": "لوحة",
         "ui.board.noneYet": "لا توجد لوحات بعد. أنشئ لوحة أولاً من نافذة السجل.",
+        "ui.capture.annotate": "تعليق",
     ]
     private static let uiL6: [String: String] = [
         "ui.editTextMore": "টেক্সট সম্পাদনা করুন…",
@@ -2289,6 +2295,7 @@ extension Lang {
         "ui.anyBoard": "সব বোর্ড",
         "ui.hint.board": "বোর্ড",
         "ui.board.noneYet": "এখনও কোনো বোর্ড নেই। আগে ইতিহাস উইন্ডোতে একটি বোর্ড তৈরি করুন।",
+        "ui.capture.annotate": "টীকা",
     ]
     private static let uiL7: [String: String] = [
         "ui.editTextMore": "Editar texto…",
@@ -2614,6 +2621,7 @@ extension Lang {
         "ui.anyBoard": "Todos os quadros",
         "ui.hint.board": "quadro",
         "ui.board.noneYet": "Ainda não há quadros. Crie um primeiro na janela de histórico.",
+        "ui.capture.annotate": "Anotar",
     ]
     private static let uiL8: [String: String] = [
         "ui.editTextMore": "Изменить текст…",
@@ -2939,6 +2947,7 @@ extension Lang {
         "ui.anyBoard": "Все доски",
         "ui.hint.board": "доска",
         "ui.board.noneYet": "Пока нет досок. Сначала создайте доску в окне истории.",
+        "ui.capture.annotate": "Аннотировать",
     ]
     private static let uiL9: [String: String] = [
         "ui.editTextMore": "テキストを編集…",
@@ -3264,6 +3273,7 @@ extension Lang {
         "ui.anyBoard": "すべてのボード",
         "ui.hint.board": "ボード",
         "ui.board.noneYet": "まだボードがありません。先に履歴ウィンドウでボードを作成してください。",
+        "ui.capture.annotate": "注釈",
     ]
     private static let uiL10: [String: String] = [
         "ui.editTextMore": "Text bearbeiten…",
@@ -3589,5 +3599,6 @@ extension Lang {
         "ui.anyBoard": "Alle Boards",
         "ui.hint.board": "Board",
         "ui.board.noneYet": "Noch keine Boards. Lege zuerst eines im Verlauf-Fenster an.",
+        "ui.capture.annotate": "Annotieren",
     ]
 }

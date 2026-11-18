@@ -23,6 +23,10 @@ final class HistoryWindowController: NSObject, NSTableViewDataSource, NSTableVie
     var settingsRoot: NSView?
     private let settingsHost = NSView()
     private let aboutScroll = NSScrollView()
+    /// The Tools or About page and the document it sits in, laid out again whenever the pane is resized.
+    private var aboutPageView: NSView?
+    private var aboutDoc: NSView?
+    private var aboutObserver: NSObjectProtocol?
     private var listPaneRef: NSView?
     private let viewMode = NSSegmentedControl(labels: [Lang.t("ui.list"), Lang.t("ui.cards")], trackingMode: .selectOne, target: nil, action: nil)
     private let shelf = ShelfController()
@@ -239,7 +243,14 @@ final class HistoryWindowController: NSObject, NSTableViewDataSource, NSTableVie
             page.autoresizingMask = [.width]
             doc.addSubview(page)
             aboutScroll.documentView = doc
-            placePage(page, in: doc, scroll: aboutScroll)
+            aboutPageView = page; aboutDoc = doc
+            aboutScroll.contentView.postsFrameChangedNotifications = true
+            if aboutObserver == nil {
+                aboutObserver = NotificationCenter.default.addObserver(forName: NSView.frameDidChangeNotification, object: aboutScroll.contentView, queue: .main) { [weak self] _ in
+                    MainActor.assumeIsolated { self?.relayoutAboutPage() }
+                }
+            }
+            relayoutAboutPage()
         }
         let plain = !isSettings && !isAbout && !isTools
         previewScroll.isHidden = !plain
@@ -249,6 +260,11 @@ final class HistoryWindowController: NSObject, NSTableViewDataSource, NSTableVie
         window.contentView?.needsLayout = true   // a pane was shown or hidden: place the panes again
     }
 
+    /// Lays out the Tools or About page for the pane's current width. Does nothing until the pane has a width.
+    private func relayoutAboutPage() {
+        guard let page = aboutPageView, let doc = aboutDoc, aboutScroll.contentView.bounds.width > 0 else { return }
+        placePage(page, in: doc, scroll: aboutScroll)
+    }
     /// Sizes the page to its content (at least the visible height) and starts the scroll at the top.
     private func placePage(_ page: NSView, in doc: NSView, scroll: NSScrollView) {
         let w = scroll.contentView.bounds.width
