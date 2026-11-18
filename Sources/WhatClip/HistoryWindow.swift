@@ -198,6 +198,9 @@ final class HistoryWindowController: NSObject, NSTableViewDataSource, NSTableVie
         if let row = sections.firstIndex(where: { $0.1 == section }) { sidebar.selectRowIndexes([row], byExtendingSelection: false) }
     }
 
+    /// Locks the window now (menu: Lock history now). It asks again the next time it is opened.
+    func lockNow() { Authentication.lockNow(); locked = true; reloadList() }
+
     /// Shows the settings or About pane for their sections, and the list and preview for every other section.
     private func updateChrome() {
         let isSettings = section == .settings, isAbout = section == .about
