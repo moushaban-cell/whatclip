@@ -132,7 +132,15 @@ final class OnboardingWindowController: NSObject {
             let status = NSTextField(labelWithString: statusText(for: key))
             status.font = .systemFont(ofSize: 11); status.textColor = .tertiaryLabelColor
             let w = NSTextField(wrappingLabelWithString: why); w.font = .systemFont(ofSize: 12); w.textColor = .secondaryLabelColor; w.preferredMaxLayoutWidth = 420
-            let row = NSStackView(views: [check, status, w]); row.orientation = .vertical; row.alignment = .leading; row.spacing = 2
+            // Accessibility and Screen Recording can only be granted in System Settings, so the row links there.
+            var rowViews: [NSView] = [check, status, w]
+            if key == "accessibility" || key == "screen" {
+                let open = NSButton(title: Lang.t("ui.perm.openSettings"), target: self,
+                                    action: key == "accessibility" ? #selector(openAccessibility) : #selector(openScreenRecording))
+                open.bezelStyle = .rounded; open.controlSize = .small
+                rowViews.append(open)
+            }
+            let row = NSStackView(views: rowViews); row.orientation = .vertical; row.alignment = .leading; row.spacing = 2
             packChecks[key] = check; packStatus[key] = status
             rows.append(row)
         }

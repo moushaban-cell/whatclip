@@ -328,6 +328,7 @@ extension Lang {
         "ui.help.favourites": "Items you marked as favourites.",
         "ui.help.board": "Items in this board. Add items with Add to board.",
         "ui.help.snippets": "Reusable text. Use {{name}} for values you fill in each time.",
+        "ui.perm.openSettings": "Open Settings",
     ]
     private static let uiL1: [String: String] = [
         "ui.editTextMore": "编辑文本…",
@@ -642,6 +643,7 @@ extension Lang {
         "ui.help.favourites": "你标记为收藏的项目。",
         "ui.help.board": "这个面板中的项目。用“添加到面板”添加项目。",
         "ui.help.snippets": "可重复使用的文本。用 {{name}} 表示每次要填写的值。",
+        "ui.perm.openSettings": "打开设置",
     ]
     private static let uiL2: [String: String] = [
         "ui.editTextMore": "टेक्स्ट संपादित करें…",
@@ -956,6 +958,7 @@ extension Lang {
         "ui.help.favourites": "आपने पसंदीदा के रूप में चिह्नित आइटम।",
         "ui.help.board": "इस बोर्ड के आइटम। “बोर्ड में जोड़ें” से आइटम जोड़ें।",
         "ui.help.snippets": "दोबारा इस्तेमाल होने वाला टेक्स्ट। हर बार भरे जाने वाले मानों के लिए {{name}} लिखें।",
+        "ui.perm.openSettings": "सेटिंग खोलें",
     ]
     private static let uiL3: [String: String] = [
         "ui.editTextMore": "Editar texto…",
@@ -1270,6 +1273,7 @@ extension Lang {
         "ui.help.favourites": "Elementos que marcaste como favoritos.",
         "ui.help.board": "Elementos de este tablero. Añádelos con «Añadir a tablero».",
         "ui.help.snippets": "Texto reutilizable. Usa {{name}} para los valores que rellenas cada vez.",
+        "ui.perm.openSettings": "Abrir Ajustes",
     ]
     private static let uiL4: [String: String] = [
         "ui.editTextMore": "Modifier le texte…",
@@ -1584,6 +1588,7 @@ extension Lang {
         "ui.help.favourites": "Éléments marqués comme favoris.",
         "ui.help.board": "Éléments de ce tableau. Ajoutez-en avec « Ajouter à un tableau ».",
         "ui.help.snippets": "Texte réutilisable. Utilisez {{name}} pour les valeurs à remplir à chaque fois.",
+        "ui.perm.openSettings": "Ouvrir les réglages",
     ]
     private static let uiL5: [String: String] = [
         "ui.editTextMore": "تعديل النص…",
@@ -1898,6 +1903,7 @@ extension Lang {
         "ui.help.favourites": "العناصر التي وضعتها في المفضلة.",
         "ui.help.board": "عناصر هذه اللوحة. أضِف عناصر بـ«إضافة إلى لوحة».",
         "ui.help.snippets": "نص قابل لإعادة الاستخدام. استخدم {{name}} للقيم التي تملأها في كل مرة.",
+        "ui.perm.openSettings": "فتح الإعدادات",
     ]
     private static let uiL6: [String: String] = [
         "ui.editTextMore": "টেক্সট সম্পাদনা করুন…",
@@ -2212,6 +2218,7 @@ extension Lang {
         "ui.help.favourites": "আপনার পছন্দ হিসেবে চিহ্নিত আইটেম।",
         "ui.help.board": "এই বোর্ডের আইটেম। “বোর্ডে যোগ করুন” দিয়ে আইটেম যোগ করুন।",
         "ui.help.snippets": "বারবার ব্যবহারযোগ্য টেক্সট। প্রতিবার পূরণ করার মানের জন্য {{name}} লিখুন।",
+        "ui.perm.openSettings": "সেটিংস খুলুন",
     ]
     private static let uiL7: [String: String] = [
         "ui.editTextMore": "Editar texto…",
@@ -2526,6 +2533,7 @@ extension Lang {
         "ui.help.favourites": "Itens que você marcou como favoritos.",
         "ui.help.board": "Itens deste quadro. Adicione com «Adicionar ao quadro».",
         "ui.help.snippets": "Texto reutilizável. Use {{name}} para os valores que você preenche sempre.",
+        "ui.perm.openSettings": "Abrir Ajustes",
     ]
     private static let uiL8: [String: String] = [
         "ui.editTextMore": "Изменить текст…",
@@ -2840,6 +2848,7 @@ extension Lang {
         "ui.help.favourites": "Элементы, отмеченные как избранные.",
         "ui.help.board": "Элементы этой доски. Добавляйте через «Добавить на доску».",
         "ui.help.snippets": "Текст для повторного использования. {{name}} — значение, которое заполняется каждый раз.",
+        "ui.perm.openSettings": "Открыть настройки",
     ]
     private static let uiL9: [String: String] = [
         "ui.editTextMore": "テキストを編集…",
@@ -3154,6 +3163,7 @@ extension Lang {
         "ui.help.favourites": "お気に入りに設定した項目。",
         "ui.help.board": "このボードの項目。「ボードに追加」で追加できます。",
         "ui.help.snippets": "繰り返し使うテキスト。毎回入力する値には {{name}} を使います。",
+        "ui.perm.openSettings": "設定を開く",
     ]
     private static let uiL10: [String: String] = [
         "ui.editTextMore": "Text bearbeiten…",
@@ -3468,5 +3478,6 @@ extension Lang {
         "ui.help.favourites": "Als Favoriten markierte Einträge.",
         "ui.help.board": "Einträge dieses Boards. Hinzufügen über „Zu Board hinzufügen“.",
         "ui.help.snippets": "Wiederverwendbarer Text. Verwende {{name}} für Werte, die du jedes Mal ausfüllst.",
+        "ui.perm.openSettings": "Einstellungen öffnen",
     ]
 }
