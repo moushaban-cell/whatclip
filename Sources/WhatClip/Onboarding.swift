@@ -7,8 +7,8 @@ final class OnboardingWindowController: NSObject {
     private let window: NSWindow
     private let monitor: PasteboardMonitor
     private let pageHost = NSView()
-    private let back = NSButton(title: "Back", target: nil, action: nil)
-    private let next = NSButton(title: "Next", target: nil, action: nil)
+    private let back = NSButton(title: Lang.t("tour.back"), target: nil, action: nil)
+    private let next = NSButton(title: Lang.t("tour.next"), target: nil, action: nil)
     private let dots = NSStackView()
     private var step = 0
     private var pages: [NSView] = []
@@ -18,7 +18,7 @@ final class OnboardingWindowController: NSObject {
         window = CloseWindow(contentRect: NSRect(x: 0, y: 0, width: 560, height: 470),
                              styleMask: [.titled, .closable, .miniaturizable, .resizable], backing: .buffered, defer: false)
         super.init()
-        window.title = "Welcome to WhatClip"; window.isReleasedWhenClosed = false; window.center()
+        window.title = Lang.t("tour.window"); window.isReleasedWhenClosed = false; window.center()
         window.minSize = NSSize(width: 520, height: 420)
         // Testing aid: WHATCLIP_TOUR_PAGE=n opens the tour at page n the first time it is shown.
         startPage = Int(ProcessInfo.processInfo.environment["WHATCLIP_TOUR_PAGE"] ?? "") ?? 0
@@ -76,12 +76,12 @@ final class OnboardingWindowController: NSObject {
     private func shortcutPage() -> NSView {
         let icon = NSImageView(image: NSImage(systemSymbolName: "command", accessibilityDescription: "Shortcut") ?? NSImage())
         icon.contentTintColor = Design.accent; icon.symbolConfiguration = NSImage.SymbolConfiguration(pointSize: 46, weight: .regular)
-        let head = NSTextField(labelWithString: "Choose your picker shortcut"); head.font = .systemFont(ofSize: 22, weight: .semibold)
-        let body = NSTextField(wrappingLabelWithString: "This opens the picker from any app. Pick a combination no other app uses. You can change it later in Settings.")
+        let head = NSTextField(labelWithString: Lang.t("tour.shortcut.title")); head.font = .systemFont(ofSize: 22, weight: .semibold)
+        let body = NSTextField(wrappingLabelWithString: Lang.t("tour.shortcut.body"))
         body.font = .systemFont(ofSize: 14); body.textColor = .secondaryLabelColor; body.alignment = .center; body.preferredMaxLayoutWidth = 420
         shortcutLabel.font = .monospacedSystemFont(ofSize: 20, weight: .medium); shortcutLabel.alignment = .center
         refreshShortcutLabel()
-        let change = NSButton(title: "Change shortcut…", target: self, action: #selector(changeShortcut)); change.bezelStyle = .rounded
+        let change = NSButton(title: Lang.t("tour.shortcut.change"), target: self, action: #selector(changeShortcut)); change.bezelStyle = .rounded
         let stack = NSStackView(views: [icon, head, body, shortcutLabel, change])
         stack.orientation = .vertical; stack.alignment = .centerX; stack.spacing = 14
         return stack
@@ -111,15 +111,15 @@ final class OnboardingWindowController: NSObject {
     private func permissionsPage() -> NSView {
         let icon = NSImageView(image: NSImage(systemSymbolName: "checkmark.shield", accessibilityDescription: "Permissions") ?? NSImage())
         icon.contentTintColor = Design.accent; icon.symbolConfiguration = NSImage.SymbolConfiguration(pointSize: 40, weight: .regular)
-        let head = NSTextField(labelWithString: "Set up WhatClip"); head.font = .systemFont(ofSize: 22, weight: .semibold)
+        let head = NSTextField(labelWithString: Lang.t("tour.permissions.title")); head.font = .systemFont(ofSize: 22, weight: .semibold)
         let intro = NSTextField(wrappingLabelWithString: "Tick what you want. Nothing is switched on unless you tick it, and you can change any of these later in Settings.")
         intro.font = .systemFont(ofSize: 13); intro.textColor = .secondaryLabelColor; intro.preferredMaxLayoutWidth = 440
         var rows: [NSView] = [icon, head, intro]
         let items: [(String, String, String)] = [
-            ("accessibility", "Paste automatically", "Accessibility: presses ⌘V in the app you were using after you choose an item."),
-            ("screen", "Screenshots and GIFs", "Screen Recording: needed only for screenshots and GIF recording."),
-            ("touch", "Touch ID or password lock", "Asks for Touch ID or your Mac password before the history opens. Uses no extra permission."),
-            ("login", "Start at login", "Opens WhatClip when you log in. Turn it off any time in Settings."),
+            ("accessibility", Lang.t("perm.accessibility.title"), Lang.t("perm.accessibility.body")),
+            ("screen", Lang.t("perm.screen.title"), Lang.t("perm.screen.body")),
+            ("touch", Lang.t("perm.touch.title"), Lang.t("perm.touch.body")),
+            ("login", Lang.t("perm.login.title"), Lang.t("perm.login.body")),
         ]
         for (key, title, why) in items {
             let check = NSButton(checkboxWithTitle: title, target: nil, action: nil)
@@ -131,7 +131,7 @@ final class OnboardingWindowController: NSObject {
             packChecks[key] = check; packStatus[key] = status
             rows.append(row)
         }
-        let setUp = NSButton(title: "Set up WhatClip", target: self, action: #selector(setUpPack)); setUp.bezelStyle = .rounded
+        let setUp = NSButton(title: Lang.t("tour.permissions.setup"), target: self, action: #selector(setUpPack)); setUp.bezelStyle = .rounded
         rows.append(setUp)
         let stack = NSStackView(views: rows); stack.orientation = .vertical; stack.alignment = .centerX; stack.spacing = 12
         return stack
@@ -140,10 +140,10 @@ final class OnboardingWindowController: NSObject {
     /// The live state of one permission, in words.
     private func statusText(for key: String) -> String {
         switch key {
-        case "accessibility": return AutoPaste.isTrusted ? "On" : "Off"
-        case "screen": return CGPreflightScreenCaptureAccess() ? "On" : "Off"
-        case "touch": return monitor.settings.requireTouchID ? "On" : "Off"
-        case "login": return monitor.settings.launchAtLogin ? "On" : "Off"
+        case "accessibility": return AutoPaste.isTrusted ? Lang.t("status.on") : Lang.t("status.off")
+        case "screen": return CGPreflightScreenCaptureAccess() ? Lang.t("status.on") : Lang.t("status.off")
+        case "touch": return monitor.settings.requireTouchID ? Lang.t("status.on") : Lang.t("status.off")
+        case "login": return monitor.settings.launchAtLogin ? Lang.t("status.on") : Lang.t("status.off")
         default: return ""
         }
     }
@@ -165,13 +165,13 @@ final class OnboardingWindowController: NSObject {
     private func build() {
         pages = [
             languagePage(),
-            tourPage(symbol: "doc.on.clipboard", title: "Everything you copy is kept",
-                     body: "Text, links, images, GIFs and files. Copies from password managers are never recorded, and nothing leaves this Mac."),
+            tourPage(symbol: "doc.on.clipboard", title: Lang.t("tour.copy.title"),
+                     body: Lang.t("tour.copy.body")),
             shortcutPage(),
-            tourPage(symbol: "menubar.rectangle", title: "Everything is in the menu bar",
-                     body: "Stack copies, take screenshots, pause capturing, open snippets and boards, or change settings from the menu. Settings are always under WhatClip ▸ Settings… (⌘,)."),
-            tourPage(symbol: "folder", title: "Pin, favourite and organise",
-                     body: "Pin what you always need, favourite items for the Library, add tags, and group items into boards. Export a copy any time from File ▸ Export History."),
+            tourPage(symbol: "menubar.rectangle", title: Lang.t("tour.menu.title"),
+                     body: Lang.t("tour.menu.body")),
+            tourPage(symbol: "folder", title: Lang.t("tour.organise.title"),
+                     body: Lang.t("tour.organise.body")),
             permissionsPage(),
         ]
         pageHost.translatesAutoresizingMaskIntoConstraints = false
@@ -179,12 +179,14 @@ final class OnboardingWindowController: NSObject {
         next.target = self; next.action = #selector(goNext); next.bezelStyle = .rounded
         back.bezelStyle = .rounded
         dots.orientation = .horizontal; dots.spacing = 6
+        let rtl: NSUserInterfaceLayoutDirection = Lang.isRightToLeft ? .rightToLeft : .leftToRight
         let footer = NSStackView(views: [back, dots, next]); footer.spacing = 12; footer.alignment = .centerY
+        footer.userInterfaceLayoutDirection = rtl; dots.userInterfaceLayoutDirection = rtl; pageHost.userInterfaceLayoutDirection = rtl
         footer.edgeInsets = NSEdgeInsets(top: 0, left: 24, bottom: 18, right: 24)
         let root = NSStackView(views: [pageHost, footer]); root.orientation = .vertical; root.spacing = 0
         root.translatesAutoresizingMaskIntoConstraints = false
         // Arabic: mirror the whole tour (buttons, dots, text) right to left.
-        root.userInterfaceLayoutDirection = Lang.isRightToLeft ? .rightToLeft : .leftToRight
+        root.userInterfaceLayoutDirection = rtl
         window.contentView = root
         NSLayoutConstraint.activate([pageHost.widthAnchor.constraint(equalTo: root.widthAnchor), footer.widthAnchor.constraint(equalTo: root.widthAnchor)])
         for p in pages { p.translatesAutoresizingMaskIntoConstraints = false }
@@ -199,7 +201,7 @@ final class OnboardingWindowController: NSObject {
                                      page.leadingAnchor.constraint(greaterThanOrEqualTo: pageHost.leadingAnchor, constant: 24),
                                      page.trailingAnchor.constraint(lessThanOrEqualTo: pageHost.trailingAnchor, constant: -24)])
         back.isEnabled = step > 0
-        next.title = step == pages.count - 1 ? "Start using WhatClip" : "Next"
+        next.title = step == pages.count - 1 ? Lang.t("tour.start") : Lang.t("tour.next")
         dots.arrangedSubviews.forEach { $0.removeFromSuperview() }
         for i in pages.indices {
             let d = NSView(); d.wantsLayer = true; d.layer?.cornerRadius = 4
