@@ -336,6 +336,9 @@ extension Lang {
         "ui.capture.none": "No screenshots or GIFs yet.",
         "ui.annotate.none": "Nothing to annotate yet. Take a screenshot or copy an image first.",
         "ui.perm.turnOff": "Turn off",
+        "ui.anyBoard": "All boards",
+        "ui.hint.board": "board",
+        "ui.board.noneYet": "No boards yet. Create one in the History window first.",
     ]
     private static let uiL1: [String: String] = [
         "ui.editTextMore": "编辑文本…",
@@ -658,6 +661,9 @@ extension Lang {
         "ui.capture.none": "还没有截图或 GIF。",
         "ui.annotate.none": "还没有可标注的内容。请先截图或复制一张图片。",
         "ui.perm.turnOff": "关闭",
+        "ui.anyBoard": "所有看板",
+        "ui.hint.board": "看板",
+        "ui.board.noneYet": "还没有看板。请先在历史记录窗口中创建一个。",
     ]
     private static let uiL2: [String: String] = [
         "ui.editTextMore": "टेक्स्ट संपादित करें…",
@@ -980,6 +986,9 @@ extension Lang {
         "ui.capture.none": "अभी कोई स्क्रीनशॉट या GIF नहीं।",
         "ui.annotate.none": "अभी एनोटेट करने के लिए कुछ नहीं है। पहले स्क्रीनशॉट लें या कोई छवि कॉपी करें।",
         "ui.perm.turnOff": "बंद करें",
+        "ui.anyBoard": "सभी बोर्ड",
+        "ui.hint.board": "बोर्ड",
+        "ui.board.noneYet": "अभी कोई बोर्ड नहीं है। पहले इतिहास विंडो में एक बनाएँ।",
     ]
     private static let uiL3: [String: String] = [
         "ui.editTextMore": "Editar texto…",
@@ -1302,6 +1311,9 @@ extension Lang {
         "ui.capture.none": "Aún no hay capturas ni GIF.",
         "ui.annotate.none": "Aún no hay nada que anotar. Haz una captura o copia una imagen primero.",
         "ui.perm.turnOff": "Desactivar",
+        "ui.anyBoard": "Todos los tableros",
+        "ui.hint.board": "tablero",
+        "ui.board.noneYet": "Aún no hay tableros. Crea uno primero en la ventana de historial.",
     ]
     private static let uiL4: [String: String] = [
         "ui.editTextMore": "Modifier le texte…",
@@ -1624,6 +1636,9 @@ extension Lang {
         "ui.capture.none": "Aucune capture ni GIF pour l'instant.",
         "ui.annotate.none": "Rien à annoter pour l'instant. Faites une capture ou copiez une image.",
         "ui.perm.turnOff": "Désactiver",
+        "ui.anyBoard": "Tous les tableaux",
+        "ui.hint.board": "tableau",
+        "ui.board.noneYet": "Pas encore de tableau. Créez-en un d'abord dans la fenêtre d'historique.",
     ]
     private static let uiL5: [String: String] = [
         "ui.editTextMore": "تعديل النص…",
@@ -1946,6 +1961,9 @@ extension Lang {
         "ui.capture.none": "لا توجد لقطات شاشة أو GIF بعد.",
         "ui.annotate.none": "لا توجد صورة للتعليق عليها بعد. التقط لقطة شاشة أو انسخ صورة أولاً.",
         "ui.perm.turnOff": "إيقاف",
+        "ui.anyBoard": "كل اللوحات",
+        "ui.hint.board": "لوحة",
+        "ui.board.noneYet": "لا توجد لوحات بعد. أنشئ لوحة أولاً من نافذة السجل.",
     ]
     private static let uiL6: [String: String] = [
         "ui.editTextMore": "টেক্সট সম্পাদনা করুন…",
@@ -2268,6 +2286,9 @@ extension Lang {
         "ui.capture.none": "এখনও কোনো স্ক্রিনশট বা GIF নেই।",
         "ui.annotate.none": "এখনও টীকা দেওয়ার মতো কিছু নেই। আগে একটি স্ক্রিনশট নিন বা ছবি কপি করুন।",
         "ui.perm.turnOff": "বন্ধ করুন",
+        "ui.anyBoard": "সব বোর্ড",
+        "ui.hint.board": "বোর্ড",
+        "ui.board.noneYet": "এখনও কোনো বোর্ড নেই। আগে ইতিহাস উইন্ডোতে একটি বোর্ড তৈরি করুন।",
     ]
     private static let uiL7: [String: String] = [
         "ui.editTextMore": "Editar texto…",
@@ -2590,6 +2611,9 @@ extension Lang {
         "ui.capture.none": "Ainda não há capturas nem GIFs.",
         "ui.annotate.none": "Nada para anotar ainda. Faça uma captura ou copie uma imagem primeiro.",
         "ui.perm.turnOff": "Desativar",
+        "ui.anyBoard": "Todos os quadros",
+        "ui.hint.board": "quadro",
+        "ui.board.noneYet": "Ainda não há quadros. Crie um primeiro na janela de histórico.",
     ]
     private static let uiL8: [String: String] = [
         "ui.editTextMore": "Изменить текст…",
@@ -2912,6 +2936,9 @@ extension Lang {
         "ui.capture.none": "Пока нет снимков экрана или GIF.",
         "ui.annotate.none": "Пока нечего аннотировать. Сначала сделайте снимок экрана или скопируйте изображение.",
         "ui.perm.turnOff": "Выключить",
+        "ui.anyBoard": "Все доски",
+        "ui.hint.board": "доска",
+        "ui.board.noneYet": "Пока нет досок. Сначала создайте доску в окне истории.",
     ]
     private static let uiL9: [String: String] = [
         "ui.editTextMore": "テキストを編集…",
@@ -3234,6 +3261,9 @@ extension Lang {
         "ui.capture.none": "まだスクリーンショットや GIF はありません。",
         "ui.annotate.none": "注釈を付けるものがまだありません。先にスクリーンショットを撮るか画像をコピーしてください。",
         "ui.perm.turnOff": "オフにする",
+        "ui.anyBoard": "すべてのボード",
+        "ui.hint.board": "ボード",
+        "ui.board.noneYet": "まだボードがありません。先に履歴ウィンドウでボードを作成してください。",
     ]
     private static let uiL10: [String: String] = [
         "ui.editTextMore": "Text bearbeiten…",
@@ -3556,5 +3586,8 @@ extension Lang {
         "ui.capture.none": "Noch keine Screenshots oder GIFs.",
         "ui.annotate.none": "Noch nichts zum Annotieren. Erst einen Screenshot machen oder ein Bild kopieren.",
         "ui.perm.turnOff": "Ausschalten",
+        "ui.anyBoard": "Alle Boards",
+        "ui.hint.board": "Board",
+        "ui.board.noneYet": "Noch keine Boards. Lege zuerst eines im Verlauf-Fenster an.",
     ]
 }

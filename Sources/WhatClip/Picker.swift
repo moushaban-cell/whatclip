@@ -46,6 +46,8 @@ final class PickerController: NSObject, NSSearchFieldDelegate, NSTableViewDataSo
     private let cardsButton = NSButton(title: Lang.t("ui.cards"), target: nil, action: nil)
     private var cardsOn = false
     private let appPop = NSPopUpButton()
+    private let boardPop = NSPopUpButton()
+    private var boardIDs: [Int64] = []
     private var appIDs: [String] = []
     private var items: [ClipItem] = []
     private var filter: Filter = .all
@@ -71,6 +73,7 @@ final class PickerController: NSObject, NSSearchFieldDelegate, NSTableViewDataSo
         filters.target = self; filters.action = #selector(filterChanged); filters.selectedSegment = 0
         datePop.addItems(withTitles: [Lang.t("ui.date.any"), Lang.t("ui.date.hour"), Lang.t("ui.date.today"), Lang.t("ui.date.week")]); datePop.target = self; datePop.action = #selector(reloadFromControl)
         appPop.target = self; appPop.action = #selector(reloadFromControl); appPop.setAccessibilityLabel("Filter by app")
+        boardPop.target = self; boardPop.action = #selector(reloadFromControl); boardPop.setAccessibilityLabel(Lang.t("ui.addToBoard"))
         datePop.setAccessibilityLabel(Lang.t("ui.a11y.date"))
         filters.segmentStyle = .texturedRounded
 
@@ -101,7 +104,7 @@ final class PickerController: NSObject, NSSearchFieldDelegate, NSTableViewDataSo
         previewScroll.widthAnchor.constraint(greaterThanOrEqualToConstant: 280).isActive = true
 
         status.font = .systemFont(ofSize: 11); status.textColor = .secondaryLabelColor
-        let hint = NSTextField(labelWithString: "↩ \(Lang.t("ui.hint.paste"))  ·  ⇧↩ \(Lang.t("ui.hint.plain"))  ·  ⌘1–9 \(Lang.t("ui.hint.pick"))  ·  ⌘D \(Lang.t("ui.hint.favourite"))  ·  ⌘⌫ \(Lang.t("ui.hint.delete"))  ·  \(Lang.t("ui.hint.more"))")
+        let hint = NSTextField(labelWithString: "↩ \(Lang.t("ui.hint.paste"))  ·  ⇧↩ \(Lang.t("ui.hint.plain"))  ·  ⌘1–9 \(Lang.t("ui.hint.pick"))  ·  ⌘D \(Lang.t("ui.hint.favourite"))  ·  ⌘B \(Lang.t("ui.hint.board"))  ·  ⌘⌫ \(Lang.t("ui.hint.delete"))  ·  \(Lang.t("ui.hint.more"))")
         hint.font = .systemFont(ofSize: 10); hint.textColor = .tertiaryLabelColor
 
         // The list and the empty state share one pane, so the empty state sits where the list would be.
@@ -118,7 +121,7 @@ final class PickerController: NSObject, NSSearchFieldDelegate, NSTableViewDataSo
         listPane.widthAnchor.constraint(equalToConstant: 360).isActive = true
         emptyHost.isHidden = true
         let body = NSStackView(views: [listPane, shelf.scroll, previewBox]); body.distribution = .fill; body.spacing = 1
-        let filterRow = NSStackView(views: [filters, datePop, appPop, cardsButton]); filterRow.spacing = 8
+        let filterRow = NSStackView(views: [filters, datePop, appPop, boardPop, cardsButton]); filterRow.spacing = 8
         let stack = NSStackView(views: [field, filterRow, body, NSStackView(views: [status, hint])])
         stack.orientation = .vertical; stack.alignment = .leading; stack.spacing = 8
         // Top inset clears the traffic-light buttons (close, minimise, zoom) that sit over the top edge.
@@ -224,6 +227,34 @@ final class PickerController: NSObject, NSSearchFieldDelegate, NSTableViewDataSo
         return f
     }
 
+    /// The board list, kept in step with the boards that exist. The chosen board stays chosen when the list changes.
+    private func refreshBoardPopup() {
+        let current = boardPop.indexOfSelectedItem > 0 ? boardIDs[safe: boardPop.indexOfSelectedItem - 1] : nil
+        let boards = (try? store.boards()) ?? []
+        boardPop.removeAllItems()
+        boardPop.addItem(withTitle: Lang.t("ui.anyBoard"))
+        boardIDs = boards.map(\.id)
+        for b in boards { boardPop.addItem(withTitle: b.name) }
+        if let current, let i = boardIDs.firstIndex(of: current) { boardPop.selectItem(at: i + 1) }
+    }
+    /// ⌘B: files the selected items into a board, from the picker, without opening the History window.
+    private func addSelectedToBoard() {
+        let picked = table.selectedRowIndexes.compactMap { items[safe: $0] }
+        guard !picked.isEmpty else { return }
+        let boards = (try? store.boards()) ?? []
+        guard !boards.isEmpty else {
+            let alert = NSAlert(); alert.messageText = Lang.t("ui.board.noneYet"); alert.runModal(); return
+        }
+        let menu = NSMenu()
+        for b in boards {
+            menu.addItem(closureMenuItem(b.name) { [weak self] in
+                for i in picked { try? self?.store.addToBoard(item: i.id, board: b.id) }
+                self?.reload()
+            })
+        }
+        menu.popUp(positioning: nil, at: NSPoint(x: table.bounds.midX, y: table.bounds.midY), in: table)
+    }
+
     private func refreshAppPopup() {
         let current = appPop.indexOfSelectedItem > 0 ? appIDs[safe: appPop.indexOfSelectedItem - 1] : nil
         appIDs = (try? store.sourceApps()) ?? []
@@ -237,8 +268,15 @@ final class PickerController: NSObject, NSSearchFieldDelegate, NSTableViewDataSo
         if locked { items = []; table.reloadData(); preview.string = Lang.t("ui.lockedPicker"); previewImage.isHidden = true; return }
         var found = (try? store.list(query: monitor.settings.fuzzySearch ? "" : field.stringValue, limit: 500, filter: storeFilter())) ?? []
         if monitor.settings.fuzzySearch, !field.stringValue.isEmpty { found = found.filter { FuzzyMatch.matches(field.stringValue, in: $0.text) } }
-        items = found.filter(filter.keeps)
         refreshAppPopup()
+        refreshBoardPopup()
+        // A chosen board shows only its items; the search text still applies to them.
+        if boardPop.indexOfSelectedItem > 0, boardIDs.indices.contains(boardPop.indexOfSelectedItem - 1) {
+            let onBoard = (try? store.items(onBoard: boardIDs[boardPop.indexOfSelectedItem - 1])) ?? []
+            let q = field.stringValue
+            found = q.isEmpty ? onBoard : onBoard.filter { $0.text.localizedCaseInsensitiveContains(q) }
+        }
+        items = found.filter(filter.keeps)
         if cardsOn { shelf.reload(items, store: store) }
         table.reloadData()
         if !items.isEmpty { table.selectRowIndexes([0], byExtendingSelection: false) }
@@ -286,6 +324,7 @@ final class PickerController: NSObject, NSSearchFieldDelegate, NSTableViewDataSo
         if ch == "y" { quickLook(); return true }
         if ch == "e" { extractText(); return true }
         if ch == "d" { toggleFavorite(); return true }
+        if ch == "b" { addSelectedToBoard(); return true }
         if e.keyCode == 51 { deleteSelected(); return true }     // ⌘⌫
         return false
     }
