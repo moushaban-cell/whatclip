@@ -14,9 +14,9 @@ final class HistoryWindowController: NSObject, NSTableViewDataSource, NSTableVie
 
     private let window: NSWindow
     let store: ClipStore
-    private let monitor: PasteboardMonitor
+    let monitor: PasteboardMonitor
     private let sidebar = NSTableView()
-    private let list = NSTableView()
+    let list = NSTableView()
     private let search = NSSearchField()
     private let listScroll = NSScrollView()
     /// Settings (from the Settings module) and the About text: shown in the detail pane when their sidebar item is chosen.
@@ -34,16 +34,16 @@ final class HistoryWindowController: NSObject, NSTableViewDataSource, NSTableVie
     private let previewScroll = NSScrollView()
     private let previewImage = NSImageView()
     private let actions = NSStackView()
-    private let snippetTitle = NSTextField()
-    private let snippetFolder = NSTextField()
-    private let snippetTags = NSTextField()
-    private let snippetBody = NSTextView()
-    private let snippetBox = NSStackView()
+    let snippetTitle = NSTextField()
+    let snippetFolder = NSTextField()
+    let snippetTags = NSTextField()
+    let snippetBody = NSTextView()
+    let snippetBox = NSStackView()
     private var sections: [(String, Section)] = []
-    private var section: Section = .all
-    private var items: [ClipItem] = []
-    private var snippets: [Snippet] = []
-    private var selectedSnippet: Snippet?
+    var section: Section = .all
+    var items: [ClipItem] = []
+    var snippets: [Snippet] = []
+    var selectedSnippet: Snippet?
 
     init(store: ClipStore, monitor: PasteboardMonitor) {
         self.store = store; self.monitor = monitor
@@ -613,50 +613,6 @@ final class HistoryWindowController: NSObject, NSTableViewDataSource, NSTableVie
     }
     @objc private func copyValue(_ s: NSMenuItem) { if let v = s.representedObject as? String { monitor.restore(v) } }
 
-    // MARK: snippets
-
-    @objc func newSnippet() {
-        section = .snippets; selectedSnippet = nil
-        if let s = try? store.addSnippet(title: Lang.t("ui.newSnippet"), body: "") { selectedSnippet = s }
-        reloadList(); reloadSidebar()
-        if let row = snippets.firstIndex(where: { $0.id == selectedSnippet?.id }) { list.selectRowIndexes([row], byExtendingSelection: false) }
-    }
-    @objc private func saveSnippet() {
-        guard var s = selectedSnippet else { return }
-        s.title = snippetTitle.stringValue.isEmpty ? Lang.t("ui.untitled") : snippetTitle.stringValue
-        s.folder = snippetFolder.stringValue; s.body = snippetBody.string; s.tags = snippetTags.stringValue
-        try? store.updateSnippet(s); selectedSnippet = s; reloadList()
-    }
-    @objc private func deleteSnippet() {
-        guard let s = selectedSnippet else { return }
-        do { try store.deleteSnippet(s.id) } catch { reportFailure(error) }
-        selectedSnippet = nil; reloadList()
-    }
-    /// Used by the menu bar: fill in and copy a snippet without opening the editor.
-    func insertSnippetFromMenu(_ snip: Snippet) {
-        selectedSnippet = snip; snippetBody.string = snip.body
-        insertSnippet()
-    }
-
-    @objc private func insertSnippet() {
-        guard let s = selectedSnippet else { return }
-        let names = Template.variables(in: snippetBody.string)
-        var values: [String: String] = [:]
-        if !names.isEmpty {
-            let alert = NSAlert(); alert.messageText = Lang.t("ui.fillIn", ["title": s.title]); alert.addButton(withTitle: Lang.t("ui.copy")); alert.addButton(withTitle: Lang.t("ui.cancel"))
-            let stack = NSStackView(); stack.orientation = .vertical; stack.alignment = .leading; stack.spacing = 6
-            var fields: [(String, NSTextField)] = []
-            for n in names {
-                let f = NSTextField(frame: NSRect(x: 0, y: 0, width: 280, height: 24)); f.placeholderString = n
-                fields.append((n, f)); stack.addArrangedSubview(NSTextField(labelWithString: n)); stack.addArrangedSubview(f)
-            }
-            stack.frame = NSRect(x: 0, y: 0, width: 300, height: CGFloat(names.count) * 52)
-            alert.accessoryView = stack
-            guard alert.runModal() == .alertFirstButtonReturn else { return }
-            for (n, f) in fields { values[n] = f.stringValue }
-        }
-        monitor.restore(Template.render(snippetBody.string, values: values))
-    }
 }
 
 
