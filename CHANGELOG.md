@@ -1,5 +1,16 @@
 # Changelog
 
+## 1.0.0
+First complete release, source only, private repository.
+- Capture of text, links, rich text, HTML, images, GIFs and files; restored in their original form.
+- Picker (default ⇧⌘X, changeable): search, filters, cards and list, previews, multi-select, Touch ID or password lock with a 15-minute session.
+- Auto-paste after choosing an item (needs the Accessibility permission).
+- Main window with History, Library, Snippets, Settings (General, History, Privacy) and About.
+- Stack, snippets with variables, boards, tags, favourites, text tools, smart actions, OCR search, annotation, area screenshots, GIF recording.
+- Encryption of text, images and files; ignore rules; masked and expiring secrets.
+- Export and import of history as JSON; one-command install; packaged zip with checksum.
+- Known limits: not notarised; screen recording, Touch ID and Services were checked only in part on the author's Mac; English only.
+
 ## 0.2.0
 - Menu-bar hub with every feature reachable (stack, capture, snippets, boards, pauses, ignore next copy, settings, help, quit).
 - Picker: filters (type, pinned, favourites, time, app), previews, multi-select, thumbnails and colour swatches, ⌘D favourite, ⌘E extract text, Quick Look, placement under the menu-bar icon.

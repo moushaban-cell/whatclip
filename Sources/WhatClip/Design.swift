@@ -4,7 +4,12 @@ import WhatClipCore
 /// One visual language for WhatClip: colours, sizes and the shared list row. Used by the picker and the history window.
 @MainActor
 enum Design {
-    static let accent = NSColor(srgbRed: 0x14 / 255, green: 0x59 / 255, blue: 0x5F / 255, alpha: 1)
+    /// The brand teal. It is lighter in dark mode, so icons and links stay readable on a dark background.
+    static let accent = NSColor(name: "WhatClipAccent") { appearance in
+        let dark = appearance.bestMatch(from: [.darkAqua, .aqua]) == .darkAqua
+        return dark ? NSColor(srgbRed: 0x5F / 255, green: 0xB8 / 255, blue: 0xC0 / 255, alpha: 1)
+                    : NSColor(srgbRed: 0x14 / 255, green: 0x59 / 255, blue: 0x5F / 255, alpha: 1)
+    }
     static let amber = NSColor(srgbRed: 0xF2 / 255, green: 0xB2 / 255, blue: 0x33 / 255, alpha: 1)
     static let rowHeight: CGFloat = 50
     /// Spacing scale (points). Use these, not ad hoc numbers.
