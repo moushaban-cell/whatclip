@@ -15,7 +15,9 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
     let gif = GIFRecorder()
     var emoji: EmojiPanelController!
     var syncTimer: Timer?
-    let hotKey = HotKey()
+    /// One shortcut per action. The picker's shortcut is in the picker settings; the others are in actionShortcuts.
+    let hotKeys: [HotAction: HotKey] = Dictionary(uniqueKeysWithValues: HotAction.allCases.map { ($0, HotKey()) })
+    var hotKeyStatuses: [HotAction: String] = [:]
     var hotKeyOK = false
     var hotKeyStatus = Lang.t("ui.hk.notRegistered")
     let menu = NSMenu()
@@ -126,13 +128,37 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
 
     /// Registers the picker shortcut from the settings. False when another app already uses it.
     @discardableResult
+    /// Registers every action's shortcut that is set. Returns whether the picker's shortcut is active.
     func applyHotKey() -> Bool {
         let st = monitor.settings
-        let ok = hotKey.register(keyCode: UInt32(st.hotKeyCode), modifiers: UInt32(st.hotKeyModifiers)) { [weak self] in self?.openPicker() }
-        hotKeyOK = ok
-        hotKeyStatus = hotKey.lastStatus
+        var pickerOK = true
+        for action in HotAction.allCases {
+            let key = hotKeys[action]!
+            let spec: ActionShortcut? = action == .picker ? ActionShortcut(keyCode: st.hotKeyCode, modifiers: st.hotKeyModifiers) : st.actionShortcuts[action.rawValue]
+            guard let spec else { key.unregister(); hotKeyStatuses[action] = nil; continue }
+            let registered = key.register(keyCode: UInt32(spec.keyCode), modifiers: UInt32(spec.modifiers)) { [weak self] in self?.runAction(action) }
+            hotKeyStatuses[action] = key.lastStatus
+            if action == .picker { pickerOK = registered }
+        }
+        hotKeyOK = pickerOK
+        hotKeyStatus = hotKeyStatuses[.picker] ?? hotKeyStatus
         settings.hotKeyStatus = hotKeyStatus
-        return ok
+        return pickerOK
+    }
+
+    /// Runs what a global shortcut asks for. Each action does what its menu item does.
+    func runAction(_ action: HotAction) {
+        switch action {
+        case .picker: openPicker()
+        case .history: openHistory()
+        case .screenshot: screenshot()
+        case .gif: recordGIF()
+        case .annotate: annotateLatest()
+        case .emoji: openEmoji()
+        case .pause: if monitor.isPaused { resumeCapture() } else { pauseForever() }
+        case .stack: toggleStack()
+        case .pasteNextStack: pasteNextStack()
+        }
     }
     func hotKeyChangedBySettings() {
         if !applyHotKey() {

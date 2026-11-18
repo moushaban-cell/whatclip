@@ -109,6 +109,7 @@ final class SettingsWindowController: NSObject, NSWindowDelegate {
             label(Lang.t("ui.set.pickerShortcut")), NSStackView(views: [shortcutLabel, shortcutButton]),
             hint(Lang.t("ui.set.pressChange")),
             shortcutStatus,
+            label(Lang.t("ui.set.otherShortcuts")), otherShortcuts,
             label(Lang.t("ui.set.lookBehaviour")),
             row(Lang.t("ui.set.appearance"), appearancePop), row(Lang.t("ui.set.openPicker"), placementPop),
             row(Lang.t("ui.set.language"), languagePop), hint(Lang.t("ui.set.languageHint")),
@@ -167,9 +168,13 @@ final class SettingsWindowController: NSObject, NSWindowDelegate {
         if let path = FolderSync.chooseFolder() { syncField.stringValue = path }
     }
 
-    /// Records the next key combination with Command, Option or Control, and saves it as the picker shortcut.
-    @objc private func recordShortcut() {
-        shortcutLabel.stringValue = Lang.t("ui.set.pressNew")
+    /// Records the picker shortcut (the picker's own button).
+    @objc private func recordPickerShortcut() { recordShortcut(for: .picker) }
+
+    /// Records the next key combination with Command, Option or Control, and saves it for this action.
+    private func recordShortcut(for action: HotAction) {
+        if action == .picker { shortcutLabel.stringValue = Lang.t("ui.set.pressNew") }
+        else { shortcutStatus.stringValue = Lang.t("ui.set.pressNew") }
         if let m = shortcutMonitor { NSEvent.removeMonitor(m) }
         shortcutMonitor = NSEvent.addLocalMonitorForEvents(matching: .keyDown) { [weak self] e in
             guard let self else { return e }
@@ -182,16 +187,80 @@ final class SettingsWindowController: NSObject, NSWindowDelegate {
             if f.contains(.option) { carbon |= 2048 }
             if f.contains(.control) { carbon |= 4096 }
             var s = self.monitor.settings
-            s.hotKeyCode = Int(e.keyCode); s.hotKeyModifiers = carbon
+            if action == .picker { s.hotKeyCode = Int(e.keyCode); s.hotKeyModifiers = carbon }
+            else { s.actionShortcuts[action.rawValue] = ActionShortcut(keyCode: Int(e.keyCode), modifiers: carbon) }
             self.endRecording()
             do { try self.monitor.update(s); self.status.stringValue = Lang.t("ui.set.shortcutSaved") } catch { self.status.stringValue = Lang.t("ui.set.shortcutFail") }
             self.load()
+            // Shows the result of the registration for this action (for example, when another app already uses the shortcut).
+            if let app = NSApp.delegate as? AppDelegate, let result = app.hotKeyStatuses[action], action != .picker { self.shortcutStatus.stringValue = result }
             return nil
         }
     }
     private func endRecording() { if let m = shortcutMonitor { NSEvent.removeMonitor(m) }; shortcutMonitor = nil }
 
     /// A readable name for a key code and Carbon modifier bits, for example "⌘⇧V".
+    /// The name of an action, as it appears in the menus.
+    static func actionTitle(_ action: HotAction) -> String {
+        switch action {
+        case .picker: return Lang.t("ui.set.showPicker")
+        case .history: return Lang.t("ui.m.openHistory")
+        case .screenshot: return Lang.t("ui.m.screenshot")
+        case .gif: return Lang.t("ui.m.gif")
+        case .annotate: return Lang.t("ui.m.annotate")
+        case .emoji: return Lang.t("ui.m.emoji")
+        case .pause: return Lang.t("ui.m.pauseCapturing")
+        case .stack: return Lang.t("ui.m.startStack")
+        case .pasteNextStack: return Lang.t("ui.m.pasteNext")
+        }
+    }
+
+    /// One row per action other than the picker: name, current shortcut, Change and Clear.
+    private lazy var otherShortcuts: NSStackView = {
+        var rows: [NSView] = []
+        for action in HotAction.allCases where action != .picker {
+            let name = NSTextField(labelWithString: Self.actionTitle(action))
+            name.widthAnchor.constraint(equalToConstant: 200).isActive = true
+            let value = NSTextField(labelWithString: "")
+            value.widthAnchor.constraint(equalToConstant: 140).isActive = true
+            otherShortcutValues[action] = value
+            let change = NSButton(title: Lang.t("ui.changeShortcut"), target: self, action: #selector(recordFromRow(_:)))
+            change.bezelStyle = .rounded; change.identifier = NSUserInterfaceItemIdentifier(action.rawValue)
+            let clear = NSButton(title: Lang.t("ui.shortcut.clear"), target: self, action: #selector(clearFromRow(_:)))
+            clear.bezelStyle = .rounded; clear.identifier = NSUserInterfaceItemIdentifier(action.rawValue)
+            let row = NSStackView(views: [name, value, change, clear]); row.spacing = 10; row.alignment = .centerY
+            rows.append(row)
+        }
+        let stack = NSStackView(views: rows); stack.orientation = .vertical; stack.alignment = .leading; stack.spacing = 8
+        return stack
+    }()
+    private var otherShortcutValues: [HotAction: NSTextField] = [:]
+
+    /// Shows each action's current shortcut, or Lang.t("ui.shortcut.none").
+    private func refreshOtherShortcuts(_ s: WhatClipSettings) {
+        for action in HotAction.allCases where action != .picker {
+            guard let field = otherShortcutValues[action] else { continue }
+            if let spec = s.actionShortcuts[action.rawValue] {
+                field.stringValue = Self.describe(code: spec.keyCode, mods: spec.modifiers)
+            } else {
+                field.stringValue = Lang.t("ui.shortcut.none")
+            }
+        }
+    }
+
+    @objc private func recordFromRow(_ sender: NSButton) {
+        guard let raw = sender.identifier?.rawValue, let action = HotAction(rawValue: raw) else { return }
+        recordShortcut(for: action)
+    }
+
+    @objc private func clearFromRow(_ sender: NSButton) {
+        guard let raw = sender.identifier?.rawValue else { return }
+        var s = monitor.settings
+        s.actionShortcuts[raw] = nil
+        do { try monitor.update(s) } catch { status.stringValue = Lang.t("ui.set.shortcutFail") }
+        load()
+    }
+
     static func describe(code: Int, mods: Int) -> String {
         var s = ""
         if mods & 4096 != 0 { s += "⌃" }
@@ -215,8 +284,9 @@ final class SettingsWindowController: NSObject, NSWindowDelegate {
         gifFPSPop.removeAllItems(); gifFPSPop.addItems(withTitles: [Lang.t("ui.gif.smallest"), "8", "12", Lang.t("ui.gif.smoothest")])
         gifFPSPop.selectItem(at: [5, 8, 12, 15].firstIndex(of: s.gifFramesPerSecond) ?? 1)
         shortcutLabel.stringValue = Lang.t("ui.set.showPicker") + Self.describe(code: s.hotKeyCode, mods: s.hotKeyModifiers)
-        shortcutButton.target = self; shortcutButton.action = #selector(recordShortcut)
+        shortcutButton.target = self; shortcutButton.action = #selector(recordPickerShortcut)
         shortcutStatus.stringValue = hotKeyStatus; shortcutStatus.font = .systemFont(ofSize: 11); shortcutStatus.textColor = .secondaryLabelColor
+        refreshOtherShortcuts(s)
         languagePop.removeAllItems(); languagePop.addItems(withTitles: Lang.names.map(\.name))
         languagePop.selectItem(at: Lang.names.firstIndex { $0.code == s.language } ?? 0)
         appearancePop.removeAllItems(); appearancePop.addItems(withTitles: AppearanceChoice.allCases.map { Lang.t("app." + $0.rawValue) })

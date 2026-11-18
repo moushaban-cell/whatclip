@@ -339,6 +339,9 @@ extension Lang {
         "ui.errorGeneric": "WhatClip could not finish that. Nothing was changed.",
         "ui.about.desc": "A clipboard history for macOS. Your history stays on this Mac: no account, no telemetry. The only network request is a daily update check.",
         "ui.about.open": "Open the picker with the shortcut in Settings (⌘X by default). Copies marked as secret by password managers are never recorded.",
+        "ui.set.otherShortcuts": "Other shortcuts",
+        "ui.shortcut.clear": "Clear",
+        "ui.shortcut.none": "No shortcut",
     ]
     private static let uiL1: [String: String] = [
         "ui.editTextMore": "编辑文本…",
@@ -664,6 +667,9 @@ extension Lang {
         "ui.errorGeneric": "WhatClip 无法完成此操作。未做任何更改。",
         "ui.about.desc": "macOS 剪贴板历史工具。历史记录只保存在这台 Mac 上：无需账户，没有遥测。唯一的网络请求是每天一次的更新检查。",
         "ui.about.open": "使用“设置”中的快捷键打开选择器（默认 ⌘X）。密码管理器标记为机密的复制内容永远不会被记录。",
+        "ui.set.otherShortcuts": "其他快捷键",
+        "ui.shortcut.clear": "清除",
+        "ui.shortcut.none": "未设置",
     ]
     private static let uiL2: [String: String] = [
         "ui.editTextMore": "टेक्स्ट संपादित करें…",
@@ -989,6 +995,9 @@ extension Lang {
         "ui.errorGeneric": "WhatClip यह पूरा नहीं कर सका। कुछ भी नहीं बदला गया।",
         "ui.about.desc": "macOS के लिए क्लिपबोर्ड इतिहास। आपका इतिहास इसी Mac पर रहता है: कोई खाता नहीं, कोई टेलीमेट्री नहीं। केवल एक दैनिक अपडेट जाँच नेटवर्क अनुरोध है।",
         "ui.about.open": "सेटिंग में दिए शॉर्टकट से पिकर खोलें (डिफ़ॉल्ट ⌘X)। पासवर्ड मैनेजर द्वारा गोपनीय चिह्नित कॉपी कभी दर्ज नहीं होतीं।",
+        "ui.set.otherShortcuts": "अन्य शॉर्टकट",
+        "ui.shortcut.clear": "हटाएँ",
+        "ui.shortcut.none": "कोई शॉर्टकट नहीं",
     ]
     private static let uiL3: [String: String] = [
         "ui.editTextMore": "Editar texto…",
@@ -1314,6 +1323,9 @@ extension Lang {
         "ui.errorGeneric": "WhatClip no pudo completar esto. No se cambió nada.",
         "ui.about.desc": "Un historial del portapapeles para macOS. Tu historial se queda en este Mac: sin cuenta, sin telemetría. La única petición de red es una comprobación diaria de actualizaciones.",
         "ui.about.open": "Abre el selector con el atajo de Ajustes (⌘X por defecto). Las copias que los gestores de contraseñas marcan como secretas nunca se registran.",
+        "ui.set.otherShortcuts": "Otros atajos",
+        "ui.shortcut.clear": "Borrar",
+        "ui.shortcut.none": "Sin atajo",
     ]
     private static let uiL4: [String: String] = [
         "ui.editTextMore": "Modifier le texte…",
@@ -1639,6 +1651,9 @@ extension Lang {
         "ui.errorGeneric": "WhatClip n'a pas pu terminer cette action. Rien n'a été modifié.",
         "ui.about.desc": "Un historique du presse-papiers pour macOS. Votre historique reste sur ce Mac : sans compte, sans télémétrie. Seule requête réseau : une vérification quotidienne des mises à jour.",
         "ui.about.open": "Ouvrez le sélecteur avec le raccourci des réglages (⌘X par défaut). Les copies marquées comme secrètes par les gestionnaires de mots de passe ne sont jamais enregistrées.",
+        "ui.set.otherShortcuts": "Autres raccourcis",
+        "ui.shortcut.clear": "Effacer",
+        "ui.shortcut.none": "Aucun raccourci",
     ]
     private static let uiL5: [String: String] = [
         "ui.editTextMore": "تعديل النص…",
@@ -1964,6 +1979,9 @@ extension Lang {
         "ui.errorGeneric": "تعذّر على WhatClip إكمال ذلك. لم يتغير شيء.",
         "ui.about.desc": "سجل للحافظة على macOS. يبقى سجلك على هذا الـ Mac: بلا حساب، وبلا قياس عن بُعد. الطلب الوحيد على الشبكة هو فحص يومي للتحديثات.",
         "ui.about.open": "افتح المنتقي بالاختصار في الإعدادات (⌘X افتراضياً). لا تُسجَّل أبداً النُّسخ التي يعلّمها مدير كلمات المرور بأنها سرية.",
+        "ui.set.otherShortcuts": "اختصارات أخرى",
+        "ui.shortcut.clear": "مسح",
+        "ui.shortcut.none": "بلا اختصار",
     ]
     private static let uiL6: [String: String] = [
         "ui.editTextMore": "টেক্সট সম্পাদনা করুন…",
@@ -2289,6 +2307,9 @@ extension Lang {
         "ui.errorGeneric": "WhatClip এটি সম্পন্ন করতে পারেনি। কিছুই পরিবর্তন হয়নি।",
         "ui.about.desc": "macOS-এর জন্য ক্লিপবোর্ড ইতিহাস। আপনার ইতিহাস এই Mac-এই থাকে: কোনো অ্যাকাউন্ট নেই, কোনো টেলিমেট্রি নেই। একমাত্র নেটওয়ার্ক অনুরোধ হলো দৈনিক আপডেট পরীক্ষা।",
         "ui.about.open": "সেটিংসের শর্টকাট দিয়ে পিকার খুলুন (ডিফল্ট ⌘X)। পাসওয়ার্ড ম্যানেজার যেসব কপি গোপন হিসেবে চিহ্নিত করে, সেগুলো কখনো রেকর্ড হয় না।",
+        "ui.set.otherShortcuts": "অন্যান্য শর্টকাট",
+        "ui.shortcut.clear": "মুছুন",
+        "ui.shortcut.none": "কোনো শর্টকাট নেই",
     ]
     private static let uiL7: [String: String] = [
         "ui.editTextMore": "Editar texto…",
@@ -2614,6 +2635,9 @@ extension Lang {
         "ui.errorGeneric": "O WhatClip não conseguiu concluir isso. Nada foi alterado.",
         "ui.about.desc": "Um histórico da área de transferência para macOS. Seu histórico fica neste Mac: sem conta, sem telemetria. A única requisição de rede é uma verificação diária de atualizações.",
         "ui.about.open": "Abra o seletor com o atalho das Configurações (⌘X por padrão). Cópias marcadas como secretas pelos gerenciadores de senhas nunca são registradas.",
+        "ui.set.otherShortcuts": "Outros atalhos",
+        "ui.shortcut.clear": "Limpar",
+        "ui.shortcut.none": "Sem atalho",
     ]
     private static let uiL8: [String: String] = [
         "ui.editTextMore": "Изменить текст…",
@@ -2939,6 +2963,9 @@ extension Lang {
         "ui.errorGeneric": "WhatClip не смог выполнить это. Ничего не изменилось.",
         "ui.about.desc": "История буфера обмена для macOS. Ваша история остаётся на этом Mac: без учётной записи и телеметрии. Единственный сетевой запрос — ежедневная проверка обновлений.",
         "ui.about.open": "Откройте выбор через сочетание клавиш в настройках (по умолчанию ⌘X). Копии, которые менеджеры паролей помечают как секретные, никогда не записываются.",
+        "ui.set.otherShortcuts": "Другие сочетания клавиш",
+        "ui.shortcut.clear": "Очистить",
+        "ui.shortcut.none": "Нет сочетания",
     ]
     private static let uiL9: [String: String] = [
         "ui.editTextMore": "テキストを編集…",
@@ -3264,6 +3291,9 @@ extension Lang {
         "ui.errorGeneric": "WhatClip で完了できませんでした。何も変更されていません。",
         "ui.about.desc": "macOS 用のクリップボード履歴。履歴はこの Mac にのみ保存されます：アカウントもテレメトリもありません。ネットワーク通信は毎日の更新確認だけです。",
         "ui.about.open": "設定で指定したショートカットでピッカーを開きます（既定は ⌘X）。パスワードマネージャが機密としてマークしたコピーは記録されません。",
+        "ui.set.otherShortcuts": "その他のショートカット",
+        "ui.shortcut.clear": "消去",
+        "ui.shortcut.none": "未設定",
     ]
     private static let uiL10: [String: String] = [
         "ui.editTextMore": "Text bearbeiten…",
@@ -3589,5 +3619,8 @@ extension Lang {
         "ui.errorGeneric": "WhatClip konnte das nicht abschließen. Nichts wurde geändert.",
         "ui.about.desc": "Ein Zwischenablage-Verlauf für macOS. Dein Verlauf bleibt auf diesem Mac: kein Konto, keine Telemetrie. Die einzige Netzwerkanfrage ist eine tägliche Update-Prüfung.",
         "ui.about.open": "Öffne die Auswahl mit dem Kurzbefehl in den Einstellungen (standardmäßig ⌘X). Kopien, die Passwort-Manager als geheim markieren, werden nie gespeichert.",
+        "ui.set.otherShortcuts": "Weitere Kurzbefehle",
+        "ui.shortcut.clear": "Entfernen",
+        "ui.shortcut.none": "Kein Kurzbefehl",
     ]
 }

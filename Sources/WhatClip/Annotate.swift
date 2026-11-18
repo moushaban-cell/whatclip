@@ -26,7 +26,7 @@ final class AnnotateController: NSObject {
         tool.selectedSegment = 0; tool.target = self; tool.action = #selector(toolChanged)
         canvas.tool = .pen
         let undo = NSButton(title: "Undo", target: self, action: #selector(undoTapped)); undo.keyEquivalent = "z"; undo.keyEquivalentModifierMask = [.command]
-        let clear = NSButton(title: "Clear", target: self, action: #selector(clearTapped))
+        let clear = NSButton(title: Lang.t("ui.shortcut.clear"), target: self, action: #selector(clearTapped))
         let save = NSButton(title: "Save as new item", target: self, action: #selector(saveTapped)); save.keyEquivalent = "\r"
         let bar = NSStackView(views: [tool, undo, clear, save]); bar.spacing = 10; bar.edgeInsets = NSEdgeInsets(top: 10, left: 12, bottom: 10, right: 12)
         let root = NSStackView(views: [bar, canvas]); root.orientation = .vertical; root.alignment = .leading

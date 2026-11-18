@@ -116,4 +116,13 @@ import Foundation
         let bad = try JSONDecoder().decode(WhatClipSettings.self, from: Data(#"{"checkForUpdates":"yes","language":"klingon"}"#.utf8))
         #expect(bad.checkForUpdates == true && bad.language == "en")
     }
+
+    @Test func actionShortcutsRoundTripAndOlderFilesHaveNone() throws {
+        var s = WhatClipSettings.default
+        s.actionShortcuts = ["screenshot": ActionShortcut(keyCode: 1, modifiers: 256)]
+        let back = try JSONDecoder().decode(WhatClipSettings.self, from: JSONEncoder().encode(s))
+        #expect(back.actionShortcuts == s.actionShortcuts)
+        let older = try JSONDecoder().decode(WhatClipSettings.self, from: Data("{}".utf8))
+        #expect(older.actionShortcuts.isEmpty)
+    }
 }
