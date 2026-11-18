@@ -83,6 +83,11 @@ final class PickerController: NSObject, NSSearchFieldDelegate, NSTableViewDataSo
         shelf.menuForItem = { [weak self] i in self?.contextMenu(forItem: i) }
         shelf.scroll.widthAnchor.constraint(equalToConstant: 360).isActive = true
         shelf.onSelect = { [weak self] i in self?.table.selectRowIndexes([i], byExtendingSelection: false); self?.updatePreview() }
+        shelf.onActivate = { [weak self] i in self?.table.selectRowIndexes([i], byExtendingSelection: false); self?.choose(plain: false) }
+        // Remember where the person moved the picker; it opens there next time. Moves the app makes itself are not remembered.
+        NotificationCenter.default.addObserver(forName: NSWindow.didMoveNotification, object: panel, queue: .main) { [weak self] _ in
+            MainActor.assumeIsolated { if self?.placing == false { self?.rememberPosition() } }
+        }
         cardsButton.setButtonType(.toggle); cardsButton.bezelStyle = .rounded; cardsButton.target = self; cardsButton.action = #selector(toggleCards)
         cardsButton.setAccessibilityLabel(Lang.t("ui.a11y.showCards"))
 
@@ -160,6 +165,9 @@ final class PickerController: NSObject, NSSearchFieldDelegate, NSTableViewDataSo
     private func place(anchor: NSRect?) {
         let size = panel.frame.size
         var origin: NSPoint
+        if let remembered = UserDefaults.standard.string(forKey: Self.positionKey).map(NSPointFromString), remembered != .zero {
+            origin = remembered
+        } else {
         switch monitor.settings.popupPlacement {
         case .menuIcon:
             if let a = anchor { origin = NSPoint(x: a.midX - size.width / 2, y: a.minY - size.height - 4) }
@@ -171,13 +179,18 @@ final class PickerController: NSObject, NSSearchFieldDelegate, NSTableViewDataSo
             let f = (NSScreen.main ?? NSScreen.screens.first)?.visibleFrame ?? NSRect(x: 0, y: 0, width: 1280, height: 800)
             origin = NSPoint(x: f.midX - size.width / 2, y: f.midY - size.height / 2)
         }
+        }
         // Keep the panel on the visible screen.
         if let f = (NSScreen.main ?? NSScreen.screens.first)?.visibleFrame {
             origin.x = min(max(origin.x, f.minX + 8), f.maxX - size.width - 8)
             origin.y = min(max(origin.y, f.minY + 8), f.maxY - size.height - 8)
         }
-        panel.setFrameOrigin(origin)
+        placing = true; panel.setFrameOrigin(origin); placing = false
     }
+
+    private static let positionKey = "picker.origin"
+    private var placing = false
+    private func rememberPosition() { UserDefaults.standard.set(NSStringFromPoint(panel.frame.origin), forKey: Self.positionKey) }
 
     @objc private func filterChanged() { filter = Filter(rawValue: filters.selectedSegment) ?? .all; reload() }
     @objc private func reloadFromControl() { reload() }

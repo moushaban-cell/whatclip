@@ -22,6 +22,11 @@ final class ShelfController: NSObject, NSCollectionViewDataSource, NSCollectionV
     let collection = ShelfCollectionView()
     /// Builds the right-click menu for the card at an index (set by the picker and the history window).
     var menuForItem: ((Int) -> NSMenu?)? { didSet { collection.menuForIndex = menuForItem } }
+    /// A double-click on a card: the same as choosing the item (paste it).
+    var onActivate: ((Int) -> Void)?
+    @objc private func cardDoubleClicked(_ g: NSClickGestureRecognizer) {
+        if let ip = collection.indexPathForItem(at: g.location(in: collection)) { onActivate?(ip.item) }
+    }
     let scroll = NSScrollView()
     var items: [ClipItem] = []
     var store: ClipStore?
@@ -36,6 +41,9 @@ final class ShelfController: NSObject, NSCollectionViewDataSource, NSCollectionV
         collection.collectionViewLayout = layout
         collection.register(CardView.self, forItemWithIdentifier: CardView.identifier)
         collection.dataSource = self; collection.delegate = self
+        let double = NSClickGestureRecognizer(target: self, action: #selector(cardDoubleClicked(_:)))
+        double.numberOfClicksRequired = 2
+        collection.addGestureRecognizer(double)
         collection.isSelectable = true; collection.allowsMultipleSelection = true
         collection.backgroundColors = [.textBackgroundColor]
         collection.setAccessibilityLabel("Clipboard cards")
