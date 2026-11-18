@@ -51,13 +51,13 @@ public struct WhatClipSettings: Sendable, Codable, Equatable {
         excludedBundleIDs: BundleIDList.defaultExcluded, secretAction: .expire,
         secretLifetimeSeconds: 60, retention: .quarter, maxItems: 500,
         encryptPayloads: false, requireTouchID: false, launchAtLogin: false, recognizeText: true,
-        appearance: .system, popupPlacement: .menuIcon, clearOnQuit: false, fuzzySearch: true, ignoredPatterns: [], onboardingDone: false, showInDock: true, gifSeconds: 5, gifFramesPerSecond: 8, hotKeyCode: 9, hotKeyModifiers: 768)
+        appearance: .system, popupPlacement: .menuIcon, clearOnQuit: false, fuzzySearch: true, ignoredPatterns: [], onboardingDone: false, showInDock: true, gifSeconds: 5, gifFramesPerSecond: 8, hotKeyCode: 7, hotKeyModifiers: 768)
 
     public init(excludedBundleIDs: [String], secretAction: SecretAction, secretLifetimeSeconds: Double, retention: Retention, maxItems: Int,
                 encryptPayloads: Bool = false, requireTouchID: Bool = false, launchAtLogin: Bool = false, recognizeText: Bool = true,
                 appearance: AppearanceChoice = .system, popupPlacement: PopupPlacement = .menuIcon, clearOnQuit: Bool = false,
                 fuzzySearch: Bool = true, ignoredPatterns: [String] = [], onboardingDone: Bool = false, showInDock: Bool = true,
-                gifSeconds: Int = 5, gifFramesPerSecond: Int = 8, hotKeyCode: Int = 9, hotKeyModifiers: Int = 768) {
+                gifSeconds: Int = 5, gifFramesPerSecond: Int = 8, hotKeyCode: Int = 7, hotKeyModifiers: Int = 768) {
         self.gifSeconds = gifSeconds; self.gifFramesPerSecond = gifFramesPerSecond; self.hotKeyCode = hotKeyCode; self.hotKeyModifiers = hotKeyModifiers
         self.showInDock = showInDock
         self.appearance = appearance; self.popupPlacement = popupPlacement; self.clearOnQuit = clearOnQuit

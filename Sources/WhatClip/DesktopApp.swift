@@ -39,7 +39,7 @@ enum DesktopMenu {
         main.addItem(sub("Edit", edit))
 
         let view = NSMenu(title: "View")
-        view.addItem(item("Clipboard Picker", pickerAction, key: "v", mods: [.command, .shift], target: target))
+        view.addItem(item("Clipboard Picker", pickerAction, key: "x", mods: [.command, .shift], target: target))
         view.addItem(item("History Window", historyAction, key: "0", target: target))
         view.addItem(.separator())
         let full = NSMenuItem(title: "Enter Full Screen", action: #selector(NSWindow.toggleFullScreen(_:)), keyEquivalent: "f")
