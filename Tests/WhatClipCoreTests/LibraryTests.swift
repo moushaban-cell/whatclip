@@ -86,4 +86,13 @@ import Foundation
         try s.clear()
         #expect(Set(try s.list().map(\.text)) == ["pinned one", "favourite one"])
     }
+
+    @Test func newestCopyIgnoresPinningSoTheStackSeesNewCopies() throws {
+        let s = try ClipStore()
+        let pinned = try s.add(text: "pinned earlier")
+        try s.setPinned(pinned.id, true)
+        let fresh = try s.add(text: "copied just now")
+        #expect(try s.newestCopy()?.id == fresh.id)
+        #expect(try s.list(limit: 1).first?.id == pinned.id)   // list still shows pinned first
+    }
 }

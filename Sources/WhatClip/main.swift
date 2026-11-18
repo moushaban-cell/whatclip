@@ -207,7 +207,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
 
     /// Called after every capture: while a stack runs, the new copy joins it.
     func copyHappened() {
-        if stackOn, let newest = try? store.list(limit: 1).first, newest.id != stackLastID {
+        if stackOn, let newest = try? store.newestCopy(), newest.id != stackLastID {
             stackLastID = newest.id; stack.append(newest)
         }
         picker.refreshIfVisible()
@@ -329,13 +329,14 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
         picker.refreshIfVisible(); history.refreshIfVisible()
     }
     // Each pause action refreshes the open windows, so the Tools page shows the new state at once.
-    @objc func pause5() { monitor.pause(for: 300); history.refreshIfVisible() }
-    @objc func pause60() { monitor.pause(for: 3600); history.refreshIfVisible() }
-    @objc func pauseForever() { monitor.pause(for: nil); history.refreshIfVisible() }
-    @objc func resumeCapture() { monitor.resume(); history.refreshIfVisible() }
+    @objc func pause5() { monitor.pause(for: 300); history.refreshIfVisible(); Hud.show(Lang.t("ui.hud.pauseOn")) }
+    @objc func pause60() { monitor.pause(for: 3600); history.refreshIfVisible(); Hud.show(Lang.t("ui.hud.pauseOn")) }
+    @objc func pauseForever() { monitor.pause(for: nil); history.refreshIfVisible(); Hud.show(Lang.t("ui.hud.pauseOn")) }
+    @objc func resumeCapture() { monitor.resume(); history.refreshIfVisible(); Hud.show(Lang.t("ui.hud.pauseOff")) }
     @objc func toggleStack() {
         stackOn.toggle()
-        if stackOn { stack = []; stackLastID = readOrDefault("list", nil) { try store.list(limit: 1) }?.first?.id ?? 0 }
+        if stackOn { stack = []; stackLastID = readOrDefault("newest", nil) { try store.newestCopy() }?.id ?? 0 }
+        Hud.show(stackOn ? Lang.t("ui.hud.stackOn") : Lang.t("ui.hud.stackOff"))
     }
     @objc func pasteNextStack() {
         guard !stack.isEmpty else { return }
@@ -343,7 +344,11 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
         if AXIsProcessTrusted() { DispatchQueue.main.asyncAfter(deadline: .now() + 0.12) { PickerController.sendPasteShortcut() } }
     }
     /// Empties the stack. Collecting keeps running, so the next copies still join it.
-    @objc func clearStack() { stack.removeAll() }
+    @objc func clearStack() {
+        let removed = stack.count
+        stack.removeAll()
+        Hud.show(Lang.t("ui.hud.stackCleared", ["n": "\(removed)"]))
+    }
     @objc func pasteAllStack(_ sender: NSMenuItem) {
         guard let raw = sender.representedObject as? String, let sep = Separator(rawValue: raw) else { return }
         pasteStack(separator: sep)

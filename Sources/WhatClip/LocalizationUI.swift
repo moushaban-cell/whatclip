@@ -342,6 +342,11 @@ extension Lang {
         "ui.set.otherShortcuts": "Other shortcuts",
         "ui.shortcut.clear": "Clear",
         "ui.shortcut.none": "No shortcut",
+        "ui.hud.stackOn": "Collecting copies is on. Each new copy joins the stack.",
+        "ui.hud.stackOff": "Collecting copies is off.",
+        "ui.hud.stackCleared": "Stack cleared. {n} items removed.",
+        "ui.hud.pauseOn": "Capturing is paused.",
+        "ui.hud.pauseOff": "Capturing is on again.",
     ]
     private static let uiL1: [String: String] = [
         "ui.editTextMore": "编辑文本…",
@@ -670,6 +675,11 @@ extension Lang {
         "ui.set.otherShortcuts": "其他快捷键",
         "ui.shortcut.clear": "清除",
         "ui.shortcut.none": "未设置",
+        "ui.hud.stackOn": "已开始收集复制内容。每次新复制都会加入队列。",
+        "ui.hud.stackOff": "已停止收集复制内容。",
+        "ui.hud.stackCleared": "已清空队列，移除了 {n} 项。",
+        "ui.hud.pauseOn": "已暂停记录复制内容。",
+        "ui.hud.pauseOff": "已恢复记录复制内容。",
     ]
     private static let uiL2: [String: String] = [
         "ui.editTextMore": "टेक्स्ट संपादित करें…",
@@ -998,6 +1008,11 @@ extension Lang {
         "ui.set.otherShortcuts": "अन्य शॉर्टकट",
         "ui.shortcut.clear": "हटाएँ",
         "ui.shortcut.none": "कोई शॉर्टकट नहीं",
+        "ui.hud.stackOn": "कॉपी जमा करना चालू है। हर नई कॉपी स्टैक में जुड़ेगी।",
+        "ui.hud.stackOff": "कॉपी जमा करना बंद है।",
+        "ui.hud.stackCleared": "स्टैक खाली किया गया। {n} आइटम हटाए गए।",
+        "ui.hud.pauseOn": "कॉपी दर्ज करना रोका गया है।",
+        "ui.hud.pauseOff": "कॉपी दर्ज करना फिर से चालू है।",
     ]
     private static let uiL3: [String: String] = [
         "ui.editTextMore": "Editar texto…",
@@ -1326,6 +1341,11 @@ extension Lang {
         "ui.set.otherShortcuts": "Otros atajos",
         "ui.shortcut.clear": "Borrar",
         "ui.shortcut.none": "Sin atajo",
+        "ui.hud.stackOn": "Recoger copias está activado. Cada copia nueva se añade a la pila.",
+        "ui.hud.stackOff": "Recoger copias está desactivado.",
+        "ui.hud.stackCleared": "Pila vaciada. Se quitaron {n} elementos.",
+        "ui.hud.pauseOn": "La captura está en pausa.",
+        "ui.hud.pauseOff": "La captura vuelve a estar activa.",
     ]
     private static let uiL4: [String: String] = [
         "ui.editTextMore": "Modifier le texte…",
@@ -1654,6 +1674,11 @@ extension Lang {
         "ui.set.otherShortcuts": "Autres raccourcis",
         "ui.shortcut.clear": "Effacer",
         "ui.shortcut.none": "Aucun raccourci",
+        "ui.hud.stackOn": "La collecte des copies est activée. Chaque nouvelle copie rejoint la pile.",
+        "ui.hud.stackOff": "La collecte des copies est désactivée.",
+        "ui.hud.stackCleared": "Pile vidée. {n} éléments supprimés.",
+        "ui.hud.pauseOn": "La capture est en pause.",
+        "ui.hud.pauseOff": "La capture a repris.",
     ]
     private static let uiL5: [String: String] = [
         "ui.editTextMore": "تعديل النص…",
@@ -1982,6 +2007,11 @@ extension Lang {
         "ui.set.otherShortcuts": "اختصارات أخرى",
         "ui.shortcut.clear": "مسح",
         "ui.shortcut.none": "بلا اختصار",
+        "ui.hud.stackOn": "تجميع النُّسخ مفعّل. تنضم كل نسخة جديدة إلى المكدس.",
+        "ui.hud.stackOff": "تم إيقاف تجميع النُّسخ.",
+        "ui.hud.stackCleared": "تم مسح المكدس. أُزيلت {n} عناصر.",
+        "ui.hud.pauseOn": "التقاط النُّسخ متوقف مؤقتًا.",
+        "ui.hud.pauseOff": "استؤنف التقاط النُّسخ.",
     ]
     private static let uiL6: [String: String] = [
         "ui.editTextMore": "টেক্সট সম্পাদনা করুন…",
@@ -2310,6 +2340,11 @@ extension Lang {
         "ui.set.otherShortcuts": "অন্যান্য শর্টকাট",
         "ui.shortcut.clear": "মুছুন",
         "ui.shortcut.none": "কোনো শর্টকাট নেই",
+        "ui.hud.stackOn": "কপি সংগ্রহ চালু। প্রতিটি নতুন কপি স্ট্যাকে যোগ হবে।",
+        "ui.hud.stackOff": "কপি সংগ্রহ বন্ধ।",
+        "ui.hud.stackCleared": "স্ট্যাক খালি। {n}টি আইটেম সরানো হয়েছে।",
+        "ui.hud.pauseOn": "কপি রেকর্ড বিরতিতে আছে।",
+        "ui.hud.pauseOff": "কপি রেকর্ড আবার চালু।",
     ]
     private static let uiL7: [String: String] = [
         "ui.editTextMore": "Editar texto…",
@@ -2638,6 +2673,11 @@ extension Lang {
         "ui.set.otherShortcuts": "Outros atalhos",
         "ui.shortcut.clear": "Limpar",
         "ui.shortcut.none": "Sem atalho",
+        "ui.hud.stackOn": "Coleta de cópias ativada. Cada nova cópia entra na pilha.",
+        "ui.hud.stackOff": "Coleta de cópias desativada.",
+        "ui.hud.stackCleared": "Pilha limpa. {n} itens removidos.",
+        "ui.hud.pauseOn": "A captura está pausada.",
+        "ui.hud.pauseOff": "A captura foi retomada.",
     ]
     private static let uiL8: [String: String] = [
         "ui.editTextMore": "Изменить текст…",
@@ -2966,6 +3006,11 @@ extension Lang {
         "ui.set.otherShortcuts": "Другие сочетания клавиш",
         "ui.shortcut.clear": "Очистить",
         "ui.shortcut.none": "Нет сочетания",
+        "ui.hud.stackOn": "Сбор копий включён. Каждая новая копия попадает в стек.",
+        "ui.hud.stackOff": "Сбор копий выключен.",
+        "ui.hud.stackCleared": "Стек очищен. Удалено элементов: {n}.",
+        "ui.hud.pauseOn": "Запись копий приостановлена.",
+        "ui.hud.pauseOff": "Запись копий возобновлена.",
     ]
     private static let uiL9: [String: String] = [
         "ui.editTextMore": "テキストを編集…",
@@ -3294,6 +3339,11 @@ extension Lang {
         "ui.set.otherShortcuts": "その他のショートカット",
         "ui.shortcut.clear": "消去",
         "ui.shortcut.none": "未設定",
+        "ui.hud.stackOn": "コピーの収集をオンにしました。新しいコピーはスタックに追加されます。",
+        "ui.hud.stackOff": "コピーの収集をオフにしました。",
+        "ui.hud.stackCleared": "スタックを空にしました。{n} 件を削除しました。",
+        "ui.hud.pauseOn": "コピーの記録を一時停止しました。",
+        "ui.hud.pauseOff": "コピーの記録を再開しました。",
     ]
     private static let uiL10: [String: String] = [
         "ui.editTextMore": "Text bearbeiten…",
@@ -3622,5 +3672,10 @@ extension Lang {
         "ui.set.otherShortcuts": "Weitere Kurzbefehle",
         "ui.shortcut.clear": "Entfernen",
         "ui.shortcut.none": "Kein Kurzbefehl",
+        "ui.hud.stackOn": "Kopien sammeln ist an. Jede neue Kopie kommt in den Stapel.",
+        "ui.hud.stackOff": "Kopien sammeln ist aus.",
+        "ui.hud.stackCleared": "Stapel geleert. {n} Einträge entfernt.",
+        "ui.hud.pauseOn": "Erfassung ist pausiert.",
+        "ui.hud.pauseOff": "Erfassung läuft wieder.",
     ]
 }

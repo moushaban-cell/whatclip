@@ -317,6 +317,15 @@ public final class ClipStore: @unchecked Sendable {
         }
     }
 
+    /// The most recent copy by time, whether or not it is pinned. (`list` puts pinned items first, so it cannot answer this.)
+    public func newestCopy() throws -> ClipItem? {
+        lock.lock(); defer { lock.unlock() }
+        var out: ClipItem?
+        try run("SELECT \(Self.columns) FROM items WHERE (expires IS NULL OR expires>?) ORDER BY last_used DESC, id DESC LIMIT 1",
+                [.real(now().timeIntervalSince1970)]) { out = self.item($0) }
+        return out
+    }
+
     public func list(query: String = "", limit: Int = 200, filter: Filter = Filter()) throws -> [ClipItem] {
         lock.lock(); defer { lock.unlock() }
         let words = query.split(whereSeparator: \.isWhitespace).map(String.init)
