@@ -1,0 +1,20 @@
+.build/
+research/
+.DS_Store
+build/
+# Internal planning documents and personal files stay out of the repository.
+clipdat.md
+.!*
+*.pdf
+research/
+design/*.png
+docs/PROJECT_STATUS.md
+docs/ROADMAP.md
+docs/FEATURE-GAPS.md
+docs/DESKTOP-APP-PLAN.md
+docs/M3-PLAN.md
+docs/FULL-BUILD-PLAN.md
+docs/REVIEW-fable.md
+docs/SPEC-original.txt
+docs/SPIKE-M0.md
+dist/
