@@ -4,8 +4,24 @@ import WhatClipCore
 /// The visual shelf: items as cards in a grid, with thumbnails, colour swatches and a titleLabel. Selecting a card selects the same
 /// item in the list, so the details pane and the actions stay in one place.
 @MainActor
+/// The cards grid. Right-click on a card opens the same menu as a list row (edit, pin, favourite, delete).
+final class ShelfCollectionView: NSCollectionView {
+    var menuForIndex: ((Int) -> NSMenu?)?
+    override func rightMouseDown(with event: NSEvent) {
+        let p = convert(event.locationInWindow, from: nil)
+        if let ip = indexPathForItem(at: p), let menu = menuForIndex?(ip.item) {
+            NSMenu.popUpContextMenu(menu, with: event, for: self)
+        } else {
+            super.rightMouseDown(with: event)
+        }
+    }
+}
+
+@MainActor
 final class ShelfController: NSObject, NSCollectionViewDataSource, NSCollectionViewDelegate {
-    let collection = NSCollectionView()
+    let collection = ShelfCollectionView()
+    /// Builds the right-click menu for the card at an index (set by the picker and the history window).
+    var menuForItem: ((Int) -> NSMenu?)? { didSet { collection.menuForIndex = menuForItem } }
     let scroll = NSScrollView()
     var items: [ClipItem] = []
     var store: ClipStore?

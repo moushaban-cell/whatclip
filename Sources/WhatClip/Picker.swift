@@ -80,6 +80,7 @@ final class PickerController: NSObject, NSSearchFieldDelegate, NSTableViewDataSo
         table.target = self; table.doubleAction = #selector(doubleClicked); table.allowsMultipleSelection = true; table.setAccessibilityLabel("Clipboard items")
         listScroll.documentView = table; listScroll.hasVerticalScroller = true; listScroll.borderType = .noBorder
         shelf.scroll.isHidden = true
+        shelf.menuForItem = { [weak self] i in self?.contextMenu(forItem: i) }
         shelf.scroll.widthAnchor.constraint(equalToConstant: 360).isActive = true
         shelf.onSelect = { [weak self] i in self?.table.selectRowIndexes([i], byExtendingSelection: false); self?.updatePreview() }
         cardsButton.setButtonType(.toggle); cardsButton.bezelStyle = .rounded; cardsButton.target = self; cardsButton.action = #selector(toggleCards)
@@ -391,6 +392,14 @@ final class PickerController: NSObject, NSSearchFieldDelegate, NSTableViewDataSo
     }
 
     func tableViewSelectionDidChange(_ notification: Notification) { updatePreview() }
+
+    /// The right-click menu for one item, the same as a list row.
+    func contextMenu(forItem index: Int) -> NSMenu? {
+        guard items.indices.contains(index) else { return nil }
+        let menu = NSMenu()
+        for m in ItemActions.menuItems(for: items[index], store: store, changed: { [weak self] in self?.reload() }) { menu.addItem(m) }
+        return menu
+    }
 
     /// Right-click on a row: edit, pin, favourite or delete that item.
     func menuNeedsUpdate(_ menu: NSMenu) {

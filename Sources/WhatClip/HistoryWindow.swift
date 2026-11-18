@@ -144,6 +144,7 @@ final class HistoryWindowController: NSObject, NSTableViewDataSource, NSTableVie
         viewMode.selectedSegment = 0; viewMode.target = self; viewMode.action = #selector(viewModeChanged)
         viewMode.setAccessibilityLabel("Show as list or cards")
         shelf.scroll.isHidden = true
+        shelf.menuForItem = { [weak self] i in self?.contextMenu(forItem: i) }
         shelf.onSelect = { [weak self] index in
             guard let self else { return }
             self.list.selectRowIndexes([index], byExtendingSelection: false)
@@ -298,6 +299,14 @@ final class HistoryWindowController: NSObject, NSTableViewDataSource, NSTableVie
             t.lineBreakMode = .byTruncatingTail; return t
         }
         return Design.row(for: items[row], store: store)
+    }
+
+    /// The right-click menu for a card or row at an index in the current list.
+    func contextMenu(forItem index: Int) -> NSMenu? {
+        guard section != .settings, section != .about, section != .snippets, items.indices.contains(index) else { return nil }
+        let menu = NSMenu()
+        for m in ItemActions.menuItems(for: items[index], store: store, changed: { [weak self] in self?.reloadList() }) { menu.addItem(m) }
+        return menu
     }
 
     /// Right-click on a list row: edit, pin, favourite or delete that item.
