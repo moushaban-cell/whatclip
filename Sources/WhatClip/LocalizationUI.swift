@@ -329,6 +329,13 @@ extension Lang {
         "ui.help.board": "Items in this board. Add items with Add to board.",
         "ui.help.snippets": "Reusable text. Use {{name}} for values you fill in each time.",
         "ui.perm.openSettings": "Open Settings",
+        "ui.board.delete": "Delete board",
+        "ui.board.deleteInfo": "Delete this board? Its items stay in your history.",
+        "ui.board.removeItem": "Remove from board",
+        "ui.capture.recent": "Recent captures",
+        "ui.capture.none": "No screenshots or GIFs yet.",
+        "ui.annotate.none": "Nothing to annotate yet. Take a screenshot or copy an image first.",
+        "ui.perm.turnOff": "Turn off",
     ]
     private static let uiL1: [String: String] = [
         "ui.editTextMore": "编辑文本…",
@@ -644,6 +651,13 @@ extension Lang {
         "ui.help.board": "这个面板中的项目。用“添加到面板”添加项目。",
         "ui.help.snippets": "可重复使用的文本。用 {{name}} 表示每次要填写的值。",
         "ui.perm.openSettings": "打开设置",
+        "ui.board.delete": "删除看板",
+        "ui.board.deleteInfo": "删除此看板？其中的项目仍保留在历史记录中。",
+        "ui.board.removeItem": "从看板移除",
+        "ui.capture.recent": "最近的截图",
+        "ui.capture.none": "还没有截图或 GIF。",
+        "ui.annotate.none": "还没有可标注的内容。请先截图或复制一张图片。",
+        "ui.perm.turnOff": "关闭",
     ]
     private static let uiL2: [String: String] = [
         "ui.editTextMore": "टेक्स्ट संपादित करें…",
@@ -959,6 +973,13 @@ extension Lang {
         "ui.help.board": "इस बोर्ड के आइटम। “बोर्ड में जोड़ें” से आइटम जोड़ें।",
         "ui.help.snippets": "दोबारा इस्तेमाल होने वाला टेक्स्ट। हर बार भरे जाने वाले मानों के लिए {{name}} लिखें।",
         "ui.perm.openSettings": "सेटिंग खोलें",
+        "ui.board.delete": "बोर्ड हटाएँ",
+        "ui.board.deleteInfo": "यह बोर्ड हटाएँ? इसकी आइटम आपके इतिहास में रहेंगे।",
+        "ui.board.removeItem": "बोर्ड से हटाएँ",
+        "ui.capture.recent": "हाल के कैप्चर",
+        "ui.capture.none": "अभी कोई स्क्रीनशॉट या GIF नहीं।",
+        "ui.annotate.none": "अभी एनोटेट करने के लिए कुछ नहीं है। पहले स्क्रीनशॉट लें या कोई छवि कॉपी करें।",
+        "ui.perm.turnOff": "बंद करें",
     ]
     private static let uiL3: [String: String] = [
         "ui.editTextMore": "Editar texto…",
@@ -1274,6 +1295,13 @@ extension Lang {
         "ui.help.board": "Elementos de este tablero. Añádelos con «Añadir a tablero».",
         "ui.help.snippets": "Texto reutilizable. Usa {{name}} para los valores que rellenas cada vez.",
         "ui.perm.openSettings": "Abrir Ajustes",
+        "ui.board.delete": "Eliminar tablero",
+        "ui.board.deleteInfo": "¿Eliminar este tablero? Sus elementos seguirán en tu historial.",
+        "ui.board.removeItem": "Quitar del tablero",
+        "ui.capture.recent": "Capturas recientes",
+        "ui.capture.none": "Aún no hay capturas ni GIF.",
+        "ui.annotate.none": "Aún no hay nada que anotar. Haz una captura o copia una imagen primero.",
+        "ui.perm.turnOff": "Desactivar",
     ]
     private static let uiL4: [String: String] = [
         "ui.editTextMore": "Modifier le texte…",
@@ -1589,6 +1617,13 @@ extension Lang {
         "ui.help.board": "Éléments de ce tableau. Ajoutez-en avec « Ajouter à un tableau ».",
         "ui.help.snippets": "Texte réutilisable. Utilisez {{name}} pour les valeurs à remplir à chaque fois.",
         "ui.perm.openSettings": "Ouvrir les réglages",
+        "ui.board.delete": "Supprimer le tableau",
+        "ui.board.deleteInfo": "Supprimer ce tableau ? Ses éléments restent dans votre historique.",
+        "ui.board.removeItem": "Retirer du tableau",
+        "ui.capture.recent": "Captures récentes",
+        "ui.capture.none": "Aucune capture ni GIF pour l'instant.",
+        "ui.annotate.none": "Rien à annoter pour l'instant. Faites une capture ou copiez une image.",
+        "ui.perm.turnOff": "Désactiver",
     ]
     private static let uiL5: [String: String] = [
         "ui.editTextMore": "تعديل النص…",
@@ -1904,6 +1939,13 @@ extension Lang {
         "ui.help.board": "عناصر هذه اللوحة. أضِف عناصر بـ«إضافة إلى لوحة».",
         "ui.help.snippets": "نص قابل لإعادة الاستخدام. استخدم {{name}} للقيم التي تملأها في كل مرة.",
         "ui.perm.openSettings": "فتح الإعدادات",
+        "ui.board.delete": "حذف اللوحة",
+        "ui.board.deleteInfo": "حذف هذه اللوحة؟ ستبقى عناصرها في سجلك.",
+        "ui.board.removeItem": "إزالة من اللوحة",
+        "ui.capture.recent": "أحدث الالتقاطات",
+        "ui.capture.none": "لا توجد لقطات شاشة أو GIF بعد.",
+        "ui.annotate.none": "لا توجد صورة للتعليق عليها بعد. التقط لقطة شاشة أو انسخ صورة أولاً.",
+        "ui.perm.turnOff": "إيقاف",
     ]
     private static let uiL6: [String: String] = [
         "ui.editTextMore": "টেক্সট সম্পাদনা করুন…",
@@ -2219,6 +2261,13 @@ extension Lang {
         "ui.help.board": "এই বোর্ডের আইটেম। “বোর্ডে যোগ করুন” দিয়ে আইটেম যোগ করুন।",
         "ui.help.snippets": "বারবার ব্যবহারযোগ্য টেক্সট। প্রতিবার পূরণ করার মানের জন্য {{name}} লিখুন।",
         "ui.perm.openSettings": "সেটিংস খুলুন",
+        "ui.board.delete": "বোর্ড মুছুন",
+        "ui.board.deleteInfo": "এই বোর্ডটি মুছবেন? এর আইটেমগুলো আপনার ইতিহাসে থাকবে।",
+        "ui.board.removeItem": "বোর্ড থেকে সরান",
+        "ui.capture.recent": "সাম্প্রতিক ক্যাপচার",
+        "ui.capture.none": "এখনও কোনো স্ক্রিনশট বা GIF নেই।",
+        "ui.annotate.none": "এখনও টীকা দেওয়ার মতো কিছু নেই। আগে একটি স্ক্রিনশট নিন বা ছবি কপি করুন।",
+        "ui.perm.turnOff": "বন্ধ করুন",
     ]
     private static let uiL7: [String: String] = [
         "ui.editTextMore": "Editar texto…",
@@ -2534,6 +2583,13 @@ extension Lang {
         "ui.help.board": "Itens deste quadro. Adicione com «Adicionar ao quadro».",
         "ui.help.snippets": "Texto reutilizável. Use {{name}} para os valores que você preenche sempre.",
         "ui.perm.openSettings": "Abrir Ajustes",
+        "ui.board.delete": "Excluir quadro",
+        "ui.board.deleteInfo": "Excluir este quadro? Os itens continuam no seu histórico.",
+        "ui.board.removeItem": "Remover do quadro",
+        "ui.capture.recent": "Capturas recentes",
+        "ui.capture.none": "Ainda não há capturas nem GIFs.",
+        "ui.annotate.none": "Nada para anotar ainda. Faça uma captura ou copie uma imagem primeiro.",
+        "ui.perm.turnOff": "Desativar",
     ]
     private static let uiL8: [String: String] = [
         "ui.editTextMore": "Изменить текст…",
@@ -2849,6 +2905,13 @@ extension Lang {
         "ui.help.board": "Элементы этой доски. Добавляйте через «Добавить на доску».",
         "ui.help.snippets": "Текст для повторного использования. {{name}} — значение, которое заполняется каждый раз.",
         "ui.perm.openSettings": "Открыть настройки",
+        "ui.board.delete": "Удалить доску",
+        "ui.board.deleteInfo": "Удалить эту доску? Её элементы останутся в истории.",
+        "ui.board.removeItem": "Убрать с доски",
+        "ui.capture.recent": "Последние снимки",
+        "ui.capture.none": "Пока нет снимков экрана или GIF.",
+        "ui.annotate.none": "Пока нечего аннотировать. Сначала сделайте снимок экрана или скопируйте изображение.",
+        "ui.perm.turnOff": "Выключить",
     ]
     private static let uiL9: [String: String] = [
         "ui.editTextMore": "テキストを編集…",
@@ -3164,6 +3227,13 @@ extension Lang {
         "ui.help.board": "このボードの項目。「ボードに追加」で追加できます。",
         "ui.help.snippets": "繰り返し使うテキスト。毎回入力する値には {{name}} を使います。",
         "ui.perm.openSettings": "設定を開く",
+        "ui.board.delete": "ボードを削除",
+        "ui.board.deleteInfo": "このボードを削除しますか？項目は履歴に残ります。",
+        "ui.board.removeItem": "ボードから削除",
+        "ui.capture.recent": "最近のキャプチャ",
+        "ui.capture.none": "まだスクリーンショットや GIF はありません。",
+        "ui.annotate.none": "注釈を付けるものがまだありません。先にスクリーンショットを撮るか画像をコピーしてください。",
+        "ui.perm.turnOff": "オフにする",
     ]
     private static let uiL10: [String: String] = [
         "ui.editTextMore": "Text bearbeiten…",
@@ -3479,5 +3549,12 @@ extension Lang {
         "ui.help.board": "Einträge dieses Boards. Hinzufügen über „Zu Board hinzufügen“.",
         "ui.help.snippets": "Wiederverwendbarer Text. Verwende {{name}} für Werte, die du jedes Mal ausfüllst.",
         "ui.perm.openSettings": "Einstellungen öffnen",
+        "ui.board.delete": "Board löschen",
+        "ui.board.deleteInfo": "Dieses Board löschen? Seine Einträge bleiben im Verlauf.",
+        "ui.board.removeItem": "Vom Board entfernen",
+        "ui.capture.recent": "Letzte Aufnahmen",
+        "ui.capture.none": "Noch keine Screenshots oder GIFs.",
+        "ui.annotate.none": "Noch nichts zum Annotieren. Erst einen Screenshot machen oder ein Bild kopieren.",
+        "ui.perm.turnOff": "Ausschalten",
     ]
 }

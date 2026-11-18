@@ -1,4 +1,5 @@
 import AppKit
+import ObjectiveC
 import WhatClipCore
 
 /// A small rounded label: a status such as "On", or a count.
@@ -24,6 +25,32 @@ final class StatusPill: NSView {
         setAccessibilityLabel(text)
     }
     required init?(coder: NSCoder) { nil }
+}
+
+/// Runs a closure when a control is clicked. The control keeps it alive through an associated object.
+final class ClosureTarget: NSObject {
+    let run: () -> Void
+    init(_ run: @escaping () -> Void) { self.run = run }
+    @objc func fire() { run() }
+}
+private var closureKey: UnsafeRawPointer { UnsafeRawPointer(bitPattern: 0x77636C)! }
+
+@MainActor
+func actionButton(_ title: String, _ run: @escaping () -> Void) -> NSButton {
+    let target = ClosureTarget(run)
+    let b = NSButton(title: title, target: target, action: #selector(ClosureTarget.fire))
+    b.bezelStyle = .rounded; b.controlSize = .small
+    objc_setAssociatedObject(b, closureKey, target, .OBJC_ASSOCIATION_RETAIN)
+    return b
+}
+
+@MainActor
+func closureMenuItem(_ title: String, _ run: @escaping () -> Void) -> NSMenuItem {
+    let target = ClosureTarget(run)
+    let it = NSMenuItem(title: title, action: #selector(ClosureTarget.fire), keyEquivalent: "")
+    it.target = target
+    objc_setAssociatedObject(it, closureKey, target, .OBJC_ASSOCIATION_RETAIN)
+    return it
 }
 
 /// One feature on the Capture and tools page: a real button with its icon, name, a line of help, and an optional state.
@@ -57,6 +84,57 @@ func toolButton(symbol: String, title: String, detail: String, state: String?, a
 }
 
 extension HistoryWindowController {
+    /// The latest screenshots and GIFs, each with the same actions as the history window: annotate, favourite, board, delete.
+    func recentCapturesBlock() -> NSView {
+        let heading = NSTextField(labelWithString: Lang.t("ui.capture.recent"))
+        heading.font = .systemFont(ofSize: 13, weight: .semibold); heading.textColor = .secondaryLabelColor
+        let all: [ClipItem] = (try? store.list(limit: 300)) ?? []
+        let isCapture: (ClipItem) -> Bool = { item in item.kind == .image || item.kind == .gif }
+        let captures = all.filter(isCapture).prefix(6)
+        var rows: [NSView] = [heading]
+        if captures.isEmpty {
+            let none = NSTextField(labelWithString: Lang.t("ui.capture.none"))
+            none.font = .systemFont(ofSize: 12); none.textColor = .secondaryLabelColor
+            rows.append(none)
+        }
+        for item in captures {
+            let thumb = NSImageView()
+            if let d = store.payloadData(for: item), let img = NSImage(data: d) { thumb.image = img }
+            thumb.imageScaling = .scaleProportionallyUpOrDown; thumb.wantsLayer = true; thumb.layer?.cornerRadius = 6; thumb.layer?.masksToBounds = true
+            thumb.translatesAutoresizingMaskIntoConstraints = false
+            thumb.widthAnchor.constraint(equalToConstant: 96).isActive = true
+            thumb.heightAnchor.constraint(equalToConstant: 60).isActive = true
+            let title = NSTextField(labelWithString: item.listTitle)
+            title.font = .systemFont(ofSize: 12, weight: .medium); title.lineBreakMode = .byTruncatingTail
+            let buttons = NSStackView()
+            buttons.spacing = 6
+            buttons.addArrangedSubview(actionButton(Lang.t("ui.capture.annotate")) { [weak self] in self?.annotate(item) })
+            buttons.addArrangedSubview(actionButton(item.favorite ? Lang.t("ui.unfavourite") : Lang.t("ui.favourite")) { [weak self] in
+                try? self?.store.setFavorite(item.id, !item.favorite); self?.updateChrome()
+            })
+            let boards = NSMenu()
+            for b in (try? store.boards()) ?? [] {
+                boards.addItem(closureMenuItem(b.name) { [weak self] in
+                    try? self?.store.addToBoard(item: item.id, board: b.id); self?.updateChrome()
+                })
+            }
+            buttons.addArrangedSubview(menuButton(Lang.t("ui.addToBoard"), boards))
+            buttons.addArrangedSubview(actionButton(Lang.t("ui.delete")) { [weak self] in
+                guard let self else { return }
+                let alert = NSAlert(); alert.messageText = Lang.t("ui.delete"); alert.informativeText = Lang.t("ui.deleteInfo")
+                alert.addButton(withTitle: Lang.t("ui.delete")); alert.addButton(withTitle: Lang.t("ui.cancel"))
+                guard alert.runModal() == .alertFirstButtonReturn else { return }
+                try? self.store.delete(item.id); self.updateChrome()
+            })
+            let text = NSStackView(views: [title, buttons]); text.orientation = .vertical; text.alignment = .leading; text.spacing = 6
+            let row = NSStackView(views: [thumb, text]); row.spacing = 12; row.alignment = .centerY
+            rows.append(row)
+        }
+        let block = NSStackView(views: rows)
+        block.orientation = .vertical; block.alignment = .leading; block.spacing = 10
+        return block
+    }
+
     /// Capture and tools: every feature that otherwise lives only in the menu bar, as tiles in the window.
     /// Each tile sends its action down the responder chain, the same action the menu item uses.
     func toolsPage() -> NSView {
@@ -105,6 +183,7 @@ extension HistoryWindowController {
             tile("pencil.tip.crop.circle", Lang.t("ui.m.annotate"), Lang.t("ui.tools.d.annotate"), #selector(AppDelegate.annotateLatest)),
             tile("face.smiling", Lang.t("ui.m.emoji"), Lang.t("ui.tools.d.emoji"), #selector(AppDelegate.openEmoji)),
         ])
+        let recent = recentCapturesBlock()
         let clipboard = section(Lang.t("ui.tools.sec.clipboard"), [
             recording
                 ? tile("pause.circle", Lang.t("ui.m.pauseCapturing"), Lang.t("ui.tools.d.pause"), #selector(AppDelegate.pauseForever),
@@ -128,7 +207,7 @@ extension HistoryWindowController {
         if needsLock { setupTiles.append(tile("lock", Lang.t("ui.lockNow"), Lang.t("ui.tools.d.lock"), #selector(AppDelegate.lockHistory))) }
         let setup = section(Lang.t("ui.tools.sec.setup"), setupTiles)
 
-        let page = NSStackView(views: [header, capture, clipboard, data, setup])
+        let page = NSStackView(views: [header, capture, recent, clipboard, data, setup])
         page.orientation = .vertical; page.alignment = .leading; page.spacing = 26
         page.edgeInsets = NSEdgeInsets(top: 28, left: 28, bottom: 28, right: 28)
         page.userInterfaceLayoutDirection = Lang.isRightToLeft ? .rightToLeft : .leftToRight

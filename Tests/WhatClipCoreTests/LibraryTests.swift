@@ -55,4 +55,24 @@ import Foundation
         try s.delete([b.id, d.id])
         #expect(try s.list().map(\.text) == ["new from Safari", "old from Notes"])
     }
+
+    @Test func removingFromABoardKeepsTheItemInHistory() throws {
+        let s = try ClipStore()
+        let it = try s.add(text: "stays in history")
+        let b = try s.addBoard(name: "Ideas", color: "blue")
+        try s.addToBoard(item: it.id, board: b.id)
+        try s.removeFromBoard(item: it.id, board: b.id)
+        #expect(try s.items(onBoard: b.id).isEmpty)
+        #expect(try s.list().map(\.text) == ["stays in history"])
+    }
+
+    @Test func deletingABoardKeepsItsItemsInHistory() throws {
+        let s = try ClipStore()
+        let it = try s.add(text: "kept after board delete")
+        let b = try s.addBoard(name: "Temp", color: "amber")
+        try s.addToBoard(item: it.id, board: b.id)
+        try s.deleteBoard(b.id)
+        #expect(try s.boards().isEmpty)
+        #expect(try s.list().map(\.text) == ["kept after board delete"])
+    }
 }

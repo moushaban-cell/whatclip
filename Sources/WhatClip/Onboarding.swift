@@ -134,12 +134,19 @@ final class OnboardingWindowController: NSObject {
             let w = NSTextField(wrappingLabelWithString: why); w.font = .systemFont(ofSize: 12); w.textColor = .secondaryLabelColor; w.preferredMaxLayoutWidth = 420
             // Accessibility and Screen Recording can only be granted in System Settings, so the row links there.
             var rowViews: [NSView] = [check, status, w]
+            let controls = NSStackView()
+            controls.spacing = 8
             if key == "accessibility" || key == "screen" {
                 let open = NSButton(title: Lang.t("ui.perm.openSettings"), target: self,
                                     action: key == "accessibility" ? #selector(openAccessibility) : #selector(openScreenRecording))
                 open.bezelStyle = .rounded; open.controlSize = .small
-                rowViews.append(open)
+                controls.addArrangedSubview(open)
             }
+            // Turning a feature off here switches it off in WhatClip. Access granted in System Settings is removed there.
+            let off = NSButton(title: Lang.t("ui.perm.turnOff"), target: self, action: #selector(turnOffPermission(_:)))
+            off.bezelStyle = .rounded; off.controlSize = .small; off.identifier = NSUserInterfaceItemIdentifier(key)
+            controls.addArrangedSubview(off)
+            rowViews.append(controls)
             let row = NSStackView(views: rowViews); row.orientation = .vertical; row.alignment = .leading; row.spacing = 2
             packChecks[key] = check; packStatus[key] = status
             rows.append(row)
@@ -162,6 +169,21 @@ final class OnboardingWindowController: NSObject {
     }
 
     /// Asks for everything ticked, in one go. macOS shows its own prompts for Accessibility and Screen Recording.
+    /// Switches one feature off in WhatClip and, for system access, opens the pane where it can be removed.
+    @objc private func turnOffPermission(_ sender: NSButton) {
+        guard let key = sender.identifier?.rawValue else { return }
+        var s = monitor.settings
+        switch key {
+        case "accessibility": s.autoPaste = false; openAccessibility()
+        case "screen": s.watchScreenshots = false; openScreenRecording()
+        case "touch": s.requireTouchID = false
+        case "login": s.launchAtLogin = false
+        default: return
+        }
+        try? monitor.update(s)
+        packChecks[key]?.state = .off
+        packStatus[key]?.stringValue = statusText(for: key)
+    }
     @objc private func setUpPack() {
         var s = monitor.settings
         if packChecks["touch"]?.state == .on { s.requireTouchID = true }

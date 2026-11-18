@@ -7,7 +7,7 @@ final class HistoryWindowController: NSObject, NSTableViewDataSource, NSTableVie
     enum Section: Equatable { case header, all, library, pinned, text, links, images, files, textInImages, board(Int64), addBoard, snippets, settings, about, tools }
 
     private let window: NSWindow
-    private let store: ClipStore
+    let store: ClipStore
     private let monitor: PasteboardMonitor
     private let sidebar = NSTableView()
     private let list = NSTableView()
@@ -211,7 +211,7 @@ final class HistoryWindowController: NSObject, NSTableViewDataSource, NSTableVie
     func lockNow() { Authentication.lockNow(); locked = true; reloadList() }
 
     /// Shows the settings or About pane for their sections, and the list and preview for every other section.
-    private func updateChrome() {
+    func updateChrome() {
         // While locked, Settings and About are hidden too: the lock covers the whole app, not only the list.
         let isSettings = section == .settings && !locked, isAbout = section == .about && !locked, isTools = section == .tools && !locked
         listPaneRef?.isHidden = isSettings || isAbout || isTools || locked
@@ -424,7 +424,11 @@ final class HistoryWindowController: NSObject, NSTableViewDataSource, NSTableVie
 
     private func showDetail(_ i: ClipItem?) {
         actions.arrangedSubviews.forEach { $0.removeFromSuperview() }
-        if case .board = section { actions.addArrangedSubview(button("Edit board…", #selector(editBoard))) }
+        if case .board = section {
+            actions.addArrangedSubview(button("Edit board…", #selector(editBoard)))
+            let delBoard = button(Lang.t("ui.board.delete"), #selector(deleteBoardTapped)); delBoard.contentTintColor = .systemRed
+            actions.addArrangedSubview(delBoard)
+        }
         guard let i else { preview.string = Lang.t("ui.nothingHere"); previewImage.isHidden = true; preview.isHidden = false; return }
         if i.kind == .image || i.kind == .gif, let d = store.payloadData(for: i), let img = NSImage(data: d) {
             previewImage.image = img; previewImage.isHidden = false; preview.isHidden = true
@@ -439,6 +443,9 @@ final class HistoryWindowController: NSObject, NSTableViewDataSource, NSTableVie
         actions.addArrangedSubview(button(Lang.t("ui.copy"), #selector(copyItem)))
         actions.addArrangedSubview(button(i.pinned ? Lang.t("ui.unpin") : Lang.t("ui.pin"), #selector(togglePin)))
         actions.addArrangedSubview(button(i.favorite ? Lang.t("ui.unfavourite") : Lang.t("ui.favourite"), #selector(toggleFavorite)))
+        // Saving to a board is one visible step: the board list opens right here, and the item is added on click.
+        actions.addArrangedSubview(menuButton(Lang.t("ui.addToBoard"), boardMenu()))
+        if case .board = section { actions.addArrangedSubview(button(Lang.t("ui.board.removeItem"), #selector(removeFromBoardTapped))) }
         actions.addArrangedSubview(menuButton(Lang.t("ui.more"), moreMenu(i)))
         let n = list.selectedRowIndexes.count
         let del = button(n > 1 ? Lang.t("ui.deleteNItems", ["n": "\(n)"]) : Lang.t("ui.delete"), #selector(deleteItem))
@@ -446,7 +453,7 @@ final class HistoryWindowController: NSObject, NSTableViewDataSource, NSTableVie
         actions.addArrangedSubview(del)
     }
 
-    private func menuButton(_ title: String, _ menu: NSMenu) -> NSButton {
+    func menuButton(_ title: String, _ menu: NSMenu) -> NSButton {
         let b = NSButton(title: title, target: nil, action: nil); b.bezelStyle = .rounded
         b.menu = menu; b.target = self; b.action = #selector(showMenu(_:)); return b
     }
@@ -454,7 +461,7 @@ final class HistoryWindowController: NSObject, NSTableViewDataSource, NSTableVie
         guard let m = sender.menu else { return }
         m.popUp(positioning: nil, at: NSPoint(x: 0, y: sender.bounds.height), in: sender)
     }
-    private func boardMenu() -> NSMenu {
+    func boardMenu() -> NSMenu {
         let m = NSMenu()
         for b in (try? store.boards()) ?? [] {
             let it = NSMenuItem(title: b.name, action: #selector(addToBoard(_:)), keyEquivalent: ""); it.target = self; it.representedObject = b.id; m.addItem(it)
@@ -517,10 +524,29 @@ final class HistoryWindowController: NSObject, NSTableViewDataSource, NSTableVie
     }
 
     @objc private func annotateItem() {
-        guard let i = selectedItem, let d = store.payloadData(for: i), let a = AnnotateController(imageData: d, store: store, monitor: monitor) else { return }
+        guard let i = selectedItem else { return }
+        annotate(i)
+    }
+    /// Opens the annotate window for an image. Says so when the image cannot be opened, instead of doing nothing.
+    func annotate(_ i: ClipItem) {
+        guard let d = store.payloadData(for: i), let a = AnnotateController(imageData: d, store: store, monitor: monitor) else {
+            let alert = NSAlert(); alert.messageText = Lang.t("ui.annotate.none"); alert.runModal(); return
+        }
         annotators.append(a); a.show()
     }
-    private var annotators: [AnnotateController] = []
+    var annotators: [AnnotateController] = []
+
+    @objc private func removeFromBoardTapped() {
+        guard case .board(let id) = section, let i = selectedItem else { return }
+        try? store.removeFromBoard(item: i.id, board: id); reloadList()
+    }
+    @objc private func deleteBoardTapped() {
+        guard case .board(let id) = section else { return }
+        let alert = NSAlert(); alert.messageText = Lang.t("ui.board.delete"); alert.informativeText = Lang.t("ui.board.deleteInfo")
+        alert.addButton(withTitle: Lang.t("ui.delete")); alert.addButton(withTitle: Lang.t("ui.cancel"))
+        guard alert.runModal() == .alertFirstButtonReturn else { return }
+        try? store.deleteBoard(id); section = .all; reloadSidebar(); reloadList()
+    }
 
     @objc private func copyItem() { guard let i = selectedItem else { return }; monitor.restore(i) }
 

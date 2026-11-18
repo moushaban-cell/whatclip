@@ -337,9 +337,13 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
         }
     }
     @objc func annotateLatest() {
-        let latest = (try? store.list(limit: 200))?.first { $0.kind == .image }
-        guard let i = latest, let d = store.payloadData(for: i), let a = AnnotateController(imageData: d, store: store, monitor: monitor) else { return }
-        annotators.append(a); a.show()
+        // The newest image in history, opened the same way as the Annotate button in the history window.
+        let latest = (try? store.list(limit: 300))?.first { $0.kind == .image || $0.kind == .gif }
+        history.show()
+        guard let i = latest else {
+            let alert = NSAlert(); alert.messageText = Lang.t("ui.annotate.none"); alert.runModal(); return
+        }
+        history.annotate(i)
     }
     var annotators: [AnnotateController] = []
     @objc func insertSnippet(_ s: NSMenuItem) {
