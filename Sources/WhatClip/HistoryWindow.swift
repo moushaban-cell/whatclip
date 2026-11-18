@@ -338,7 +338,7 @@ final class HistoryWindowController: NSObject, NSTableViewDataSource, NSTableVie
             }
             let l = NSTextField(labelWithString: "")
             let out = NSMutableAttributedString()
-            if case .board(let id) = sec, let b = (try? store.boards())?.first(where: { $0.id == id }) {
+            if case .board(let id) = sec, let b = readOrDefault("boards", nil) { try store.boards() }?.first(where: { $0.id == id }) {
                 out.append(NSAttributedString(string: "● ", attributes: [.foregroundColor: Self.colour(b.colorName), .font: NSFont.systemFont(ofSize: 13)]))
             }
             let isAdd = sec == .addBoard

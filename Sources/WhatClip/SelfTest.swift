@@ -74,7 +74,7 @@ enum SelfTest {
         }
 
         // Annotate: opens a window for the newest image
-        if let image = (try? store.list(limit: 300))?.first(where: { $0.kind == .image }) {
+        if let image = readOrDefault("list", nil) { try store.list(limit: 300) }?.first(where: { $0.kind == .image }) {
             let before = app.history.annotators.count
             app.history.annotate(image)
             check("annotate opens a window for the newest image") { app.history.annotators.count == before + 1 }

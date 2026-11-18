@@ -335,7 +335,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
     @objc func resumeCapture() { monitor.resume(); history.refreshIfVisible() }
     @objc func toggleStack() {
         stackOn.toggle()
-        if stackOn { stack = []; stackLastID = (try? store.list(limit: 1).first?.id) ?? 0 }
+        if stackOn { stack = []; stackLastID = readOrDefault("list", nil) { try store.list(limit: 1) }?.first?.id ?? 0 }
     }
     @objc func pasteNextStack() {
         guard !stack.isEmpty else { return }
@@ -384,7 +384,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
     }
     @objc func annotateLatest() {
         // The newest image in history, opened the same way as the Annotate button in the history window.
-        let latest = (try? store.list(limit: 300))?.first { $0.kind == .image || $0.kind == .gif }
+        let latest = readOrDefault("list", nil) { try store.list(limit: 300) }?.first { $0.kind == .image || $0.kind == .gif }
         history.show()
         guard let i = latest else {
             let alert = NSAlert(); alert.messageText = Lang.t("ui.annotate.none"); alert.runModal(); return
@@ -393,7 +393,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
     }
     var annotators: [AnnotateController] = []
     @objc func insertSnippet(_ s: NSMenuItem) {
-        guard let id = s.representedObject as? Int64, let snip = (try? store.snippets())?.first(where: { $0.id == id }) else { return }
+        guard let id = s.representedObject as? Int64, let snip = readOrDefault("snippets", nil) { try store.snippets() }?.first(where: { $0.id == id }) else { return }
         history.show(); history.insertSnippetFromMenu(snip)
     }
     @objc func manageSnippets() { history.newSnippet(); history.show() }

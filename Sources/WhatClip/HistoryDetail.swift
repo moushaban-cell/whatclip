@@ -189,7 +189,7 @@ extension HistoryWindowController {
     }
     /// Renames and recolours the board in view.
     @objc func editBoard() {
-        guard case .board(let id) = section, let b = (try? store.boards())?.first(where: { $0.id == id }),
+        guard case .board(let id) = section, let b = readOrDefault("boards", nil) { try store.boards() }?.first(where: { $0.id == id }),
               let (name, colour) = boardDialog(title: Lang.t("ui.editBoard"), name: b.name, colour: b.colorName) else { return }
         try? store.updateBoard(id, name: name, color: colour); reloadSidebar()
     }
