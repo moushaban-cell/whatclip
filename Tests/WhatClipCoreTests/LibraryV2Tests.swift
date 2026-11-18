@@ -60,4 +60,17 @@ import Foundation
         try s.updateText(a.id, to: "https://example.com/edited")
         #expect(try s.list().first { $0.id == a.id }?.kind == .url)
     }
+
+    @Test func importRejectsAnotherVersionOfTheFormat() throws {
+        let s = try ClipStore()
+        let bad = Data(#"{"format":"whatclip-history","version":2,"exportedAt":"2026-11-18T00:00:00Z","items":[]}"#.utf8)
+        #expect(throws: (any Error).self) { try Transfer.importData(bad, into: s) }
+    }
+
+    @Test func importSkipsEmptyAndImageRecords() throws {
+        let s = try ClipStore()
+        let text = #"{"format":"whatclip-history","version":1,"exportedAt":"2026-11-18T00:00:00Z","items":[{"kind":"text","text":"","created":"2026-11-18T00:00:00Z","pinned":false,"favorite":false,"tags":[]},{"kind":"image","text":"not an image","created":"2026-11-18T00:00:00Z","pinned":false,"favorite":false,"tags":[]},{"kind":"text","text":"kept","created":"2026-11-18T00:00:00Z","pinned":false,"favorite":false,"tags":[]}]}"#
+        #expect(try Transfer.importData(Data(text.utf8), into: s) == 1)
+        #expect(try s.list().map(\.text) == ["kept"])
+    }
 }
