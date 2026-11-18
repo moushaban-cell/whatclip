@@ -247,7 +247,9 @@ final class HistoryWindowController: NSObject, NSTableViewDataSource, NSTableVie
             let b = NSButton(title: title, target: AboutActions.shared, action: action); b.bezelStyle = .inline; return b
         }
         func section(_ views: [NSView]) -> NSStackView {
-            let s = NSStackView(views: views); s.orientation = .vertical; s.alignment = .leading; s.spacing = 8; return s
+            let s = NSStackView(views: views); s.orientation = .vertical; s.alignment = .width; s.spacing = 8
+            s.userInterfaceLayoutDirection = Lang.isRightToLeft ? .rightToLeft : .leftToRight
+            return s
         }
         func divider() -> NSBox { let b = NSBox(); b.boxType = .separator; return b }
 
@@ -268,13 +270,15 @@ final class HistoryWindowController: NSObject, NSTableViewDataSource, NSTableVie
         let links = section([heading(Lang.t("ui.about.linksTitle")), body(Lang.t("ui.about.licence")),
                              link(Lang.t("ui.about.donate"), #selector(AboutActions.openSupport))])
 
-        let page = NSStackView(views: [head, divider(), builder, divider(), privacy, divider(), links])
-        page.orientation = .vertical; page.alignment = .leading; page.spacing = 18
+        let sections: [NSView] = [head, divider(), builder, divider(), privacy, divider(), links]
+        // Stacked from the top (top gravity), each section filling the width; text follows the language direction.
+        let page = NSStackView()
+        page.orientation = .vertical; page.alignment = .width; page.spacing = 18
         page.edgeInsets = NSEdgeInsets(top: 28, left: 28, bottom: 28, right: 28)
-        for v in page.arrangedSubviews where v is NSBox { v.widthAnchor.constraint(equalTo: page.widthAnchor, constant: -56).isActive = true }
         page.userInterfaceLayoutDirection = Lang.isRightToLeft ? .rightToLeft : .leftToRight
-        page.alignment = Lang.isRightToLeft ? .trailing : .leading
+        for v in sections { page.addView(v, in: .top) }
         page.translatesAutoresizingMaskIntoConstraints = false
+        if Lang.isRightToLeft { mirrorForRTL(page) }
         return page
     }
 
@@ -697,3 +701,16 @@ final class AboutActions: NSObject {
     @objc func openSupport() { NSWorkspace.shared.open(URL(string: "https://github.com/sponsors/moushaban-cell")!) }
 }
 
+
+/// A view whose origin is at the top-left, so content in a scroll view starts at the top.
+final class TopAlignedView: NSView {
+    override var isFlipped: Bool { true }
+}
+
+/// Arabic: every view in the subtree lays out right to left, and text is right aligned.
+@MainActor
+func mirrorForRTL(_ view: NSView) {
+    view.userInterfaceLayoutDirection = .rightToLeft
+    if let field = view as? NSTextField { field.alignment = .right }
+    for sub in view.subviews { mirrorForRTL(sub) }
+}
