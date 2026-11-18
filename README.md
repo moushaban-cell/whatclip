@@ -29,7 +29,7 @@ macOS forgets whatever you copied before. WhatClip remembers it, so you can get 
 **Capture**
 - Text, links, rich text, HTML, images, animated GIFs and copied files, restored in their original form
 - Duplicates are merged, not repeated
-- Ignore rules by app, pasteboard type or regular expression (for example, one-time codes)
+- Ignore rules by app, and copies that password managers mark as secret
 
 **Find and reuse**
 - Picker with search (fuzzy or exact), filters for type, pinned, favourites, time and app

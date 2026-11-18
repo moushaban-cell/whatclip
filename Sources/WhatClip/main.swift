@@ -72,6 +72,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
         if !monitor.settings.onboardingDone { onboarding.show() }
         // Testing aid: WHATCLIP_SHOW=picker, history or onboarding opens that window at launch.
         switch ProcessInfo.processInfo.environment["WHATCLIP_SHOW"] {
+        case "annotate":                     // the Annotate latest action, after launch
+            DispatchQueue.main.asyncAfter(deadline: .now() + 2) { [weak self] in self?.annotateLatest() }
         case "picker":                       // opened after launch, when the menu-bar item has its real position
             DispatchQueue.main.asyncAfter(deadline: .now() + 2) { [weak self] in self?.openPicker() }
         case "menu":

@@ -2,6 +2,12 @@ import AppKit
 import WhatClipCore
 
 /// The full history window: sidebar (filters, boards, snippets), the list, a preview and actions on the selected item.
+/// A view whose origin is its top-left corner, so scroll content starts at the top.
+@MainActor
+final class FlippedDocumentView: NSView {
+    override var isFlipped: Bool { true }
+}
+
 @MainActor
 final class HistoryWindowController: NSObject, NSTableViewDataSource, NSTableViewDelegate, NSSearchFieldDelegate, NSMenuDelegate {
     enum Section: Equatable { case header, all, library, pinned, text, links, images, files, textInImages, board(Int64), addBoard, snippets, settings, about, tools }
@@ -227,9 +233,13 @@ final class HistoryWindowController: NSObject, NSTableViewDataSource, NSTableVie
         }
         if isAbout || isTools {
             let page = isTools ? toolsPage() : aboutPage()
-            aboutScroll.documentView = page
-            page.widthAnchor.constraint(equalTo: aboutScroll.contentView.widthAnchor).isActive = true
-            page.heightAnchor.constraint(greaterThanOrEqualTo: aboutScroll.contentView.heightAnchor).isActive = true
+            // A top-down document laid out by frame: the page starts at its top, and grows to fit its content.
+            let doc = FlippedDocumentView()
+            page.translatesAutoresizingMaskIntoConstraints = true
+            page.autoresizingMask = [.width]
+            doc.addSubview(page)
+            aboutScroll.documentView = doc
+            placePage(page, in: doc, scroll: aboutScroll)
         }
         let plain = !isSettings && !isAbout && !isTools
         previewScroll.isHidden = !plain
@@ -239,6 +249,18 @@ final class HistoryWindowController: NSObject, NSTableViewDataSource, NSTableVie
         window.contentView?.needsLayout = true   // a pane was shown or hidden: place the panes again
     }
 
+    /// Sizes the page to its content (at least the visible height) and starts the scroll at the top.
+    private func placePage(_ page: NSView, in doc: NSView, scroll: NSScrollView) {
+        let w = scroll.contentView.bounds.width
+        // Set the width first, so wrapped text is measured at the width it will be shown at.
+        page.setFrameSize(NSSize(width: w, height: 1))
+        page.layoutSubtreeIfNeeded()
+        let h = max(page.fittingSize.height, scroll.contentView.bounds.height)
+        doc.frame = NSRect(x: 0, y: 0, width: w, height: h)
+        page.frame = doc.bounds
+        scroll.contentView.scroll(to: NSPoint(x: 0, y: 0))
+        scroll.reflectScrolledClipView(scroll.contentView)
+    }
     /// The About page, in sections: the app, who built it, privacy, and the licence and links.
     private func aboutPage() -> NSView {
         let version = (Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String) ?? "0.2.0"
