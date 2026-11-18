@@ -1,5 +1,16 @@
 # Changelog
 
+## Unreleased
+- Global shortcuts for more actions: history, screenshot, GIF, annotate, emoji, pause, stack and paste next. Each one is set in Settings → General → Other shortcuts, and can be cleared.
+- Boards: drag an item from the list onto a board in the sidebar; the picker has a board filter (choose one board to work from); ⌘B files the selected items into a board.
+- Boards: create, rename, recolour, delete, and remove items from a board. Deleting a board keeps its items in history.
+- Capture and tools: a Recent captures list with Annotate, Favourite, Add to board and Delete; Pause and Resume switch the label straight away.
+- Snippets: a New snippet button on the empty page; item actions no longer appear on the Snippets page.
+- Failures are shown instead of silent: deletes, clears, pin, favourite and board actions report errors; a copy that cannot be saved is logged (never its content).
+- Shell actions no longer hang when a command writes a lot of output; folder sync no longer drops another Mac's changes after a failed import.
+- Privacy text corrected: the only network request is the daily update check.
+- Internal: the history window is split into files for the sidebar, detail pane, snippets and About page.
+
 ## 1.0.0
 First complete release, source only, private repository.
 - Capture of text, links, rich text, HTML, images, GIFs and files; restored in their original form.

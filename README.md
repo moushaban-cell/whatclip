@@ -40,12 +40,14 @@ macOS forgets whatever you copied before. WhatClip remembers it, so you can get 
 
 **Organise**
 - Pin, favourite (the Library), tag, and group into coloured boards
+- Drag an item onto a board in the sidebar to file it; in the picker, choose one board to work from
 - Text tools: case, lines, JSON, Base64, URL encoding, word counts
 - Smart actions for emails, phone numbers, dates, colours and file paths
 - Text inside images is read on your Mac and is searchable
 
 **Make**
 - Screenshot of an area, a 5-second GIF of the screen, and an annotation editor (pen, line, rectangle, arrow)
+- Global shortcuts for the picker, history, screenshots, GIFs, annotation, emoji, pausing and the stack, each set in Settings
 - Export and import your history as a JSON file
 
 **Desktop app**
@@ -94,10 +96,14 @@ WhatClip makes no network requests, has no account and collects no telemetry. Yo
 | Esc | Close the picker or a window |
 | ⌘, | Settings |
 
+The picker's shortcut and the shortcuts for other actions (history, screenshot, GIF, annotate, emoji, pause, stack, paste next) are set in **Settings → General → Other shortcuts**. None is set by default, except the picker.
+
+Drag any item from the list onto a board in the sidebar to file it.
+
 ## Build and test
 
 ```sh
-./scripts/test.sh          # 64 tests
+./scripts/test.sh          # the unit tests (Swift Testing)
 ./scripts/build-app.sh     # builds build/WhatClip.app
 ./scripts/package.sh       # builds dist/WhatClip-<version>.zip for a release
 ```
@@ -109,7 +115,9 @@ Set `WHATCLIP_SIGN_ID` to the name of your local code-signing certificate to kee
 - Secret detection works on the shape of text. It can miss unusual secrets and flag harmless text.
 - Some apps never expose their copies to any clipboard tool.
 - Screen recording, Touch ID and the Services entry are built but still being checked on more Macs.
-- English only. Not notarised yet.
+- The app's own self-test (`WHATCLIP_SELFTEST=1`, see CONTRIBUTING.md) checks the clipboard, stack, boards, favourites and export in the running app.
+- Eleven languages: English, Chinese, Hindi, Spanish, French, Arabic, Bengali, Portuguese, Russian, Japanese and German. Translations are checked by native speakers as they come in; please report wrong ones.
+- Not notarised yet.
 
 ## Contributing
 
