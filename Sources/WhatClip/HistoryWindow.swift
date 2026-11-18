@@ -15,7 +15,7 @@ final class HistoryWindowController: NSObject, NSTableViewDataSource, NSTableVie
     private let window: NSWindow
     let store: ClipStore
     let monitor: PasteboardMonitor
-    private let sidebar = NSTableView()
+    let sidebar = NSTableView()
     let list = NSTableView()
     private let search = NSSearchField()
     private let listScroll = NSScrollView()
@@ -39,7 +39,7 @@ final class HistoryWindowController: NSObject, NSTableViewDataSource, NSTableVie
     let snippetTags = NSTextField()
     let snippetBody = NSTextView()
     let snippetBox = NSStackView()
-    private var sections: [(String, Section)] = []
+    var sections: [(String, Section)] = []
     var section: Section = .all
     var items: [ClipItem] = []
     var snippets: [Snippet] = []
@@ -200,29 +200,6 @@ final class HistoryWindowController: NSObject, NSTableViewDataSource, NSTableVie
         let b = NSButton(title: title, target: self, action: action); b.bezelStyle = .rounded; return b
     }
 
-    // MARK: sidebar
-
-    /// The sidebar in groups: History (what was copied), Library (saved things), Boards, Tools, App.
-    /// Headers are shown but cannot be selected. "New board" is always the last row of Boards.
-    func reloadSidebar() {
-        var s: [(String, Section)] = [(Lang.t("ui.history"), .header), (Lang.t("ui.allItems"), .all), (Lang.t("ui.pinned"), .pinned), (Lang.t("ui.text"), .text), (Lang.t("ui.links"), .links),
-                                      (Lang.t("ui.imagesGifs"), .images), (Lang.t("ui.files"), .files), (Lang.t("ui.textInImages"), .textInImages),
-                                      (Lang.t("ui.library"), .header), (Lang.t("ui.favourites"), .library), (Lang.t("ui.snippets"), .snippets)]
-        let boards = (try? store.boards()) ?? []
-        s.append((Lang.t("ui.boards"), .header))
-        for b in boards { s.append((b.name, .board(b.id))) }
-        s.append(("+ " + Lang.t("ui.newBoard"), .addBoard))
-        s.append((Lang.t("ui.tools"), .header))
-        s.append((Lang.t("ui.tools.page"), .tools))
-        s.append((Lang.t("ui.app"), .header))
-        s.append((Lang.t("ui.settings"), .settings))
-        s.append((Lang.t("ui.about"), .about))
-        sections = s
-        sidebar.reloadData()
-        if let row = sections.firstIndex(where: { $0.1 == section }) { sidebar.selectRowIndexes([row], byExtendingSelection: false) }
-    }
-
-    /// Locks the window now (menu: Lock history now). It asks again the next time it is opened.
     func lockNow() { Authentication.lockNow(); locked = true; reloadList() }
 
     /// Shows the settings or About pane for their sections, and the list and preview for every other section.
