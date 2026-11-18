@@ -351,6 +351,13 @@ extension Lang {
         "ui.set.pickerStyleHint": "Compact shows a small list near the cursor, like the Windows clipboard. Full shows filters and previews.",
         "style.full": "Full: filters and previews",
         "style.compact": "Compact: a small list",
+        "ui.update.available": "WhatClip {v} is available",
+        "ui.update.info": "You have an older version. Update now, or open the release page.",
+        "ui.update.now": "Update now",
+        "ui.update.later": "Later",
+        "ui.update.page": "Release page",
+        "ui.update.confirm": "Install WhatClip {v}?",
+        "ui.update.confirmInfo": "WhatClip will close. Terminal will download the new version, check it, install it in Applications and open WhatClip again. Your history and settings stay as they are.",
     ]
     private static let uiL1: [String: String] = [
         "ui.editTextMore": "编辑文本…",
@@ -688,6 +695,13 @@ extension Lang {
         "ui.set.pickerStyleHint": "紧凑会在光标附近显示小列表，类似 Windows 剪贴板。完整版显示筛选和预览。",
         "style.full": "完整：筛选和预览",
         "style.compact": "紧凑：小列表",
+        "ui.update.available": "WhatClip {v} 已可用",
+        "ui.update.info": "你使用的是旧版本。可以立即更新，或打开发布页面。",
+        "ui.update.now": "立即更新",
+        "ui.update.later": "稍后",
+        "ui.update.page": "发布页面",
+        "ui.update.confirm": "安装 WhatClip {v}？",
+        "ui.update.confirmInfo": "WhatClip 将关闭。终端会下载新版本、校验后安装到“应用程序”中，并重新打开 WhatClip。你的历史记录和设置保持不变。",
     ]
     private static let uiL2: [String: String] = [
         "ui.editTextMore": "टेक्स्ट संपादित करें…",
@@ -1025,6 +1039,13 @@ extension Lang {
         "ui.set.pickerStyleHint": "कॉम्पैक्ट कर्सर के पास एक छोटी सूची दिखाता है, जैसे Windows क्लिपबोर्ड। पूर्ण में फ़िल्टर और पूर्वावलोकन दिखते हैं।",
         "style.full": "पूर्ण: फ़िल्टर और पूर्वावलोकन",
         "style.compact": "कॉम्पैक्ट: छोटी सूची",
+        "ui.update.available": "WhatClip {v} उपलब्ध है",
+        "ui.update.info": "आपके पास पुराना संस्करण है। अभी अपडेट करें, या रिलीज़ पेज खोलें।",
+        "ui.update.now": "अभी अपडेट करें",
+        "ui.update.later": "बाद में",
+        "ui.update.page": "रिलीज़ पेज",
+        "ui.update.confirm": "WhatClip {v} इंस्टॉल करें?",
+        "ui.update.confirmInfo": "WhatClip बंद होगा। Terminal नया संस्करण डाउनलोड करेगा, जाँचेगा, Applications में इंस्टॉल करेगा और WhatClip फिर खोलेगा। आपका इतिहास और सेटिंग्स वैसे ही रहेंगी।",
     ]
     private static let uiL3: [String: String] = [
         "ui.editTextMore": "Editar texto…",
@@ -1362,6 +1383,13 @@ extension Lang {
         "ui.set.pickerStyleHint": "Compacto muestra una lista pequeña junto al cursor, como el portapapeles de Windows. Completo muestra filtros y vistas previas.",
         "style.full": "Completo: filtros y vistas previas",
         "style.compact": "Compacto: lista pequeña",
+        "ui.update.available": "WhatClip {v} está disponible",
+        "ui.update.info": "Tienes una versión anterior. Actualiza ahora o abre la página de la versión.",
+        "ui.update.now": "Actualizar ahora",
+        "ui.update.later": "Más tarde",
+        "ui.update.page": "Página de la versión",
+        "ui.update.confirm": "¿Instalar WhatClip {v}?",
+        "ui.update.confirmInfo": "WhatClip se cerrará. Terminal descargará la nueva versión, la comprobará, la instalará en Aplicaciones y volverá a abrir WhatClip. Tu historial y ajustes no cambian.",
     ]
     private static let uiL4: [String: String] = [
         "ui.editTextMore": "Modifier le texte…",
@@ -1699,6 +1727,13 @@ extension Lang {
         "ui.set.pickerStyleHint": "Compact affiche une petite liste près du curseur, comme le presse-papiers de Windows. Complet affiche les filtres et les aperçus.",
         "style.full": "Complet : filtres et aperçus",
         "style.compact": "Compact : petite liste",
+        "ui.update.available": "WhatClip {v} est disponible",
+        "ui.update.info": "Vous avez une version plus ancienne. Mettez à jour maintenant ou ouvrez la page de publication.",
+        "ui.update.now": "Mettre à jour",
+        "ui.update.later": "Plus tard",
+        "ui.update.page": "Page de publication",
+        "ui.update.confirm": "Installer WhatClip {v} ?",
+        "ui.update.confirmInfo": "WhatClip va se fermer. Terminal téléchargera la nouvelle version, la vérifiera, l'installera dans Applications et rouvrira WhatClip. Votre historique et vos réglages restent inchangés.",
     ]
     private static let uiL5: [String: String] = [
         "ui.editTextMore": "تعديل النص…",
@@ -2036,6 +2071,13 @@ extension Lang {
         "ui.set.pickerStyleHint": "المضغوط يعرض قائمة صغيرة قرب المؤشر، مثل حافظة Windows. الكامل يعرض عوامل التصفية والمعاينات.",
         "style.full": "الكامل: عوامل التصفية والمعاينات",
         "style.compact": "المضغوط: قائمة صغيرة",
+        "ui.update.available": "WhatClip {v} متاح",
+        "ui.update.info": "لديك نسخة أقدم. حدّث الآن أو افتح صفحة الإصدار.",
+        "ui.update.now": "حدّث الآن",
+        "ui.update.later": "لاحقًا",
+        "ui.update.page": "صفحة الإصدار",
+        "ui.update.confirm": "تثبيت WhatClip {v}؟",
+        "ui.update.confirmInfo": "سيُغلق WhatClip. سيحمّل Terminal الإصدار الجديد ويتحقق منه ويثبّته في التطبيقات ثم يعيد فتح WhatClip. يبقى سجلك وإعداداتك كما هي.",
     ]
     private static let uiL6: [String: String] = [
         "ui.editTextMore": "টেক্সট সম্পাদনা করুন…",
@@ -2373,6 +2415,13 @@ extension Lang {
         "ui.set.pickerStyleHint": "কমপ্যাক্ট কার্সরের কাছে একটি ছোট তালিকা দেখায়, Windows ক্লিপবোর্ডের মতো। পূর্ণে ফিল্টার ও প্রিভিউ থাকে।",
         "style.full": "পূর্ণ: ফিল্টার ও প্রিভিউ",
         "style.compact": "কমপ্যাক্ট: ছোট তালিকা",
+        "ui.update.available": "WhatClip {v} পাওয়া যাচ্ছে",
+        "ui.update.info": "আপনার কাছে পুরনো সংস্করণ আছে। এখনই আপডেট করুন, অথবা রিলিজ পেজ খুলুন।",
+        "ui.update.now": "এখনই আপডেট করুন",
+        "ui.update.later": "পরে",
+        "ui.update.page": "রিলিজ পেজ",
+        "ui.update.confirm": "WhatClip {v} ইনস্টল করবেন?",
+        "ui.update.confirmInfo": "WhatClip বন্ধ হবে। Terminal নতুন সংস্করণ ডাউনলোড ও যাচাই করে Applications-এ ইনস্টল করবে এবং WhatClip আবার খুলবে। আপনার ইতিহাস ও সেটিংস অপরিবর্তিত থাকবে।",
     ]
     private static let uiL7: [String: String] = [
         "ui.editTextMore": "Editar texto…",
@@ -2710,6 +2759,13 @@ extension Lang {
         "ui.set.pickerStyleHint": "Compacto mostra uma lista pequena perto do cursor, como a área de transferência do Windows. Completo mostra filtros e pré-visualizações.",
         "style.full": "Completo: filtros e pré-visualizações",
         "style.compact": "Compacto: lista pequena",
+        "ui.update.available": "WhatClip {v} está disponível",
+        "ui.update.info": "Você tem uma versão anterior. Atualize agora ou abra a página da versão.",
+        "ui.update.now": "Atualizar agora",
+        "ui.update.later": "Mais tarde",
+        "ui.update.page": "Página da versão",
+        "ui.update.confirm": "Instalar o WhatClip {v}?",
+        "ui.update.confirmInfo": "O WhatClip será fechado. O Terminal baixará a nova versão, a verificará, a instalará em Aplicativos e abrirá o WhatClip novamente. Seu histórico e configurações não mudam.",
     ]
     private static let uiL8: [String: String] = [
         "ui.editTextMore": "Изменить текст…",
@@ -3047,6 +3103,13 @@ extension Lang {
         "ui.set.pickerStyleHint": "Компактный показывает небольшой список у курсора, как буфер обмена Windows. Полный показывает фильтры и предпросмотр.",
         "style.full": "Полный: фильтры и предпросмотр",
         "style.compact": "Компактный: небольшой список",
+        "ui.update.available": "Доступна WhatClip {v}",
+        "ui.update.info": "У вас старая версия. Обновите сейчас или откройте страницу релиза.",
+        "ui.update.now": "Обновить сейчас",
+        "ui.update.later": "Позже",
+        "ui.update.page": "Страница релиза",
+        "ui.update.confirm": "Установить WhatClip {v}?",
+        "ui.update.confirmInfo": "WhatClip закроется. Terminal загрузит новую версию, проверит её, установит в «Программы» и снова откроет WhatClip. История и настройки не изменятся.",
     ]
     private static let uiL9: [String: String] = [
         "ui.editTextMore": "テキストを編集…",
@@ -3384,6 +3447,13 @@ extension Lang {
         "ui.set.pickerStyleHint": "コンパクトは Windows のクリップボードのように、カーソル付近に小さなリストを表示します。フルはフィルタとプレビューを表示します。",
         "style.full": "フル：フィルタとプレビュー",
         "style.compact": "コンパクト：小さなリスト",
+        "ui.update.available": "WhatClip {v} が利用できます",
+        "ui.update.info": "古いバージョンを使用しています。今すぐ更新するか、リリースページを開いてください。",
+        "ui.update.now": "今すぐ更新",
+        "ui.update.later": "あとで",
+        "ui.update.page": "リリースページ",
+        "ui.update.confirm": "WhatClip {v} をインストールしますか？",
+        "ui.update.confirmInfo": "WhatClip を閉じます。ターミナルが新しいバージョンをダウンロードして確認し、「アプリケーション」にインストールしてから WhatClip を再び開きます。履歴と設定はそのままです。",
     ]
     private static let uiL10: [String: String] = [
         "ui.editTextMore": "Text bearbeiten…",
@@ -3721,5 +3791,12 @@ extension Lang {
         "ui.set.pickerStyleHint": "Kompakt zeigt eine kleine Liste am Mauszeiger, wie die Windows-Zwischenablage. Vollständig zeigt Filter und Vorschau.",
         "style.full": "Vollständig: Filter und Vorschau",
         "style.compact": "Kompakt: kleine Liste",
+        "ui.update.available": "WhatClip {v} ist verfügbar",
+        "ui.update.info": "Du hast eine ältere Version. Jetzt aktualisieren oder die Release-Seite öffnen.",
+        "ui.update.now": "Jetzt aktualisieren",
+        "ui.update.later": "Später",
+        "ui.update.page": "Release-Seite",
+        "ui.update.confirm": "WhatClip {v} installieren?",
+        "ui.update.confirmInfo": "WhatClip wird geschlossen. Das Terminal lädt die neue Version, prüft sie, installiert sie in den Programmen und öffnet WhatClip erneut. Dein Verlauf und deine Einstellungen bleiben unverändert.",
     ]
 }

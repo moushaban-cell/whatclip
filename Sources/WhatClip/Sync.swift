@@ -68,11 +68,34 @@ enum UpdateCheck {
 
     static func announce(_ version: String) {
         let alert = NSAlert()
-        alert.messageText = "WhatClip \(version) is available"
-        alert.informativeText = "You have an older version. The release notes and download are on the project page."
-        alert.addButton(withTitle: "Open the release page"); alert.addButton(withTitle: "Later")
-        if alert.runModal() == .alertFirstButtonReturn, let url = URL(string: "https://github.com/moushaban-cell/whatclip/releases/latest") {
-            NSWorkspace.shared.open(url)
+        alert.messageText = Lang.t("ui.update.available", ["v": version])
+        alert.informativeText = Lang.t("ui.update.info")
+        alert.addButton(withTitle: Lang.t("ui.update.now")); alert.addButton(withTitle: Lang.t("ui.update.later")); alert.addButton(withTitle: Lang.t("ui.update.page"))
+        switch alert.runModal() {
+        case .alertFirstButtonReturn: confirmAndInstall(version)
+        case .alertThirdButtonReturn:
+            if let url = URL(string: "https://github.com/moushaban-cell/whatclip/releases/latest") { NSWorkspace.shared.open(url) }
+        default: break
+        }
+    }
+
+    /// Asks once more, then writes the installer script to a private folder and opens it in Terminal, so every step is visible.
+    static func confirmAndInstall(_ version: String) {
+        guard let script = UpdateScript.make(version: version) else { return }
+        let confirm = NSAlert()
+        confirm.messageText = Lang.t("ui.update.confirm", ["v": version])
+        confirm.informativeText = Lang.t("ui.update.confirmInfo")
+        confirm.addButton(withTitle: Lang.t("ui.update.now")); confirm.addButton(withTitle: Lang.t("ui.update.later"))
+        guard confirm.runModal() == .alertFirstButtonReturn else { return }
+        let dir = FileManager.default.temporaryDirectory.appendingPathComponent("WhatClipUpdate-\(UUID().uuidString)", isDirectory: true)
+        do {
+            try FileManager.default.createDirectory(at: dir, withIntermediateDirectories: true, attributes: [.posixPermissions: 0o700])
+            let file = dir.appendingPathComponent("install-whatclip-\(version).command")
+            try script.write(to: file, atomically: true, encoding: .utf8)
+            try FileManager.default.setAttributes([.posixPermissions: 0o700], ofItemAtPath: file.path)
+            NSWorkspace.shared.open(file)
+        } catch {
+            reportFailure(error)
         }
     }
 }

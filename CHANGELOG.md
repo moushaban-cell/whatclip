@@ -1,6 +1,7 @@
 # Changelog
 
 ## Unreleased
+- Updates: when a newer release exists, **Update now** asks once more, then opens Terminal, which downloads the release from GitHub, checks its SHA-256 checksum, installs it into Applications and reopens WhatClip. Your history and settings are not touched. Nothing is installed if the checksum does not match.
 - Global shortcuts for more actions: history, screenshot, GIF, annotate, emoji, pause, stack and paste next. Each one is set in Settings → General → Other shortcuts, and can be cleared.
 - Boards: drag an item from the list onto a board in the sidebar; the picker has a board filter (choose one board to work from); ⌘B files the selected items into a board.
 - Boards: create, rename, recolour, delete, and remove items from a board. Deleting a board keeps its items in history.
