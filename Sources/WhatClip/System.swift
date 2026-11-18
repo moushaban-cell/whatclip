@@ -84,6 +84,15 @@ enum AutoPaste {
         _ = AXIsProcessTrustedWithOptions(options)
     }
 
+    private static var askedThisLaunch = false
+    /// Asks for the permission once per launch. Later pastes without it do not open the settings again;
+    /// the item simply stays on the clipboard for ⌘V.
+    static func askOnce() {
+        guard !askedThisLaunch else { return }
+        askedThisLaunch = true
+        requestTrust()
+    }
+
     /// Brings the previous app forward, then sends ⌘V to it.
     static func paste(into app: NSRunningApplication?) {
         // Forces the app the person was using to the front, then sends ⌘V only once that app really has focus.

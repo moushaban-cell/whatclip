@@ -308,7 +308,7 @@ final class PickerController: NSObject, NSSearchFieldDelegate, NSTableViewDataSo
         // Auto-paste: the item is on the clipboard now; paste it into the app the person was using.
         // Without the Accessibility permission, WhatClip asks macOS for it, and the item stays on the clipboard for ⌘V.
         if monitor.settings.autoPaste {
-            if AutoPaste.isTrusted { AutoPaste.paste(into: previousApp) } else { AutoPaste.requestTrust() }
+            if AutoPaste.isTrusted { AutoPaste.paste(into: previousApp) } else { AutoPaste.askOnce() }
         }
     }
 
