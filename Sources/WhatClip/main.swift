@@ -301,10 +301,11 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
         do { try store.clear() } catch { reportFailure(error) }
         picker.refreshIfVisible(); history.refreshIfVisible()
     }
-    @objc func pause5() { monitor.pause(for: 300) }
-    @objc func pause60() { monitor.pause(for: 3600) }
-    @objc func pauseForever() { monitor.pause(for: nil) }
-    @objc func resumeCapture() { monitor.resume() }
+    // Each pause action refreshes the open windows, so the Tools page shows the new state at once.
+    @objc func pause5() { monitor.pause(for: 300); history.refreshIfVisible() }
+    @objc func pause60() { monitor.pause(for: 3600); history.refreshIfVisible() }
+    @objc func pauseForever() { monitor.pause(for: nil); history.refreshIfVisible() }
+    @objc func resumeCapture() { monitor.resume(); history.refreshIfVisible() }
     @objc func toggleStack() {
         stackOn.toggle()
         if stackOn { stack = []; stackLastID = (try? store.list(limit: 1).first?.id) ?? 0 }

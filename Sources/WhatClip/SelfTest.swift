@@ -24,6 +24,20 @@ enum SelfTest {
         // Clipboard section
         check("pause capturing turns on") { app.monitor.pause(for: nil); return monitor.isPaused }
         check("resume capturing turns off") { app.monitor.resume(); return !monitor.isPaused }
+        // The Tools page must show the action that does the opposite of the current state.
+        func toolsButtonTitles() -> [String] {
+            var found: [String] = []
+            func walk(_ v: NSView) {
+                if let b = v as? NSButton { found.append(b.attributedTitle.string) }
+                v.subviews.forEach(walk)
+            }
+            walk(app.history.toolsPage())
+            return found
+        }
+        app.monitor.pause(for: nil)
+        check("Tools page offers Resume while paused") { toolsButtonTitles().contains { $0.contains(Lang.t("ui.m.resume")) } }
+        app.monitor.resume()
+        check("Tools page offers Pause while capturing") { toolsButtonTitles().contains { $0.contains(Lang.t("ui.m.pauseCapturing")) } }
         check("ignore next copy is set") { monitor.policy.ignoreNextCopy = true; return monitor.policy.ignoreNextCopy }
         monitor.policy.ignoreNextCopy = false
 

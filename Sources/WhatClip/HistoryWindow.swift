@@ -189,7 +189,12 @@ final class HistoryWindowController: NSObject, NSTableViewDataSource, NSTableVie
 
     /// The window refreshes itself when a copy arrives while it is open.
     var isVisible: Bool { window.isVisible }
-    func refreshIfVisible() { if window.isVisible { reloadSidebar(); reloadList() } }
+    /// Brings the open window up to date with the data and the settings: the list, and the Tools page when it is open.
+    func refreshIfVisible() {
+        guard window.isVisible else { return }
+        reloadSidebar(); reloadList()
+        if section == .tools || section == .about { updateChrome() }
+    }
 
     private func button(_ title: String, _ action: Selector) -> NSButton {
         let b = NSButton(title: title, target: self, action: action); b.bezelStyle = .rounded; return b
