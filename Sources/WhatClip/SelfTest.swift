@@ -90,6 +90,14 @@ enum SelfTest {
             check("clear history keeps pinned and favourite items") { texts.contains("selftest pinned") && texts.contains("selftest fav") && !texts.contains("selftest plain") }
         }
 
+        // Drag source: a history row produces a payload that carries its item id, and only ours
+        app.history.reloadList()
+        check("a history row can be dragged, carrying its item id") {
+            guard let item = app.history.items.first else { return false }
+            guard let writer = app.history.tableView(app.history.list, pasteboardWriterForRow: 0) as? NSPasteboardItem else { return false }
+            return writer.string(forType: HistoryDrag.type) == String(item.id)
+        }
+
         // Export and import round trip
         if let data = try? Transfer.export(store) {
             check("export produces data") { !data.isEmpty }

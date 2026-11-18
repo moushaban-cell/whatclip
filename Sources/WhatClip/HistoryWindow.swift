@@ -85,12 +85,15 @@ final class HistoryWindowController: NSObject, NSTableViewDataSource, NSTableVie
 
     private func build() {
         sidebar.headerView = nil; sidebar.dataSource = self; sidebar.delegate = self; sidebar.rowHeight = 26
+        // Items can be dragged from the list onto a board in the sidebar.
+        sidebar.registerForDraggedTypes([HistoryDrag.type])
         sidebar.addTableColumn(NSTableColumn(identifier: .init("side")))
         sidebar.setAccessibilityLabel(Lang.t("ui.a11y.sections"))
         let sideScroll = NSScrollView(); sideScroll.documentView = sidebar; sideScroll.hasVerticalScroller = true; sideScroll.borderType = .noBorder
 
         search.placeholderString = Lang.t("ui.search"); search.delegate = self
         list.headerView = nil; list.dataSource = self; list.delegate = self; list.rowHeight = Design.rowHeight
+        list.setDraggingSourceOperationMask(.copy, forLocal: true)
         list.allowsMultipleSelection = true; list.setAccessibilityLabel(Lang.t("ui.a11y.items"))
         // Keyboard: Return or a double-click copies the selected item; arrows move through the list (built into the table).
         list.target = self; list.doubleAction = #selector(copyItem)
