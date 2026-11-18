@@ -306,6 +306,7 @@ final class HistoryWindowController: NSObject, NSTableViewDataSource, NSTableVie
         guard section != .settings, section != .about, section != .snippets, items.indices.contains(index) else { return nil }
         let menu = NSMenu()
         for m in ItemActions.menuItems(for: items[index], store: store, changed: { [weak self] in self?.reloadList() }) { menu.addItem(m) }
+        for m in ItemActions.actionItems(for: items[index], actions: UserAction.parse(monitor.settings.actionsText), store: store, changed: { [weak self] in self?.reloadList() }) { menu.addItem(m) }
         return menu
     }
 

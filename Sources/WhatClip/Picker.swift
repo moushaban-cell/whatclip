@@ -393,11 +393,15 @@ final class PickerController: NSObject, NSSearchFieldDelegate, NSTableViewDataSo
 
     func tableViewSelectionDidChange(_ notification: Notification) { updatePreview() }
 
+    /// The person's actions, from Settings.
+    func currentActions() -> [UserAction] { UserAction.parse(monitor.settings.actionsText) }
+
     /// The right-click menu for one item, the same as a list row.
     func contextMenu(forItem index: Int) -> NSMenu? {
         guard items.indices.contains(index) else { return nil }
         let menu = NSMenu()
         for m in ItemActions.menuItems(for: items[index], store: store, changed: { [weak self] in self?.reload() }) { menu.addItem(m) }
+        for m in ItemActions.actionItems(for: items[index], actions: currentActions(), store: store, changed: { [weak self] in self?.reload() }) { menu.addItem(m) }
         return menu
     }
 

@@ -50,20 +50,28 @@ public struct WhatClipSettings: Sendable, Codable, Equatable {
     public var autoPaste: Bool
     /// Interface language code (for example "en", "es", "ar"). English is the default.
     public var language: String
+    /// User actions, one per line in the form "Name | command" (see UserAction).
+    public var actionsText: String
+    /// Optional sync: a folder you choose (for example in iCloud Drive). Empty means off.
+    public var syncFolder: String
+    /// Check GitHub once a day for a newer version. Sends no personal data.
+    public var checkForUpdates: Bool
 
-    public static let supportedLanguages = ["en", "es", "fr", "de", "ar"]
+    public static let supportedLanguages = ["en", "zh-Hans", "hi", "es", "fr", "ar", "bn", "pt", "ru", "ja", "de"]
 
     public static let `default` = WhatClipSettings(
         excludedBundleIDs: BundleIDList.defaultExcluded, secretAction: .expire,
         secretLifetimeSeconds: 60, retention: .quarter, maxItems: 500,
         encryptPayloads: false, requireTouchID: false, launchAtLogin: false, recognizeText: true,
-        appearance: .system, popupPlacement: .menuIcon, clearOnQuit: false, fuzzySearch: true, ignoredPatterns: [], onboardingDone: false, showInDock: true, gifSeconds: 5, gifFramesPerSecond: 8, hotKeyCode: 7, hotKeyModifiers: 768, autoPaste: true, language: "en")
+        appearance: .system, popupPlacement: .menuIcon, clearOnQuit: false, fuzzySearch: true, ignoredPatterns: [], onboardingDone: false, showInDock: true, gifSeconds: 5, gifFramesPerSecond: 8, hotKeyCode: 7, hotKeyModifiers: 768, autoPaste: true, language: "en", actionsText: "", syncFolder: "", checkForUpdates: true)
 
     public init(excludedBundleIDs: [String], secretAction: SecretAction, secretLifetimeSeconds: Double, retention: Retention, maxItems: Int,
                 encryptPayloads: Bool = false, requireTouchID: Bool = false, launchAtLogin: Bool = false, recognizeText: Bool = true,
                 appearance: AppearanceChoice = .system, popupPlacement: PopupPlacement = .menuIcon, clearOnQuit: Bool = false,
                 fuzzySearch: Bool = true, ignoredPatterns: [String] = [], onboardingDone: Bool = false, showInDock: Bool = true,
-                gifSeconds: Int = 5, gifFramesPerSecond: Int = 8, hotKeyCode: Int = 7, hotKeyModifiers: Int = 768, autoPaste: Bool = true, language: String = "en") {
+                gifSeconds: Int = 5, gifFramesPerSecond: Int = 8, hotKeyCode: Int = 7, hotKeyModifiers: Int = 768, autoPaste: Bool = true, language: String = "en",
+                actionsText: String = "", syncFolder: String = "", checkForUpdates: Bool = true) {
+        self.actionsText = actionsText; self.syncFolder = syncFolder; self.checkForUpdates = checkForUpdates
         self.language = language; self.autoPaste = autoPaste; self.gifSeconds = gifSeconds; self.gifFramesPerSecond = gifFramesPerSecond; self.hotKeyCode = hotKeyCode; self.hotKeyModifiers = hotKeyModifiers
         self.showInDock = showInDock
         self.appearance = appearance; self.popupPlacement = popupPlacement; self.clearOnQuit = clearOnQuit
@@ -82,7 +90,7 @@ public struct WhatClipSettings: Sendable, Codable, Equatable {
 
     enum CodingKeys: String, CodingKey {
         case excludedBundleIDs, secretAction, secretLifetimeSeconds, retention, maxItems, encryptPayloads, requireTouchID, launchAtLogin, recognizeText
-        case appearance, popupPlacement, clearOnQuit, fuzzySearch, ignoredPatterns, onboardingDone, showInDock, gifSeconds, gifFramesPerSecond, hotKeyCode, hotKeyModifiers, autoPaste, language
+        case appearance, popupPlacement, clearOnQuit, fuzzySearch, ignoredPatterns, onboardingDone, showInDock, gifSeconds, gifFramesPerSecond, hotKeyCode, hotKeyModifiers, autoPaste, language, actionsText, syncFolder, checkForUpdates
     }
 
     /// Tolerant: a missing or wrong field takes its default instead of failing the whole file.
@@ -111,7 +119,10 @@ public struct WhatClipSettings: Sendable, Codable, Equatable {
             hotKeyCode: (try? c?.decode(Int.self, forKey: .hotKeyCode)) ?? d.hotKeyCode,
             hotKeyModifiers: (try? c?.decode(Int.self, forKey: .hotKeyModifiers)) ?? d.hotKeyModifiers,
             autoPaste: (try? c?.decode(Bool.self, forKey: .autoPaste)) ?? d.autoPaste,
-            language: (try? c?.decode(String.self, forKey: .language)) ?? d.language)
+            language: (try? c?.decode(String.self, forKey: .language)) ?? d.language,
+            actionsText: (try? c?.decode(String.self, forKey: .actionsText)) ?? d.actionsText,
+            syncFolder: (try? c?.decode(String.self, forKey: .syncFolder)) ?? d.syncFolder,
+            checkForUpdates: (try? c?.decode(Bool.self, forKey: .checkForUpdates)) ?? d.checkForUpdates)
     }
 
     /// Keeps numbers in sensible ranges and drops invalid bundle identifiers.

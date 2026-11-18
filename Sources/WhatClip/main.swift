@@ -13,6 +13,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
     var onboarding: OnboardingWindowController!
     let gif = GIFRecorder()
     var emoji: EmojiPanelController!
+    var syncTimer: Timer?
     let hotKey = HotKey()
     var hotKeyOK = false
     var hotKeyStatus = "Not registered yet."
@@ -25,13 +26,16 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
     func applicationDidFinishLaunching(_ n: Notification) {
         // Every file this app creates is private to the user from the start.
         umask(0o077)
-        Lang.current = (try? SettingsStore(url: FileManager.default.urls(for: .applicationSupportDirectory, in: .userDomainMask)[0].appendingPathComponent("WhatClip/settings.json")).load().language) ?? "en"
         PickerController.cleanPreviews()
         let dir = ProcessInfo.processInfo.environment["WHATCLIP_DATA"].map { URL(fileURLWithPath: $0) }
             ?? FileManager.default.urls(for: .applicationSupportDirectory, in: .userDomainMask)[0].appendingPathComponent("WhatClip")
         try? FileManager.default.createDirectory(at: dir, withIntermediateDirectories: true, attributes: [.posixPermissions: 0o700])
         guard let s = try? ClipStore(path: dir.appendingPathComponent("history.sqlite").path) else { NSApp.terminate(nil); return }
         store = s
+        // The language comes from the same folder as the data. Arabic also sets the app's system layout to right to left.
+        let language = SettingsStore(url: dir.appendingPathComponent("settings.json")).load().language
+        Lang.current = language
+        UserDefaults.standard.set(language == "en" ? nil : [language], forKey: "AppleLanguages")
         monitor = PasteboardMonitor(store: store, settingsStore: SettingsStore(url: dir.appendingPathComponent("settings.json")))
         monitor.applyPrivacyAndSystem(monitor.settings)
         monitor.start()
@@ -57,6 +61,10 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
                                            exportAction: #selector(exportHistory), importAction: #selector(importHistory))
         applyAppearance()
         applyActivationPolicy()
+        // Optional folder sync and the daily update check. Both are off or local unless you turn them on.
+        runFolderSync()
+        syncTimer = Timer.scheduledTimer(withTimeInterval: 600, repeats: true) { [weak self] _ in MainActor.assumeIsolated { self?.runFolderSync() } }
+        UpdateCheck.runIfDue(enabled: monitor.settings.checkForUpdates, current: (Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String) ?? "0")
         if !monitor.settings.onboardingDone { onboarding.show() }
         // Testing aid: WHATCLIP_SHOW=picker, history or onboarding opens that window at launch.
         switch ProcessInfo.processInfo.environment["WHATCLIP_SHOW"] {
@@ -80,7 +88,21 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
         }
     }
 
+    func runFolderSync() {
+        guard let store, let monitor else { return }
+        FolderSync.run(store: store, folder: monitor.settings.syncFolder)
+    }
+
+    /// Pastes every stack item at once, joined by a separator (one per line, comma, or space).
+    func pasteStack(separator: Separator) {
+        let texts = stack.map(\.text)
+        guard !texts.isEmpty else { return }
+        monitor.restore(Merge.join(texts, separator: separator))
+        stack.removeAll(); stackOn = false
+    }
+
     func applicationWillTerminate(_ n: Notification) {
+        runFolderSync()
         PickerController.cleanPreviews()
         if monitor?.settings.clearOnQuit == true { try? store.clear(keepPinned: true) }
     }
@@ -182,6 +204,12 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
         let m = NSMenu()
         m.addItem(item(stackOn ? "Stop collecting copies" : "Start collecting copies", #selector(toggleStack)))
         m.addItem(item("Paste next (\(stack.count) waiting)", #selector(pasteNextStack), enabled: !stack.isEmpty))
+        m.addItem(.separator())
+        for sep in [Separator.newline, .comma, .space] {
+            let it = item("Paste all, \(sep.title.lowercased())", #selector(pasteAllStack(_:)), enabled: !stack.isEmpty)
+            it.representedObject = sep.rawValue
+            m.addItem(it)
+        }
         m.addItem(item("Clear stack", #selector(clearStack), enabled: !stack.isEmpty))
         return m
     }
@@ -263,6 +291,10 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
         if AXIsProcessTrusted() { DispatchQueue.main.asyncAfter(deadline: .now() + 0.12) { PickerController.sendPasteShortcut() } }
     }
     @objc func clearStack() { stack.removeAll(); stackOn = false }
+    @objc func pasteAllStack(_ sender: NSMenuItem) {
+        guard let raw = sender.representedObject as? String, let sep = Separator(rawValue: raw) else { return }
+        pasteStack(separator: sep)
+    }
     @objc func screenshot() { Screenshot.captureArea() }
 
     /// File ▸ Export History…: a JSON file of text, tags and favourites, saved privately.

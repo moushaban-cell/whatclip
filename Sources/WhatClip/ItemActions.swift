@@ -29,6 +29,32 @@ enum ItemActions {
         return out
     }
 
+    /// "Run action" items for a text item: each of the person's own actions. The output becomes a new item.
+    static func actionItems(for item: ClipItem, actions: [UserAction], store: ClipStore, changed: @escaping () -> Void) -> [NSMenuItem] {
+        guard item.kind == .text || item.kind == .url || item.kind == .richText, !actions.isEmpty else { return [] }
+        let parent = NSMenuItem(title: "Run action", action: nil, keyEquivalent: "")
+        let sub = NSMenu()
+        for act in actions {
+            let a = ItemAction {
+                Task { @MainActor in
+                    switch await ActionRunner.run(command: act.command, input: item.text) {
+                    case .success(let out):
+                        let text = out.trimmingCharacters(in: .newlines)
+                        if !text.isEmpty { _ = try? store.add(text: text, sourceBundleID: item.sourceBundleID); changed() }
+                    case .failure:
+                        let alert = NSAlert(); alert.messageText = "The action “\(act.name)” did not finish"
+                        alert.informativeText = "Check the command in Settings. Nothing was added."; alert.runModal()
+                    }
+                }
+            }
+            let m = NSMenuItem(title: act.name, action: #selector(ItemAction.fire), keyEquivalent: "")
+            m.target = a; m.representedObject = a
+            sub.addItem(m)
+        }
+        parent.submenu = sub
+        return [parent]
+    }
+
     /// Edits the text of a text item in a sheet. A text that already exists in history is refused, with a message.
     static func editText(_ item: ClipItem, store: ClipStore, changed: @escaping () -> Void) {
         let alert = NSAlert()

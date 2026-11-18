@@ -107,3 +107,13 @@ import Foundation
         #expect(bad.autoPaste == true)
     }
 }
+
+@Suite struct NewSettings4Tests {
+    @Test func actionsSyncAndUpdateDefaults() throws {
+        #expect(WhatClipSettings.default.checkForUpdates == true && WhatClipSettings.default.syncFolder == "")
+        let back = try JSONDecoder().decode(WhatClipSettings.self, from: JSONEncoder().encode(WhatClipSettings.default))
+        #expect(back == WhatClipSettings.default)
+        let bad = try JSONDecoder().decode(WhatClipSettings.self, from: Data(#"{"checkForUpdates":"yes","language":"klingon"}"#.utf8))
+        #expect(bad.checkForUpdates == true && bad.language == "en")
+    }
+}

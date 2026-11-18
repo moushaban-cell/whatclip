@@ -26,6 +26,11 @@ final class SettingsWindowController: NSObject, NSWindowDelegate {
     private let encrypt = NSButton(checkboxWithTitle: "Encrypt stored images and files (key kept in your Keychain)", target: nil, action: nil)
     private let touchID = NSButton(checkboxWithTitle: "Ask for Touch ID or my Mac password before opening the main app", target: nil, action: nil)
     private let autoPaste = NSButton(checkboxWithTitle: "Paste automatically after I choose an item (needs Accessibility)", target: nil, action: nil)
+    private let actionsView = NSTextView()
+    private let actionsScroll = NSScrollView()
+    private let syncField = NSTextField()
+    private let chooseSync = NSButton(title: "Choose folder…", target: nil, action: nil)
+    private let updates = NSButton(checkboxWithTitle: "Check once a day for a new version (one request to GitHub, no personal data)", target: nil, action: nil)
     private let loginItem = NSButton(checkboxWithTitle: "Start WhatClip when I log in", target: nil, action: nil)
     private let ocr = NSButton(checkboxWithTitle: "Read text in copied images on this Mac (searchable)", target: nil, action: nil)
     private let status = NSTextField(labelWithString: "")
@@ -72,6 +77,15 @@ final class SettingsWindowController: NSObject, NSWindowDelegate {
         func row(_ t: String, _ v: NSView) -> NSStackView { let r = NSStackView(views: [NSTextField(labelWithString: t), v]); r.spacing = 10; return r }
         excluded.isRichText = false; excluded.font = .monospacedSystemFont(ofSize: 12, weight: .regular); excluded.isAutomaticQuoteSubstitutionEnabled = false
         excluded.setAccessibilityLabel("Excluded apps, bundle identifiers")
+        actionsView.isVerticallyResizable = true; actionsView.isHorizontallyResizable = false; actionsView.autoresizingMask = [.width]
+        actionsView.textContainer?.widthTracksTextView = true; actionsView.font = .monospacedSystemFont(ofSize: 12, weight: .regular)
+        actionsView.isAutomaticQuoteSubstitutionEnabled = false; actionsView.textColor = .labelColor; actionsView.backgroundColor = .textBackgroundColor
+        actionsScroll.documentView = actionsView; actionsScroll.hasVerticalScroller = true; actionsScroll.borderType = .bezelBorder
+        actionsScroll.heightAnchor.constraint(equalToConstant: 80).isActive = true
+        actionsScroll.widthAnchor.constraint(greaterThanOrEqualToConstant: 380).isActive = true
+        syncField.placeholderString = "No folder chosen (sync is off)"; syncField.isEditable = false
+        syncField.widthAnchor.constraint(greaterThanOrEqualToConstant: 300).isActive = true
+        chooseSync.target = self; chooseSync.action = #selector(pickSyncFolder)
         // Size the text to the box, so the list shows (a text view needs this to lay out inside a scroll view).
         excluded.isVerticallyResizable = true; excluded.isHorizontallyResizable = false; excluded.autoresizingMask = [.width]
         excluded.textContainer?.widthTracksTextView = true; excluded.textContainerInset = NSSize(width: 6, height: 6)
@@ -95,7 +109,11 @@ final class SettingsWindowController: NSObject, NSWindowDelegate {
             shortcutStatus,
             label("Look and behaviour"),
             row("Appearance", appearancePop), row("Open the picker", placementPop),
-            autoPaste, showInDock, fuzzy, clearOnQuit, loginItem,
+            autoPaste, showInDock, fuzzy, clearOnQuit, loginItem, updates,
+            label("Your actions (one per line: Name | shell command)"), actionsScroll,
+            hint("A command receives the item's text on standard input. Its output becomes a new item. Actions run only when you choose them."),
+            label("Optional sync through a folder"), NSStackView(views: [syncField, chooseSync]),
+            hint("Pick a folder, for example in iCloud Drive. WhatClip keeps a copy of your text history there and merges the others. No account needed."),
             label("Screen recording"),
             row("GIF length", gifSecondsPop), row("GIF frames per second", gifFPSPop),
         ])
@@ -138,6 +156,11 @@ final class SettingsWindowController: NSObject, NSWindowDelegate {
         root.translatesAutoresizingMaskIntoConstraints = false
         rootView = root
         NSLayoutConstraint.activate([tabs.widthAnchor.constraint(equalTo: root.widthAnchor), bar.widthAnchor.constraint(equalTo: root.widthAnchor)])
+    }
+
+    /// Picks the sync folder with a standard dialog.
+    @objc private func pickSyncFolder() {
+        if let path = FolderSync.chooseFolder() { syncField.stringValue = path }
     }
 
     /// Records the next key combination with Command, Option or Control, and saves it as the picker shortcut.
@@ -195,6 +218,9 @@ final class SettingsWindowController: NSObject, NSWindowDelegate {
         placementPop.removeAllItems(); placementPop.addItems(withTitles: PopupPlacement.allCases.map(\.title))
         placementPop.selectItem(at: PopupPlacement.allCases.firstIndex(of: s.popupPlacement) ?? 0)
         showInDock.state = s.showInDock ? .on : .off
+        actionsView.string = s.actionsText
+        syncField.stringValue = s.syncFolder
+        updates.state = s.checkForUpdates ? .on : .off
         autoPaste.state = s.autoPaste ? .on : .off
         clearOnQuit.state = s.clearOnQuit ? .on : .off; fuzzy.state = s.fuzzySearch ? .on : .off
         ignoredField.stringValue = s.ignoredPatterns.joined(separator: "  ")
@@ -213,6 +239,9 @@ final class SettingsWindowController: NSObject, NSWindowDelegate {
         s.appearance = AppearanceChoice.allCases[max(0, appearancePop.indexOfSelectedItem)]
         s.popupPlacement = PopupPlacement.allCases[max(0, placementPop.indexOfSelectedItem)]
         s.showInDock = showInDock.state == .on
+        s.actionsText = actionsView.string
+        s.syncFolder = syncField.stringValue
+        s.checkForUpdates = updates.state == .on
         s.autoPaste = autoPaste.state == .on
         s.gifSeconds = [3, 5, 10, 15][max(0, gifSecondsPop.indexOfSelectedItem)]
         s.gifFramesPerSecond = [5, 8, 12, 15][max(0, gifFPSPop.indexOfSelectedItem)]
