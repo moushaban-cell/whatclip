@@ -149,10 +149,11 @@ final class HistoryWindowController: NSObject, NSTableViewDataSource, NSTableVie
             guard let self else { return }
             self.list.selectRowIndexes([index], byExtendingSelection: false)
         }
+        // The toolbar (search and List/Cards) stays at the top; the items take the rest of the pane.
         let listArea = NSStackView(views: [listScroll, shelf.scroll]); listArea.orientation = .vertical; listArea.distribution = .fillEqually
-        let listPane = NSStackView(views: [NSStackView(views: [search, viewMode]), listArea]); listPane.orientation = .vertical; listPane.spacing = 6
+        listArea.setHuggingPriority(.defaultLow, for: .vertical)
+        let listPane = ListPaneView(search: search, mode: viewMode, body: listArea)
         listPaneRef = listPane
-        listPane.edgeInsets = NSEdgeInsets(top: 10, left: 8, bottom: 8, right: 8)
         listPane.widthAnchor.constraint(greaterThanOrEqualToConstant: 240).isActive = true
         // Three panes placed by hand: sections (fixed width), items (fixed width), details (takes the rest).
         // A plain layout keeps each pane exactly where it belongs, including when Settings replaces the list.
@@ -574,6 +575,7 @@ final class PaneLayout: NSView {
     private let panes: [NSView]
     private let widths: [CGFloat?]
     private let divider: CGFloat = 1
+    private var dividers: [NSView] = []
 
     init(panes: [NSView], widths: [CGFloat?]) {
         self.panes = panes; self.widths = widths
@@ -584,30 +586,65 @@ final class PaneLayout: NSView {
 
     override var isFlipped: Bool { true }
 
+    /// Panes run from the leading edge: left to right normally, right to left in Arabic (the list follows the language).
     override func layout() {
         super.layout()
-        let visible = panes.filter { !$0.isHidden }
-        var x: CGFloat = 0
-        for (i, pane) in panes.enumerated() {
-            if pane.isHidden { continue }
-            let isLast = pane === visible.last
-            let w: CGFloat = isLast ? max(0, bounds.width - x) : (widths[i] ?? 0)
-            pane.frame = NSRect(x: x, y: 0, width: w, height: bounds.height)
-            x += w + divider
-            if !isLast { addDividerIfNeeded(after: pane, at: x - divider) }
+        let rtl = userInterfaceLayoutDirection == .rightToLeft
+        let visible = panes.enumerated().filter { !$0.element.isHidden }
+        let fixed = visible.dropLast().map { widths[$0.offset] ?? 0 }
+        let gaps = CGFloat(max(0, visible.count - 1)) * divider
+        let remainder = max(0, bounds.width - fixed.reduce(0, +) - gaps)
+        let sizes = fixed + [remainder]
+        var edge: CGFloat = rtl ? bounds.width : 0      // leading edge of the next pane
+        for (k, item) in visible.enumerated() {
+            let w = sizes[k]
+            let x = rtl ? edge - w : edge
+            item.element.frame = NSRect(x: x, y: 0, width: w, height: bounds.height)
+            edge = rtl ? x - divider : x + w + divider
+            if k < visible.count - 1 {
+                let dx = rtl ? x - divider : x + w
+                divider(at: k).frame = NSRect(x: dx, y: 0, width: divider, height: bounds.height)
+            }
         }
+        for (k, d) in dividers.enumerated() where k >= max(0, visible.count - 1) { d.isHidden = true }
     }
 
-    private var dividers: [NSView] = []
-    private func addDividerIfNeeded(after pane: NSView, at x: CGFloat) {
-        let d: NSView
-        if let existing = dividers.first(where: { $0.superview === self && $0.identifier?.rawValue == "\(panes.firstIndex(of: pane) ?? 0)" }) {
-            d = existing
-        } else {
-            d = NSView(); d.wantsLayer = true; d.layer?.backgroundColor = NSColor.separatorColor.cgColor
-            d.identifier = NSUserInterfaceItemIdentifier("\(panes.firstIndex(of: pane) ?? 0)")
-            addSubview(d); dividers.append(d)
-        }
-        d.frame = NSRect(x: x, y: 0, width: divider, height: bounds.height)
+    private func divider(at index: Int) -> NSView {
+        if index < dividers.count { dividers[index].isHidden = false; return dividers[index] }
+        let d = NSView(); d.wantsLayer = true; d.layer?.backgroundColor = NSColor.separatorColor.cgColor
+        addSubview(d); dividers.append(d)
+        return d
+    }
+}
+
+/// A vertical stack whose first view is at the top, whatever the window's coordinate system.
+final class TopDownStack: NSStackView {
+    override var isFlipped: Bool { true }
+}
+
+/// The item-list pane: the search field and the List/Cards control along the top, the items below.
+/// Placed by hand so the toolbar mirrors in Arabic: the control on the left, the search field filling the rest.
+final class ListPaneView: NSView {
+    private let search: NSView
+    private let mode: NSView
+    private let body: NSView
+    init(search: NSView, mode: NSView, body: NSView) {
+        self.search = search; self.mode = mode; self.body = body
+        super.init(frame: .zero)
+        addSubview(search); addSubview(mode); addSubview(body)
+    }
+    required init?(coder: NSCoder) { nil }
+    override var isFlipped: Bool { true }
+    override func layout() {
+        super.layout()
+        let rowHeight: CGFloat = 30, margin: CGFloat = 8, gap: CGFloat = 6
+        let rtl = Lang.isRightToLeft
+        let modeWidth = max(mode.intrinsicContentSize.width, 60)
+        let searchWidth = max(0, bounds.width - 2 * margin - modeWidth - gap)
+        let modeX = rtl ? margin : bounds.width - margin - modeWidth
+        let searchX = rtl ? margin + modeWidth + gap : margin
+        mode.frame = NSRect(x: modeX, y: 10, width: modeWidth, height: rowHeight)
+        search.frame = NSRect(x: searchX, y: 10, width: searchWidth, height: rowHeight)
+        body.frame = NSRect(x: 0, y: rowHeight + 18, width: bounds.width, height: max(0, bounds.height - rowHeight - 18))
     }
 }

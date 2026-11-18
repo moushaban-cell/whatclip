@@ -360,6 +360,14 @@ extension AppDelegate {
     }
 }
 
+// One copy only: if WhatClip is already running, the new copy brings the running one forward and quits.
+let runningCopies = NSRunningApplication.runningApplications(withBundleIdentifier: Bundle.main.bundleIdentifier ?? "app.whatclip.WhatClip")
+    .filter { $0.processIdentifier != ProcessInfo.processInfo.processIdentifier }
+if let first = runningCopies.first {
+    first.activate()
+    exit(0)
+}
+
 let app = NSApplication.shared
 let delegate = MainActor.assumeIsolated { AppDelegate() }
 app.delegate = delegate
