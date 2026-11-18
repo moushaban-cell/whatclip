@@ -7,7 +7,7 @@ import UniformTypeIdentifiers
 import WhatClipCore
 
 /// Records the main display for a few seconds and saves an animated GIF to the history and the clipboard.
-/// Needs the Screen Recording permission (macOS asks the first time). Not verified on this Mac yet: see docs/QA_MATRIX.md.
+/// Needs the Screen Recording permission (macOS asks the first time). Not verified on the owner's Mac yet..
 @MainActor
 final class GIFRecorder: NSObject, SCStreamOutput, SCStreamDelegate {
     private var stream: SCStream?
