@@ -69,7 +69,7 @@ final class PickerController: NSObject, NSSearchFieldDelegate, NSTableViewDataSo
         field.placeholderString = Lang.t("ui.a11y.search"); field.delegate = self; field.font = .systemFont(ofSize: 15)
         field.setAccessibilityLabel(Lang.t("ui.a11y.search"))
         filters.target = self; filters.action = #selector(filterChanged); filters.selectedSegment = 0
-        datePop.addItems(withTitles: ["Any time", "Last hour", "Today", "Last 7 days"]); datePop.target = self; datePop.action = #selector(reloadFromControl)
+        datePop.addItems(withTitles: [Lang.t("ui.date.any"), Lang.t("ui.date.hour"), Lang.t("ui.date.today"), Lang.t("ui.date.week")]); datePop.target = self; datePop.action = #selector(reloadFromControl)
         appPop.target = self; appPop.action = #selector(reloadFromControl); appPop.setAccessibilityLabel("Filter by app")
         datePop.setAccessibilityLabel(Lang.t("ui.a11y.date"))
         filters.segmentStyle = .texturedRounded
@@ -77,7 +77,7 @@ final class PickerController: NSObject, NSSearchFieldDelegate, NSTableViewDataSo
         let col = NSTableColumn(identifier: .init("row")); col.resizingMask = .autoresizingMask; table.addTableColumn(col)
         table.headerView = nil; table.dataSource = self; table.delegate = self; table.rowHeight = Design.rowHeight
         let rowMenu = NSMenu(); rowMenu.delegate = self; table.menu = rowMenu
-        table.target = self; table.doubleAction = #selector(doubleClicked); table.allowsMultipleSelection = true; table.setAccessibilityLabel("Clipboard items")
+        table.target = self; table.doubleAction = #selector(doubleClicked); table.allowsMultipleSelection = true; table.setAccessibilityLabel(Lang.t("ui.a11y.clipItems"))
         listScroll.documentView = table; listScroll.hasVerticalScroller = true; listScroll.borderType = .noBorder
         shelf.scroll.isHidden = true
         shelf.menuForItem = { [weak self] i in self?.contextMenu(forItem: i) }
@@ -96,7 +96,7 @@ final class PickerController: NSObject, NSSearchFieldDelegate, NSTableViewDataSo
         previewScroll.widthAnchor.constraint(greaterThanOrEqualToConstant: 280).isActive = true
 
         status.font = .systemFont(ofSize: 11); status.textColor = .secondaryLabelColor
-        let hint = NSTextField(labelWithString: "↩ paste  ·  ⇧↩ plain text  ·  ⌘1–9 pick  ·  ⌘D favourite  ·  ⌘⌫ delete  ·  More in the menu")
+        let hint = NSTextField(labelWithString: "↩ \(Lang.t("ui.hint.paste"))  ·  ⇧↩ \(Lang.t("ui.hint.plain"))  ·  ⌘1–9 \(Lang.t("ui.hint.pick"))  ·  ⌘D \(Lang.t("ui.hint.favourite"))  ·  ⌘⌫ \(Lang.t("ui.hint.delete"))  ·  \(Lang.t("ui.hint.more"))")
         hint.font = .systemFont(ofSize: 10); hint.textColor = .tertiaryLabelColor
 
         // The list and the empty state share one pane, so the empty state sits where the list would be.
@@ -121,6 +121,7 @@ final class PickerController: NSObject, NSSearchFieldDelegate, NSTableViewDataSo
         stack.translatesAutoresizingMaskIntoConstraints = false
         panel.contentView = stack
         stack.userInterfaceLayoutDirection = Lang.isRightToLeft ? .rightToLeft : .leftToRight
+        if Lang.isRightToLeft { mirrorForRTL(stack) }
         field.widthAnchor.constraint(equalTo: stack.widthAnchor, constant: -24).isActive = true
         body.widthAnchor.constraint(equalTo: stack.widthAnchor, constant: -24).isActive = true
         // The body grows with the window (340 is the starting height, not a fixed one).
@@ -224,7 +225,7 @@ final class PickerController: NSObject, NSSearchFieldDelegate, NSTableViewDataSo
         if !items.isEmpty { table.selectRowIndexes([0], byExtendingSelection: false) }
         updateEmptyState()
         updatePreview()
-        status.stringValue = (items.count == 1 ? "1 item" : "\(items.count) items") + (queue.isEmpty ? "" : " · stack: \(queue.count)")
+        status.stringValue = (items.count == 1 ? Lang.t("ui.items.one") : Lang.t("ui.items.many", ["n": "\(items.count)"])) + (queue.isEmpty ? "" : " " + Lang.t("ui.stackCount", ["n": "\(queue.count)"]))
     }
 
     func controlTextDidChange(_ obj: Notification) { reload() }

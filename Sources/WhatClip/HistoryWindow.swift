@@ -225,6 +225,9 @@ final class HistoryWindowController: NSObject, NSTableViewDataSource, NSTableVie
             let page = aboutPage()
             aboutScroll.documentView = page
             page.widthAnchor.constraint(equalTo: aboutScroll.contentView.widthAnchor).isActive = true
+            // As tall as the pane, so the scroll view does not centre the sections; they stay at the top.
+            let fill = page.heightAnchor.constraint(equalTo: aboutScroll.contentView.heightAnchor); fill.priority = .defaultHigh
+            fill.isActive = true
         }
         let plain = !isSettings && !isAbout
         previewScroll.isHidden = !plain
@@ -238,10 +241,12 @@ final class HistoryWindowController: NSObject, NSTableViewDataSource, NSTableVie
     private func aboutPage() -> NSView {
         let version = (Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String) ?? "0.2.0"
         func heading(_ s: String) -> NSTextField {
-            let f = NSTextField(labelWithString: s); f.font = .systemFont(ofSize: 13, weight: .semibold); f.textColor = .secondaryLabelColor; return f
+            let f = NSTextField(labelWithString: s); f.font = .systemFont(ofSize: 13, weight: .semibold); f.textColor = .secondaryLabelColor
+            f.setContentHuggingPriority(.defaultLow, for: .horizontal); return f
         }
         func body(_ s: String, weight: NSFont.Weight = .regular) -> NSTextField {
-            let f = NSTextField(wrappingLabelWithString: s); f.font = .systemFont(ofSize: 13, weight: weight); f.preferredMaxLayoutWidth = 520; return f
+            let f = NSTextField(wrappingLabelWithString: s); f.font = .systemFont(ofSize: 13, weight: weight); f.preferredMaxLayoutWidth = 520
+            f.setContentHuggingPriority(.defaultLow, for: .horizontal); return f
         }
         func link(_ title: String, _ action: Selector) -> NSButton {
             let b = NSButton(title: title, target: AboutActions.shared, action: action); b.bezelStyle = .inline; return b
@@ -411,10 +416,10 @@ final class HistoryWindowController: NSObject, NSTableViewDataSource, NSTableVie
         // Primary actions stay visible; everything else lives in one More menu, so the row never overflows.
         actions.addArrangedSubview(button(Lang.t("ui.copy"), #selector(copyItem)))
         actions.addArrangedSubview(button(i.pinned ? Lang.t("ui.unpin") : Lang.t("ui.pin"), #selector(togglePin)))
-        actions.addArrangedSubview(button(i.favorite ? "Unfavourite" : "Favourite", #selector(toggleFavorite)))
+        actions.addArrangedSubview(button(i.favorite ? Lang.t("ui.unfavourite") : Lang.t("ui.favourite"), #selector(toggleFavorite)))
         actions.addArrangedSubview(menuButton(Lang.t("ui.more"), moreMenu(i)))
         let n = list.selectedRowIndexes.count
-        let del = button(n > 1 ? "Delete \(n) items" : Lang.t("ui.delete"), #selector(deleteItem))
+        let del = button(n > 1 ? Lang.t("ui.deleteNItems", ["n": "\(n)"]) : Lang.t("ui.delete"), #selector(deleteItem))
         del.contentTintColor = .systemRed
         actions.addArrangedSubview(del)
     }

@@ -9,7 +9,7 @@ Everything you copy, searchable and one shortcut away. Stays on your Mac. No acc
 
 <p align="center">
   <a href="#install"><img alt="Install in one command" src="https://img.shields.io/badge/install-one%20command-14595F"></a>
-  <a href="LICENSE"><img alt="MIT licence" src="https://img.shields.io/badge/licence-MIT-F2B233"></a>
+  <a href="LICENSE"><img alt="PolyForm Noncommercial licence" src="https://img.shields.io/badge/licence-PolyForm%20Noncommercial-F2B233"></a>
   <img alt="macOS 14 or later" src="https://img.shields.io/badge/macOS-14%2B-14595F">
   <img alt="Swift 6" src="https://img.shields.io/badge/Swift-6-F2B233">
 </p>
@@ -115,6 +115,10 @@ Set `WHATCLIP_SIGN_ID` to the name of your local code-signing certificate to kee
 
 Issues and pull requests are welcome. Read [CONTRIBUTING.md](CONTRIBUTING.md) and [CODE_OF_CONDUCT.md](CODE_OF_CONDUCT.md). Report security problems privately as described in [SECURITY.md](SECURITY.md).
 
+## Support
+
+WhatClip is free for noncommercial use. If it helps you, you can support its development at [github.com/sponsors/moushaban-cell](https://github.com/sponsors/moushaban-cell).
+
 ## Licence and credits
 
-MIT licence, see [LICENSE](LICENSE). WhatClip was built after reading how other MIT clipboard managers work, including Maccy, Clipy, Flycut, FlowClip, pesty, ClipHistory, open-paste, Kelsiito/clipboard and clipflow. No code was copied from them. Third-party notices are in [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md).
+Free for any noncommercial use under the [PolyForm Noncommercial 1.0.0 licence](LICENSE). Commercial use needs a separate written licence from the copyright holder. Some included code is MIT-licensed; see [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md). WhatClip was built after reading how other MIT clipboard managers work, including Maccy, Clipy, Flycut, FlowClip, pesty, ClipHistory, open-paste, Kelsiito/clipboard and clipflow. No code was copied from them. Third-party notices are in [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md).
