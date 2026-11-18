@@ -71,6 +71,10 @@ final class SettingsWindowController: NSObject, NSWindowDelegate {
         func row(_ t: String, _ v: NSView) -> NSStackView { let r = NSStackView(views: [NSTextField(labelWithString: t), v]); r.spacing = 10; return r }
         excluded.isRichText = false; excluded.font = .monospacedSystemFont(ofSize: 12, weight: .regular); excluded.isAutomaticQuoteSubstitutionEnabled = false
         excluded.setAccessibilityLabel("Excluded apps, bundle identifiers")
+        // Size the text to the box, so the list shows (a text view needs this to lay out inside a scroll view).
+        excluded.isVerticallyResizable = true; excluded.isHorizontallyResizable = false; excluded.autoresizingMask = [.width]
+        excluded.textContainer?.widthTracksTextView = true; excluded.textContainerInset = NSSize(width: 6, height: 6)
+        excluded.backgroundColor = .textBackgroundColor; excluded.textColor = .labelColor
         let excludedScroll = NSScrollView(); excludedScroll.documentView = excluded; excludedScroll.hasVerticalScroller = true; excludedScroll.borderType = .bezelBorder
         excludedScroll.heightAnchor.constraint(equalToConstant: 96).isActive = true
         excludedScroll.widthAnchor.constraint(greaterThanOrEqualToConstant: 380).isActive = true
@@ -122,6 +126,8 @@ final class SettingsWindowController: NSObject, NSWindowDelegate {
             item.view = host; tabs.addTabViewItem(item)
         }
         tabs.setContentHuggingPriority(.defaultLow, for: .vertical)
+        // Testing aid: WHATCLIP_TAB=0|1|2 opens General, History or Privacy.
+        if let t = ProcessInfo.processInfo.environment["WHATCLIP_TAB"], let i = Int(t) { tabs.selectTabViewItem(at: i) }
 
         // Save bar: always visible under the tabs.
         let save = NSButton(title: "Save", target: self, action: #selector(saveTapped)); save.keyEquivalent = "\r"; save.bezelStyle = .rounded

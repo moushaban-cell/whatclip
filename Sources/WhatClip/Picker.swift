@@ -316,7 +316,9 @@ final class PickerController: NSObject, NSSearchFieldDelegate, NSTableViewDataSo
         let bytes: Data
         if let data = monitor.store.payloadData(for: i) {
             bytes = data
-            ext = i.kind == .gif ? "gif" : (i.payloadType == "public.png" ? "png" : (i.payloadType == "public.rtf" ? "rtf" : "tiff"))
+            // The file type follows the payload, so Quick Look opens it with the right viewer.
+            let byType = ["public.png": "png", "public.jpeg": "jpg", "public.tiff": "tiff", "public.rtf": "rtf", "public.html": "html", "com.compuserve.gif": "gif"]
+            ext = i.kind == .gif ? "gif" : (byType[i.payloadType ?? ""] ?? "bin")
         } else {
             bytes = Data(i.text.utf8); ext = "txt"
         }
