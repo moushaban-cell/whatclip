@@ -1,6 +1,9 @@
 import AppKit
 import WhatClipCore
 
+/// Actions the menu bar can call on the app delegate (kept here so the menu compiles on its own).
+@objc protocol MainAppActions { @objc func focusSearch() }
+
 /// The standard macOS menu bar for WhatClip, so Hide, Minimise, Close, Edit and the rest behave as people expect.
 /// Only WhatClip's own menus; nothing system-wide is changed.
 @MainActor
@@ -41,6 +44,7 @@ enum DesktopMenu {
         let view = NSMenu(title: "View")
         view.addItem(item("Clipboard Picker", pickerAction, key: "x", mods: [.command, .shift], target: target))
         view.addItem(item("History Window", historyAction, key: "0", target: target))
+        view.addItem(item("Find in History", #selector(MainAppActions.focusSearch), key: "f", target: target))
         view.addItem(.separator())
         let full = NSMenuItem(title: "Enter Full Screen", action: #selector(NSWindow.toggleFullScreen(_:)), keyEquivalent: "f")
         full.keyEquivalentModifierMask = [.command, .control]; view.addItem(full)
