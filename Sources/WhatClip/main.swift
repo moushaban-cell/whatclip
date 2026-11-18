@@ -285,7 +285,13 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
     @objc func pasteRecent(_ s: NSMenuItem) { if let i = s.representedObject as? ClipItem { monitor.restore(i) } }
     @objc func ignoreNext() { monitor.policy.ignoreNextCopy = true }
     @objc func lockHistory() { picker.close(); history.lockNow() }
-    @objc func clearHistory() { try? store.clear() }
+    /// Clears unpinned, unfavourited history after one confirmation. Pinned and favourite items are kept.
+    @objc func clearHistory() {
+        let alert = NSAlert(); alert.messageText = Lang.t("ui.clearConfirm")
+        alert.addButton(withTitle: Lang.t("ui.delete")); alert.addButton(withTitle: Lang.t("ui.cancel"))
+        guard alert.runModal() == .alertFirstButtonReturn else { return }
+        try? store.clear(); picker.refreshIfVisible(); history.refreshIfVisible()
+    }
     @objc func pause5() { monitor.pause(for: 300) }
     @objc func pause60() { monitor.pause(for: 3600) }
     @objc func pauseForever() { monitor.pause(for: nil) }
@@ -299,7 +305,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
         monitor.restore(stack.removeFirst())
         if AXIsProcessTrusted() { DispatchQueue.main.asyncAfter(deadline: .now() + 0.12) { PickerController.sendPasteShortcut() } }
     }
-    @objc func clearStack() { stack.removeAll(); stackOn = false }
+    /// Empties the stack. Collecting keeps running, so the next copies still join it.
+    @objc func clearStack() { stack.removeAll() }
     @objc func pasteAllStack(_ sender: NSMenuItem) {
         guard let raw = sender.representedObject as? String, let sep = Separator(rawValue: raw) else { return }
         pasteStack(separator: sep)

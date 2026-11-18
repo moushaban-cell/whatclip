@@ -75,4 +75,15 @@ import Foundation
         #expect(try s.boards().isEmpty)
         #expect(try s.list().map(\.text) == ["kept after board delete"])
     }
+
+    @Test func clearKeepsPinnedAndFavouriteItems() throws {
+        let s = try ClipStore()
+        let pinned = try s.add(text: "pinned one")
+        let fav = try s.add(text: "favourite one")
+        _ = try s.add(text: "plain one")
+        try s.setPinned(pinned.id, true)
+        try s.setFavorite(fav.id, true)
+        try s.clear()
+        #expect(Set(try s.list().map(\.text)) == ["pinned one", "favourite one"])
+    }
 }

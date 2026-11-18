@@ -340,6 +340,7 @@ extension Lang {
         "ui.hint.board": "board",
         "ui.board.noneYet": "No boards yet. Create one in the History window first.",
         "ui.capture.annotate": "Annotate",
+        "ui.clearConfirm": "Clear history? Pinned and favourite items are kept.",
     ]
     private static let uiL1: [String: String] = [
         "ui.editTextMore": "编辑文本…",
@@ -666,6 +667,7 @@ extension Lang {
         "ui.hint.board": "看板",
         "ui.board.noneYet": "还没有看板。请先在历史记录窗口中创建一个。",
         "ui.capture.annotate": "标注",
+        "ui.clearConfirm": "清空历史记录？置顶和收藏的项目会保留。",
     ]
     private static let uiL2: [String: String] = [
         "ui.editTextMore": "टेक्स्ट संपादित करें…",
@@ -992,6 +994,7 @@ extension Lang {
         "ui.hint.board": "बोर्ड",
         "ui.board.noneYet": "अभी कोई बोर्ड नहीं है। पहले इतिहास विंडो में एक बनाएँ।",
         "ui.capture.annotate": "एनोटेट करें",
+        "ui.clearConfirm": "इतिहास साफ़ करें? पिन और पसंदीदा आइटम रहेंगे।",
     ]
     private static let uiL3: [String: String] = [
         "ui.editTextMore": "Editar texto…",
@@ -1318,6 +1321,7 @@ extension Lang {
         "ui.hint.board": "tablero",
         "ui.board.noneYet": "Aún no hay tableros. Crea uno primero en la ventana de historial.",
         "ui.capture.annotate": "Anotar",
+        "ui.clearConfirm": "¿Borrar el historial? Se conservan los elementos fijados y favoritos.",
     ]
     private static let uiL4: [String: String] = [
         "ui.editTextMore": "Modifier le texte…",
@@ -1644,6 +1648,7 @@ extension Lang {
         "ui.hint.board": "tableau",
         "ui.board.noneYet": "Pas encore de tableau. Créez-en un d'abord dans la fenêtre d'historique.",
         "ui.capture.annotate": "Annoter",
+        "ui.clearConfirm": "Effacer l'historique ? Les éléments épinglés et favoris sont conservés.",
     ]
     private static let uiL5: [String: String] = [
         "ui.editTextMore": "تعديل النص…",
@@ -1970,6 +1975,7 @@ extension Lang {
         "ui.hint.board": "لوحة",
         "ui.board.noneYet": "لا توجد لوحات بعد. أنشئ لوحة أولاً من نافذة السجل.",
         "ui.capture.annotate": "تعليق",
+        "ui.clearConfirm": "مسح السجل؟ تبقى العناصر المثبتة والمفضلة.",
     ]
     private static let uiL6: [String: String] = [
         "ui.editTextMore": "টেক্সট সম্পাদনা করুন…",
@@ -2296,6 +2302,7 @@ extension Lang {
         "ui.hint.board": "বোর্ড",
         "ui.board.noneYet": "এখনও কোনো বোর্ড নেই। আগে ইতিহাস উইন্ডোতে একটি বোর্ড তৈরি করুন।",
         "ui.capture.annotate": "টীকা",
+        "ui.clearConfirm": "ইতিহাস মুছবেন? পিন করা ও পছন্দের আইটেম থাকবে।",
     ]
     private static let uiL7: [String: String] = [
         "ui.editTextMore": "Editar texto…",
@@ -2622,6 +2629,7 @@ extension Lang {
         "ui.hint.board": "quadro",
         "ui.board.noneYet": "Ainda não há quadros. Crie um primeiro na janela de histórico.",
         "ui.capture.annotate": "Anotar",
+        "ui.clearConfirm": "Limpar o histórico? Itens fixados e favoritos são mantidos.",
     ]
     private static let uiL8: [String: String] = [
         "ui.editTextMore": "Изменить текст…",
@@ -2948,6 +2956,7 @@ extension Lang {
         "ui.hint.board": "доска",
         "ui.board.noneYet": "Пока нет досок. Сначала создайте доску в окне истории.",
         "ui.capture.annotate": "Аннотировать",
+        "ui.clearConfirm": "Очистить историю? Закреплённые и избранные элементы сохранятся.",
     ]
     private static let uiL9: [String: String] = [
         "ui.editTextMore": "テキストを編集…",
@@ -3274,6 +3283,7 @@ extension Lang {
         "ui.hint.board": "ボード",
         "ui.board.noneYet": "まだボードがありません。先に履歴ウィンドウでボードを作成してください。",
         "ui.capture.annotate": "注釈",
+        "ui.clearConfirm": "履歴を消去しますか？ピン留めとお気に入りの項目は残ります。",
     ]
     private static let uiL10: [String: String] = [
         "ui.editTextMore": "Text bearbeiten…",
@@ -3600,5 +3610,6 @@ extension Lang {
         "ui.hint.board": "Board",
         "ui.board.noneYet": "Noch keine Boards. Lege zuerst eines im Verlauf-Fenster an.",
         "ui.capture.annotate": "Annotieren",
+        "ui.clearConfirm": "Verlauf löschen? Angeheftete und Favoriten bleiben erhalten.",
     ]
 }
