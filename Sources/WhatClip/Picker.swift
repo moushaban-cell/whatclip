@@ -122,7 +122,9 @@ final class PickerController: NSObject, NSSearchFieldDelegate, NSTableViewDataSo
         emptyHost.isHidden = true
         let body = NSStackView(views: [listPane, shelf.scroll, previewBox]); body.distribution = .fill; body.spacing = 1
         let filterRow = NSStackView(views: [filters, datePop, appPop, boardPop, cardsButton]); filterRow.spacing = 8
-        let stack = NSStackView(views: [field, filterRow, body, NSStackView(views: [status, hint])])
+        let footer = NSStackView(views: [status, hint])
+        filterRowView = filterRow; previewBoxView = previewBox; footerView = footer
+        let stack = NSStackView(views: [field, filterRow, body, footer])
         stack.orientation = .vertical; stack.alignment = .leading; stack.spacing = 8
         // Top inset clears the traffic-light buttons (close, minimise, zoom) that sit over the top edge.
         stack.edgeInsets = NSEdgeInsets(top: 34, left: 14, bottom: 12, right: 14)
@@ -137,6 +139,21 @@ final class PickerController: NSObject, NSSearchFieldDelegate, NSTableViewDataSo
         bodyHeight.priority = .defaultHigh; bodyHeight.isActive = true
         body.setContentHuggingPriority(.defaultLow, for: .vertical)
         body.setContentCompressionResistancePriority(.defaultLow, for: .vertical)
+        applyStyle()
+    }
+
+    /// Full: filters, previews, footer and the full-size panel. Compact: the search and a short list in a small panel.
+    func applyStyle() {
+        let compact = monitor.settings.pickerStyle == .compact
+        filterRowView?.isHidden = compact; previewBoxView?.isHidden = compact; footerView?.isHidden = compact
+        cardsButton.isHidden = compact
+        if compact {
+            panel.minSize = NSSize(width: 300, height: 240)
+            panel.setContentSize(NSSize(width: 360, height: 380))
+        } else {
+            panel.minSize = NSSize(width: 520, height: 340)
+            panel.setContentSize(NSSize(width: 680, height: 440))
+        }
     }
 
     var isVisible: Bool { panel.isVisible }
@@ -149,6 +166,7 @@ final class PickerController: NSObject, NSSearchFieldDelegate, NSTableViewDataSo
         lastOpened = Date()
         previousApp = NSWorkspace.shared.frontmostApplication
         field.stringValue = ""; filter = start; filters.selectedSegment = start.rawValue
+        applyStyle()   // the style can change in Settings between openings
         // The picker (⌘X) never asks for Touch ID: quick paste must stay one step. The lock guards the main app (history, Settings).
         locked = false
         place(anchor: anchor)
@@ -196,6 +214,10 @@ final class PickerController: NSObject, NSSearchFieldDelegate, NSTableViewDataSo
         }
         placing = true; panel.setFrameOrigin(origin); placing = false
     }
+
+    private var filterRowView: NSView?
+    private var previewBoxView: NSView?
+    private var footerView: NSView?
 
     private static let positionKey = "picker.origin"
     private var placing = false

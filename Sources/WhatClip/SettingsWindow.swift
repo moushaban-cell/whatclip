@@ -15,6 +15,7 @@ final class SettingsWindowController: NSObject, NSWindowDelegate {
     private let appearancePop = NSPopUpButton()
     private let languagePop = NSPopUpButton()
     private let placementPop = NSPopUpButton()
+    private let pickerStylePop = NSPopUpButton()
     private let gifSecondsPop = NSPopUpButton()
     private let gifFPSPop = NSPopUpButton()
     private let shortcutLabel = NSTextField(labelWithString: "")
@@ -112,6 +113,7 @@ final class SettingsWindowController: NSObject, NSWindowDelegate {
             label(Lang.t("ui.set.otherShortcuts")), otherShortcuts,
             label(Lang.t("ui.set.lookBehaviour")),
             row(Lang.t("ui.set.appearance"), appearancePop), row(Lang.t("ui.set.openPicker"), placementPop),
+            row(Lang.t("ui.set.pickerStyle"), pickerStylePop), hint(Lang.t("ui.set.pickerStyleHint")),
             row(Lang.t("ui.set.language"), languagePop), hint(Lang.t("ui.set.languageHint")),
             autoPaste, showInDock, fuzzy, clearOnQuit, loginItem, updates, watchShots,
             label(Lang.t("ui.set.actionsLabel")), actionsScroll,
@@ -291,6 +293,8 @@ final class SettingsWindowController: NSObject, NSWindowDelegate {
         languagePop.selectItem(at: Lang.names.firstIndex { $0.code == s.language } ?? 0)
         appearancePop.removeAllItems(); appearancePop.addItems(withTitles: AppearanceChoice.allCases.map { Lang.t("app." + $0.rawValue) })
         appearancePop.selectItem(at: AppearanceChoice.allCases.firstIndex(of: s.appearance) ?? 0)
+        pickerStylePop.removeAllItems(); pickerStylePop.addItems(withTitles: PickerStyle.allCases.map { Lang.t("style." + $0.rawValue) })
+        pickerStylePop.selectItem(at: PickerStyle.allCases.firstIndex(of: s.pickerStyle) ?? 0)
         placementPop.removeAllItems(); placementPop.addItems(withTitles: PopupPlacement.allCases.map { Lang.t("place." + $0.rawValue) })
         placementPop.selectItem(at: PopupPlacement.allCases.firstIndex(of: s.popupPlacement) ?? 0)
         showInDock.state = s.showInDock ? .on : .off
@@ -316,6 +320,7 @@ final class SettingsWindowController: NSObject, NSWindowDelegate {
         s.appearance = AppearanceChoice.allCases[max(0, appearancePop.indexOfSelectedItem)]
         s.language = Lang.names[max(0, languagePop.indexOfSelectedItem)].code
         s.popupPlacement = PopupPlacement.allCases[max(0, placementPop.indexOfSelectedItem)]
+        s.pickerStyle = PickerStyle.allCases[max(0, pickerStylePop.indexOfSelectedItem)]
         s.showInDock = showInDock.state == .on
         s.actionsText = actionsView.string
         s.syncFolder = syncField.stringValue

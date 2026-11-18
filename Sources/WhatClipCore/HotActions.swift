@@ -14,3 +14,8 @@ public enum HotAction: String, CaseIterable, Codable, Sendable {
     /// Whether the shortcut is saved in the picker fields rather than in actionShortcuts.
     public var usesPickerFields: Bool { self == .picker }
 }
+
+/// The picker's look: full (filters, previews and the footer) or compact (a small list, like the Windows clipboard).
+public enum PickerStyle: String, Codable, Sendable, CaseIterable {
+    case full, compact
+}

@@ -60,6 +60,8 @@ public struct WhatClipSettings: Sendable, Codable, Equatable {
     public var watchScreenshots: Bool
     /// Global shortcuts for actions other than the picker, keyed by HotAction raw value. Empty means none is set.
     public var actionShortcuts: [String: ActionShortcut] = [:]
+    /// How the picker opens: the full picker with filters and previews, or a compact list.
+    public var pickerStyle: PickerStyle = .full
 
     public static let supportedLanguages = ["en", "zh-Hans", "hi", "es", "fr", "ar", "bn", "pt", "ru", "ja", "de"]
 
@@ -75,8 +77,8 @@ public struct WhatClipSettings: Sendable, Codable, Equatable {
                 fuzzySearch: Bool = true, ignoredPatterns: [String] = [], onboardingDone: Bool = false, showInDock: Bool = true,
                 gifSeconds: Int = 5, gifFramesPerSecond: Int = 8, hotKeyCode: Int = 7, hotKeyModifiers: Int = 256, autoPaste: Bool = true, language: String = "en",
                 actionsText: String = "", syncFolder: String = "", checkForUpdates: Bool = true, watchScreenshots: Bool = true,
-                actionShortcuts: [String: ActionShortcut] = [:]) {
-        self.actionShortcuts = actionShortcuts; self.actionsText = actionsText; self.syncFolder = syncFolder; self.checkForUpdates = checkForUpdates; self.watchScreenshots = watchScreenshots
+                actionShortcuts: [String: ActionShortcut] = [:], pickerStyle: PickerStyle = .full) {
+        self.pickerStyle = pickerStyle; self.actionShortcuts = actionShortcuts; self.actionsText = actionsText; self.syncFolder = syncFolder; self.checkForUpdates = checkForUpdates; self.watchScreenshots = watchScreenshots
         self.language = language; self.autoPaste = autoPaste; self.gifSeconds = gifSeconds; self.gifFramesPerSecond = gifFramesPerSecond; self.hotKeyCode = hotKeyCode; self.hotKeyModifiers = hotKeyModifiers
         self.showInDock = showInDock
         self.appearance = appearance; self.popupPlacement = popupPlacement; self.clearOnQuit = clearOnQuit
@@ -95,7 +97,7 @@ public struct WhatClipSettings: Sendable, Codable, Equatable {
 
     enum CodingKeys: String, CodingKey {
         case excludedBundleIDs, secretAction, secretLifetimeSeconds, retention, maxItems, encryptPayloads, requireTouchID, launchAtLogin, recognizeText
-        case appearance, popupPlacement, clearOnQuit, fuzzySearch, ignoredPatterns, onboardingDone, showInDock, gifSeconds, gifFramesPerSecond, hotKeyCode, hotKeyModifiers, autoPaste, language, actionsText, actionShortcuts, syncFolder, checkForUpdates, watchScreenshots
+        case appearance, popupPlacement, clearOnQuit, fuzzySearch, ignoredPatterns, onboardingDone, showInDock, gifSeconds, gifFramesPerSecond, hotKeyCode, hotKeyModifiers, autoPaste, language, actionsText, actionShortcuts, syncFolder, checkForUpdates, watchScreenshots, pickerStyle
     }
 
     /// Tolerant: a missing or wrong field takes its default instead of failing the whole file.
@@ -129,7 +131,8 @@ public struct WhatClipSettings: Sendable, Codable, Equatable {
             syncFolder: (try? c?.decode(String.self, forKey: .syncFolder)) ?? d.syncFolder,
             checkForUpdates: (try? c?.decode(Bool.self, forKey: .checkForUpdates)) ?? d.checkForUpdates,
             watchScreenshots: (try? c?.decode(Bool.self, forKey: .watchScreenshots)) ?? d.watchScreenshots,
-            actionShortcuts: (try? c?.decode([String: ActionShortcut].self, forKey: .actionShortcuts)) ?? d.actionShortcuts)
+            actionShortcuts: (try? c?.decode([String: ActionShortcut].self, forKey: .actionShortcuts)) ?? d.actionShortcuts,
+            pickerStyle: (try? c?.decode(PickerStyle.self, forKey: .pickerStyle)) ?? d.pickerStyle)
     }
 
     /// Keeps numbers in sensible ranges and drops invalid bundle identifiers.

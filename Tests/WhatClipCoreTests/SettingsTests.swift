@@ -125,4 +125,13 @@ import Foundation
         let older = try JSONDecoder().decode(WhatClipSettings.self, from: Data("{}".utf8))
         #expect(older.actionShortcuts.isEmpty)
     }
+
+    @Test func pickerStyleRoundTripsAndDefaultsToFull() throws {
+        var s = WhatClipSettings.default
+        s.pickerStyle = .compact
+        let back = try JSONDecoder().decode(WhatClipSettings.self, from: JSONEncoder().encode(s))
+        #expect(back.pickerStyle == .compact)
+        let older = try JSONDecoder().decode(WhatClipSettings.self, from: Data("{}".utf8))
+        #expect(older.pickerStyle == .full)
+    }
 }

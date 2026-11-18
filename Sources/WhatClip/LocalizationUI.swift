@@ -347,6 +347,10 @@ extension Lang {
         "ui.hud.stackCleared": "Stack cleared. {n} items removed.",
         "ui.hud.pauseOn": "Capturing is paused.",
         "ui.hud.pauseOff": "Capturing is on again.",
+        "ui.set.pickerStyle": "Picker style",
+        "ui.set.pickerStyleHint": "Compact shows a small list near the cursor, like the Windows clipboard. Full shows filters and previews.",
+        "style.full": "Full: filters and previews",
+        "style.compact": "Compact: a small list",
     ]
     private static let uiL1: [String: String] = [
         "ui.editTextMore": "编辑文本…",
@@ -680,6 +684,10 @@ extension Lang {
         "ui.hud.stackCleared": "已清空队列，移除了 {n} 项。",
         "ui.hud.pauseOn": "已暂停记录复制内容。",
         "ui.hud.pauseOff": "已恢复记录复制内容。",
+        "ui.set.pickerStyle": "选择器样式",
+        "ui.set.pickerStyleHint": "紧凑会在光标附近显示小列表，类似 Windows 剪贴板。完整版显示筛选和预览。",
+        "style.full": "完整：筛选和预览",
+        "style.compact": "紧凑：小列表",
     ]
     private static let uiL2: [String: String] = [
         "ui.editTextMore": "टेक्स्ट संपादित करें…",
@@ -1013,6 +1021,10 @@ extension Lang {
         "ui.hud.stackCleared": "स्टैक खाली किया गया। {n} आइटम हटाए गए।",
         "ui.hud.pauseOn": "कॉपी दर्ज करना रोका गया है।",
         "ui.hud.pauseOff": "कॉपी दर्ज करना फिर से चालू है।",
+        "ui.set.pickerStyle": "पिकर शैली",
+        "ui.set.pickerStyleHint": "कॉम्पैक्ट कर्सर के पास एक छोटी सूची दिखाता है, जैसे Windows क्लिपबोर्ड। पूर्ण में फ़िल्टर और पूर्वावलोकन दिखते हैं।",
+        "style.full": "पूर्ण: फ़िल्टर और पूर्वावलोकन",
+        "style.compact": "कॉम्पैक्ट: छोटी सूची",
     ]
     private static let uiL3: [String: String] = [
         "ui.editTextMore": "Editar texto…",
@@ -1346,6 +1358,10 @@ extension Lang {
         "ui.hud.stackCleared": "Pila vaciada. Se quitaron {n} elementos.",
         "ui.hud.pauseOn": "La captura está en pausa.",
         "ui.hud.pauseOff": "La captura vuelve a estar activa.",
+        "ui.set.pickerStyle": "Estilo del selector",
+        "ui.set.pickerStyleHint": "Compacto muestra una lista pequeña junto al cursor, como el portapapeles de Windows. Completo muestra filtros y vistas previas.",
+        "style.full": "Completo: filtros y vistas previas",
+        "style.compact": "Compacto: lista pequeña",
     ]
     private static let uiL4: [String: String] = [
         "ui.editTextMore": "Modifier le texte…",
@@ -1679,6 +1695,10 @@ extension Lang {
         "ui.hud.stackCleared": "Pile vidée. {n} éléments supprimés.",
         "ui.hud.pauseOn": "La capture est en pause.",
         "ui.hud.pauseOff": "La capture a repris.",
+        "ui.set.pickerStyle": "Style du sélecteur",
+        "ui.set.pickerStyleHint": "Compact affiche une petite liste près du curseur, comme le presse-papiers de Windows. Complet affiche les filtres et les aperçus.",
+        "style.full": "Complet : filtres et aperçus",
+        "style.compact": "Compact : petite liste",
     ]
     private static let uiL5: [String: String] = [
         "ui.editTextMore": "تعديل النص…",
@@ -2012,6 +2032,10 @@ extension Lang {
         "ui.hud.stackCleared": "تم مسح المكدس. أُزيلت {n} عناصر.",
         "ui.hud.pauseOn": "التقاط النُّسخ متوقف مؤقتًا.",
         "ui.hud.pauseOff": "استؤنف التقاط النُّسخ.",
+        "ui.set.pickerStyle": "نمط المنتقي",
+        "ui.set.pickerStyleHint": "المضغوط يعرض قائمة صغيرة قرب المؤشر، مثل حافظة Windows. الكامل يعرض عوامل التصفية والمعاينات.",
+        "style.full": "الكامل: عوامل التصفية والمعاينات",
+        "style.compact": "المضغوط: قائمة صغيرة",
     ]
     private static let uiL6: [String: String] = [
         "ui.editTextMore": "টেক্সট সম্পাদনা করুন…",
@@ -2345,6 +2369,10 @@ extension Lang {
         "ui.hud.stackCleared": "স্ট্যাক খালি। {n}টি আইটেম সরানো হয়েছে।",
         "ui.hud.pauseOn": "কপি রেকর্ড বিরতিতে আছে।",
         "ui.hud.pauseOff": "কপি রেকর্ড আবার চালু।",
+        "ui.set.pickerStyle": "পিকার ধরন",
+        "ui.set.pickerStyleHint": "কমপ্যাক্ট কার্সরের কাছে একটি ছোট তালিকা দেখায়, Windows ক্লিপবোর্ডের মতো। পূর্ণে ফিল্টার ও প্রিভিউ থাকে।",
+        "style.full": "পূর্ণ: ফিল্টার ও প্রিভিউ",
+        "style.compact": "কমপ্যাক্ট: ছোট তালিকা",
     ]
     private static let uiL7: [String: String] = [
         "ui.editTextMore": "Editar texto…",
@@ -2678,6 +2706,10 @@ extension Lang {
         "ui.hud.stackCleared": "Pilha limpa. {n} itens removidos.",
         "ui.hud.pauseOn": "A captura está pausada.",
         "ui.hud.pauseOff": "A captura foi retomada.",
+        "ui.set.pickerStyle": "Estilo do seletor",
+        "ui.set.pickerStyleHint": "Compacto mostra uma lista pequena perto do cursor, como a área de transferência do Windows. Completo mostra filtros e pré-visualizações.",
+        "style.full": "Completo: filtros e pré-visualizações",
+        "style.compact": "Compacto: lista pequena",
     ]
     private static let uiL8: [String: String] = [
         "ui.editTextMore": "Изменить текст…",
@@ -3011,6 +3043,10 @@ extension Lang {
         "ui.hud.stackCleared": "Стек очищен. Удалено элементов: {n}.",
         "ui.hud.pauseOn": "Запись копий приостановлена.",
         "ui.hud.pauseOff": "Запись копий возобновлена.",
+        "ui.set.pickerStyle": "Вид выбора",
+        "ui.set.pickerStyleHint": "Компактный показывает небольшой список у курсора, как буфер обмена Windows. Полный показывает фильтры и предпросмотр.",
+        "style.full": "Полный: фильтры и предпросмотр",
+        "style.compact": "Компактный: небольшой список",
     ]
     private static let uiL9: [String: String] = [
         "ui.editTextMore": "テキストを編集…",
@@ -3344,6 +3380,10 @@ extension Lang {
         "ui.hud.stackCleared": "スタックを空にしました。{n} 件を削除しました。",
         "ui.hud.pauseOn": "コピーの記録を一時停止しました。",
         "ui.hud.pauseOff": "コピーの記録を再開しました。",
+        "ui.set.pickerStyle": "ピッカーの表示",
+        "ui.set.pickerStyleHint": "コンパクトは Windows のクリップボードのように、カーソル付近に小さなリストを表示します。フルはフィルタとプレビューを表示します。",
+        "style.full": "フル：フィルタとプレビュー",
+        "style.compact": "コンパクト：小さなリスト",
     ]
     private static let uiL10: [String: String] = [
         "ui.editTextMore": "Text bearbeiten…",
@@ -3677,5 +3717,9 @@ extension Lang {
         "ui.hud.stackCleared": "Stapel geleert. {n} Einträge entfernt.",
         "ui.hud.pauseOn": "Erfassung ist pausiert.",
         "ui.hud.pauseOff": "Erfassung läuft wieder.",
+        "ui.set.pickerStyle": "Auswahl-Stil",
+        "ui.set.pickerStyleHint": "Kompakt zeigt eine kleine Liste am Mauszeiger, wie die Windows-Zwischenablage. Vollständig zeigt Filter und Vorschau.",
+        "style.full": "Vollständig: Filter und Vorschau",
+        "style.compact": "Kompakt: kleine Liste",
     ]
 }
