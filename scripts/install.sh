@@ -8,4 +8,4 @@ cd "$(dirname "$0")/.."
 ./scripts/build-app.sh
 rm -rf /Applications/WhatClip.app
 cp -R build/WhatClip.app /Applications/WhatClip.app
-echo "Installed to /Applications/WhatClip.app. Open it, then press ⇧⌘V to see your history."
+echo "Installed to /Applications/WhatClip.app. Open it, then press ⌘X to see your history."
