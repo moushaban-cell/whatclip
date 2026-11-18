@@ -4,7 +4,7 @@ import WhatClipCore
 /// The full history window: sidebar (filters, boards, snippets), the list, a preview and actions on the selected item.
 @MainActor
 final class HistoryWindowController: NSObject, NSTableViewDataSource, NSTableViewDelegate, NSSearchFieldDelegate, NSMenuDelegate {
-    enum Section: Equatable { case header, all, library, pinned, text, links, images, files, textInImages, board(Int64), snippets, settings, about, tools }
+    enum Section: Equatable { case header, all, library, pinned, text, links, images, files, textInImages, board(Int64), addBoard, snippets, settings, about, tools }
 
     private let window: NSWindow
     private let store: ClipStore
@@ -187,18 +187,18 @@ final class HistoryWindowController: NSObject, NSTableViewDataSource, NSTableVie
 
     // MARK: sidebar
 
-    /// The sidebar in groups: History, Library, Boards, Tools. Headers are shown but cannot be selected.
+    /// The sidebar in groups: History (what was copied), Library (saved things), Boards, Tools, App.
+    /// Headers are shown but cannot be selected. "New board" is always the last row of Boards.
     func reloadSidebar() {
         var s: [(String, Section)] = [(Lang.t("ui.history"), .header), (Lang.t("ui.allItems"), .all), (Lang.t("ui.pinned"), .pinned), (Lang.t("ui.text"), .text), (Lang.t("ui.links"), .links),
                                       (Lang.t("ui.imagesGifs"), .images), (Lang.t("ui.files"), .files), (Lang.t("ui.textInImages"), .textInImages),
-                                      (Lang.t("ui.library"), .header), (Lang.t("ui.favourites"), .library)]
+                                      (Lang.t("ui.library"), .header), (Lang.t("ui.favourites"), .library), (Lang.t("ui.snippets"), .snippets)]
         let boards = (try? store.boards()) ?? []
         s.append((Lang.t("ui.boards"), .header))
         for b in boards { s.append((b.name, .board(b.id))) }
-        if boards.isEmpty { s.append((Lang.t("ui.noBoards"), .header)) }
+        s.append(("+ " + Lang.t("ui.newBoard"), .addBoard))
         s.append((Lang.t("ui.tools"), .header))
         s.append((Lang.t("ui.tools.page"), .tools))
-        s.append((Lang.t("ui.snippets"), .snippets))
         s.append((Lang.t("ui.app"), .header))
         s.append((Lang.t("ui.settings"), .settings))
         s.append((Lang.t("ui.about"), .about))
@@ -312,7 +312,7 @@ final class HistoryWindowController: NSObject, NSTableViewDataSource, NSTableVie
         case .board(let id): items = ((try? store.items(onBoard: id)) ?? []).filter { search.stringValue.isEmpty || $0.text.localizedCaseInsensitiveContains(search.stringValue) }
         case .library: items = (try? store.list(query: search.stringValue, limit: 1000, filter: .init(favoritesOnly: true))) ?? []
         case .textInImages: items = (try? store.list(query: search.stringValue, limit: 1000, filter: .init(hasText: true))) ?? []
-        case .snippets, .header, .settings, .about, .tools: break
+        case .snippets, .header, .addBoard, .settings, .about, .tools: break
         }
         list.reloadData()
         if viewMode.selectedSegment == 1 { shelf.reload(items, store: store) }
@@ -333,14 +333,24 @@ final class HistoryWindowController: NSObject, NSTableViewDataSource, NSTableVie
                 h.font = .systemFont(ofSize: 11, weight: .semibold); h.textColor = .secondaryLabelColor
                 h.lineBreakMode = .byTruncatingTail
                 h.alignment = Lang.isRightToLeft ? .right : .left
-                return h
+                // Sit the heading on the bottom of its row, so it belongs to the group below it.
+                let holder = NSView(); h.translatesAutoresizingMaskIntoConstraints = false
+                holder.addSubview(h)
+                NSLayoutConstraint.activate([
+                    h.leadingAnchor.constraint(equalTo: holder.leadingAnchor, constant: 2),
+                    h.trailingAnchor.constraint(lessThanOrEqualTo: holder.trailingAnchor),
+                    h.bottomAnchor.constraint(equalTo: holder.bottomAnchor, constant: -4),
+                ])
+                return holder
             }
             let l = NSTextField(labelWithString: "")
             let out = NSMutableAttributedString()
             if case .board(let id) = sec, let b = (try? store.boards())?.first(where: { $0.id == id }) {
                 out.append(NSAttributedString(string: "● ", attributes: [.foregroundColor: Self.colour(b.colorName), .font: NSFont.systemFont(ofSize: 13)]))
             }
-            out.append(NSAttributedString(string: title, attributes: [.font: NSFont.systemFont(ofSize: 13)]))
+            let isAdd = sec == .addBoard
+            out.append(NSAttributedString(string: title, attributes: [
+                .font: NSFont.systemFont(ofSize: 13), .foregroundColor: isAdd ? NSColor.secondaryLabelColor : NSColor.labelColor]))
             // Arabic: the item text starts from the right, like the rest of the window.
             let paragraph = NSMutableParagraphStyle(); paragraph.alignment = Lang.isRightToLeft ? .right : .left
             out.addAttribute(.paragraphStyle, value: paragraph, range: NSRange(location: 0, length: out.length))
@@ -381,12 +391,16 @@ final class HistoryWindowController: NSObject, NSTableViewDataSource, NSTableVie
     /// Sidebar rows are taller than the list rows; headers are short.
     func tableView(_ tableView: NSTableView, heightOfRow row: Int) -> CGFloat {
         guard tableView == sidebar else { return Design.rowHeight }
-        return sections[row].1 == .header ? 26 : 24
+        // Group headers get air above them, except the first one at the top of the sidebar.
+        if sections[row].1 == .header { return row == 0 ? 24 : 34 }
+        return 26
     }
 
     func tableViewSelectionDidChange(_ notification: Notification) {
         if (notification.object as? NSTableView) == sidebar {
             guard sidebar.selectedRow >= 0 else { return }
+            // The "+ New board" row opens the dialog and keeps the section that was open.
+            if sections[sidebar.selectedRow].1 == .addBoard { newBoard(); reloadSidebar(); return }
             section = sections[sidebar.selectedRow].1
             selectedSnippet = nil; reloadList(); return
         }
