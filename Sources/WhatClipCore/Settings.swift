@@ -48,19 +48,23 @@ public struct WhatClipSettings: Sendable, Codable, Equatable {
     public var hotKeyModifiers: Int
     /// After choosing an item, paste it into the app you were using (needs the Accessibility permission).
     public var autoPaste: Bool
+    /// Interface language code (for example "en", "es", "ar"). English is the default.
+    public var language: String
+
+    public static let supportedLanguages = ["en", "es", "fr", "de", "ar"]
 
     public static let `default` = WhatClipSettings(
         excludedBundleIDs: BundleIDList.defaultExcluded, secretAction: .expire,
         secretLifetimeSeconds: 60, retention: .quarter, maxItems: 500,
         encryptPayloads: false, requireTouchID: false, launchAtLogin: false, recognizeText: true,
-        appearance: .system, popupPlacement: .menuIcon, clearOnQuit: false, fuzzySearch: true, ignoredPatterns: [], onboardingDone: false, showInDock: true, gifSeconds: 5, gifFramesPerSecond: 8, hotKeyCode: 7, hotKeyModifiers: 768, autoPaste: true)
+        appearance: .system, popupPlacement: .menuIcon, clearOnQuit: false, fuzzySearch: true, ignoredPatterns: [], onboardingDone: false, showInDock: true, gifSeconds: 5, gifFramesPerSecond: 8, hotKeyCode: 7, hotKeyModifiers: 768, autoPaste: true, language: "en")
 
     public init(excludedBundleIDs: [String], secretAction: SecretAction, secretLifetimeSeconds: Double, retention: Retention, maxItems: Int,
                 encryptPayloads: Bool = false, requireTouchID: Bool = false, launchAtLogin: Bool = false, recognizeText: Bool = true,
                 appearance: AppearanceChoice = .system, popupPlacement: PopupPlacement = .menuIcon, clearOnQuit: Bool = false,
                 fuzzySearch: Bool = true, ignoredPatterns: [String] = [], onboardingDone: Bool = false, showInDock: Bool = true,
-                gifSeconds: Int = 5, gifFramesPerSecond: Int = 8, hotKeyCode: Int = 7, hotKeyModifiers: Int = 768, autoPaste: Bool = true) {
-        self.autoPaste = autoPaste; self.gifSeconds = gifSeconds; self.gifFramesPerSecond = gifFramesPerSecond; self.hotKeyCode = hotKeyCode; self.hotKeyModifiers = hotKeyModifiers
+                gifSeconds: Int = 5, gifFramesPerSecond: Int = 8, hotKeyCode: Int = 7, hotKeyModifiers: Int = 768, autoPaste: Bool = true, language: String = "en") {
+        self.language = language; self.autoPaste = autoPaste; self.gifSeconds = gifSeconds; self.gifFramesPerSecond = gifFramesPerSecond; self.hotKeyCode = hotKeyCode; self.hotKeyModifiers = hotKeyModifiers
         self.showInDock = showInDock
         self.appearance = appearance; self.popupPlacement = popupPlacement; self.clearOnQuit = clearOnQuit
         self.fuzzySearch = fuzzySearch; self.ignoredPatterns = ignoredPatterns; self.onboardingDone = onboardingDone
@@ -78,7 +82,7 @@ public struct WhatClipSettings: Sendable, Codable, Equatable {
 
     enum CodingKeys: String, CodingKey {
         case excludedBundleIDs, secretAction, secretLifetimeSeconds, retention, maxItems, encryptPayloads, requireTouchID, launchAtLogin, recognizeText
-        case appearance, popupPlacement, clearOnQuit, fuzzySearch, ignoredPatterns, onboardingDone, showInDock, gifSeconds, gifFramesPerSecond, hotKeyCode, hotKeyModifiers, autoPaste
+        case appearance, popupPlacement, clearOnQuit, fuzzySearch, ignoredPatterns, onboardingDone, showInDock, gifSeconds, gifFramesPerSecond, hotKeyCode, hotKeyModifiers, autoPaste, language
     }
 
     /// Tolerant: a missing or wrong field takes its default instead of failing the whole file.
@@ -106,12 +110,14 @@ public struct WhatClipSettings: Sendable, Codable, Equatable {
             gifFramesPerSecond: (try? c?.decode(Int.self, forKey: .gifFramesPerSecond)) ?? d.gifFramesPerSecond,
             hotKeyCode: (try? c?.decode(Int.self, forKey: .hotKeyCode)) ?? d.hotKeyCode,
             hotKeyModifiers: (try? c?.decode(Int.self, forKey: .hotKeyModifiers)) ?? d.hotKeyModifiers,
-            autoPaste: (try? c?.decode(Bool.self, forKey: .autoPaste)) ?? d.autoPaste)
+            autoPaste: (try? c?.decode(Bool.self, forKey: .autoPaste)) ?? d.autoPaste,
+            language: (try? c?.decode(String.self, forKey: .language)) ?? d.language)
     }
 
     /// Keeps numbers in sensible ranges and drops invalid bundle identifiers.
     public mutating func clamped() {
         secretLifetimeSeconds = min(max(secretLifetimeSeconds.isFinite ? secretLifetimeSeconds : 60, 10), 86_400)
+        if !Self.supportedLanguages.contains(language) { language = "en" }
         gifSeconds = min(max(gifSeconds, 2), 15)
         gifFramesPerSecond = [5, 8, 12, 15].contains(gifFramesPerSecond) ? gifFramesPerSecond : 8
         if hotKeyModifiers & 0x0F00 == 0 { hotKeyModifiers = 768 }   // a shortcut needs command or control or option

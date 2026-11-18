@@ -24,6 +24,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
     func applicationDidFinishLaunching(_ n: Notification) {
         // Every file this app creates is private to the user from the start.
         umask(0o077)
+        Lang.current = (try? SettingsStore(url: FileManager.default.urls(for: .applicationSupportDirectory, in: .userDomainMask)[0].appendingPathComponent("WhatClip/settings.json")).load().language) ?? "en"
         PickerController.cleanPreviews()
         let dir = ProcessInfo.processInfo.environment["WHATCLIP_DATA"].map { URL(fileURLWithPath: $0) }
             ?? FileManager.default.urls(for: .applicationSupportDirectory, in: .userDomainMask)[0].appendingPathComponent("WhatClip")
@@ -148,8 +149,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
 
     func menuNeedsUpdate(_ menu: NSMenu) {
         menu.removeAllItems()
-        add("Open clipboard picker   ⌘⇧V", #selector(openPicker))
-        add("Open history window", #selector(openHistory))
+        add(Lang.t("menu.openPicker") + "   ⇧⌘X", #selector(openPicker))
+        add(Lang.t("menu.openHistory"), #selector(openHistory))
         menu.addItem(.separator())
 
         let recent = (try? store.list(limit: 8)) ?? []
@@ -167,10 +168,10 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
         menu.addItem(.separator())
         add("Clear history (keeps pinned)", #selector(clearHistory))
         menu.addItem(.separator())
-        add("Settings…", #selector(openSettings))
+        add(Lang.t("menu.settings"), #selector(openSettings))
         add("Set up permissions…", #selector(openOnboarding))
         add("Help and about", #selector(openHelp))
-        add("Quit WhatClip", #selector(quit), key: "q")
+        add(Lang.t("menu.quit"), #selector(quit), key: "q")
     }
 
     private func stackMenu() -> NSMenu {

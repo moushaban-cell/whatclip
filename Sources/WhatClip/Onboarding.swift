@@ -45,6 +45,30 @@ final class OnboardingWindowController: NSObject {
         return stack
     }
 
+    private let languagePop = NSPopUpButton()
+
+    /// First page: the language. English is selected by default; the choice is saved and applied the next time WhatClip starts.
+    private func languagePage() -> NSView {
+        let icon = NSImageView(image: NSImage(systemSymbolName: "globe", accessibilityDescription: "Language") ?? NSImage())
+        icon.contentTintColor = Design.accent; icon.symbolConfiguration = NSImage.SymbolConfiguration(pointSize: 46, weight: .regular)
+        let head = NSTextField(labelWithString: Lang.t("tour.language.title")); head.font = .systemFont(ofSize: 22, weight: .semibold)
+        let body = NSTextField(wrappingLabelWithString: Lang.t("tour.language.body"))
+        body.font = .systemFont(ofSize: 14); body.textColor = .secondaryLabelColor; body.alignment = .center; body.preferredMaxLayoutWidth = 420
+        languagePop.removeAllItems(); languagePop.addItems(withTitles: Lang.names.map(\.name))
+        let current = monitor.settings.language
+        languagePop.selectItem(at: Lang.names.firstIndex { $0.code == current } ?? 0)
+        languagePop.target = self; languagePop.action = #selector(languageChosen)
+        let stack = NSStackView(views: [icon, head, body, languagePop])
+        stack.orientation = .vertical; stack.alignment = .centerX; stack.spacing = 14
+        return stack
+    }
+
+    @objc private func languageChosen() {
+        var s = monitor.settings
+        s.language = Lang.names[max(0, languagePop.indexOfSelectedItem)].code
+        try? monitor.update(s)
+    }
+
     private let shortcutLabel = NSTextField(labelWithString: "")
     private let recorder = ShortcutRecorder()
 
@@ -140,6 +164,7 @@ final class OnboardingWindowController: NSObject {
 
     private func build() {
         pages = [
+            languagePage(),
             tourPage(symbol: "doc.on.clipboard", title: "Everything you copy is kept",
                      body: "Text, links, images, GIFs and files. Copies from password managers are never recorded, and nothing leaves this Mac."),
             shortcutPage(),
