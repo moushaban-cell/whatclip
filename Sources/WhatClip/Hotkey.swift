@@ -15,7 +15,7 @@ final class HotKey {
     private(set) var lastStatus = "Not registered yet."
 
     /// Returns false when the shortcut is already taken by another app (or is not valid). The reason is in `lastStatus`.
-    func register(keyCode: UInt32 = UInt32(kVK_ANSI_V), modifiers: UInt32 = UInt32(cmdKey | shiftKey), action: @escaping () -> Void) -> Bool {
+    func register(keyCode: UInt32 = UInt32(kVK_ANSI_X), modifiers: UInt32 = UInt32(cmdKey | shiftKey), action: @escaping () -> Void) -> Bool {
         unregister()
         Self.handler = action
         if !Self.installed {

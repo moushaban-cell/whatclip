@@ -48,7 +48,7 @@ final class OnboardingWindowController: NSObject {
     private let shortcutLabel = NSTextField(labelWithString: "")
     private let recorder = ShortcutRecorder()
 
-    /// Choose the picker shortcut during the first launch. Default ⇧⌘V; change it any time in Settings too.
+    /// Choose the picker shortcut during the first launch. Default ⇧⌘X; change it any time in Settings too.
     private func shortcutPage() -> NSView {
         let icon = NSImageView(image: NSImage(systemSymbolName: "command", accessibilityDescription: "Shortcut") ?? NSImage())
         icon.contentTintColor = Design.accent; icon.symbolConfiguration = NSImage.SymbolConfiguration(pointSize: 46, weight: .regular)
